@@ -69,7 +69,7 @@ public class FloatWindowService extends Service {
 
         @Override
         public void run() {
-            boolean isHome = Utils.isHome((ActivityManager) getSystemService(Context.ACTIVITY_SERVICE), getPackageManager());
+            boolean isHome = Utils.isHome((ActivityManager) getSystemService(Context.ACTIVITY_SERVICE), getPackageName());
             // 当前界面是桌面，且没有悬浮窗显示，则创建悬浮窗。
             if (isHome && !floatManager.isWindowShowing()) {
                 handler.post(new Runnable() {
