@@ -6,12 +6,15 @@ import android.content.Context;
 import android.os.Build;
 import android.util.Log;
 
+import androidx.annotation.RequiresApi;
+
 import java.util.List;
 
 import static com.xl.pet.constants.Constants.LOG_TAG;
 
 public class Utils {
     // 判断是否在桌面
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
     public static boolean isHome(Context context) {
         String topActivity = "";
         //android5.0以上
@@ -35,7 +38,6 @@ public class Utils {
             }
             return "com.android.launcher3".equals(topActivity);
         }
-        Log.d(LOG_TAG,"版本过低无法判断是否回退桌面...");
         return true;
     }
 

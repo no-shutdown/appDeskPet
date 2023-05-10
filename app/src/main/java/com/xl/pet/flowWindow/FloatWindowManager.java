@@ -3,11 +3,9 @@ package com.xl.pet.flowWindow;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.os.Build;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.WindowManager;
 
-import com.xl.pet.constants.Constants;
 import com.xl.pet.flowWindow.pet.DefaultPet;
 
 public class FloatWindowManager {
@@ -46,8 +44,6 @@ public class FloatWindowManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //显示
-        Log.i(Constants.LOG_TAG,"show pet");
         windowManager.addView(person, layoutParams);
     }
 
@@ -75,8 +71,7 @@ public class FloatWindowManager {
     }
     private WindowManager getOrCreateWindowManager(Context context) {
         if (windowManager == null) {
-            windowManager = (WindowManager) context
-                    .getSystemService(Context.WINDOW_SERVICE);
+            windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         }
         return windowManager;
     }

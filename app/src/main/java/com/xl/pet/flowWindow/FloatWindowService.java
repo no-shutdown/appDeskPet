@@ -2,11 +2,13 @@ package com.xl.pet.flowWindow;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import com.xl.pet.utils.Utils;
 
@@ -67,6 +69,7 @@ public class FloatWindowService extends Service {
 
     class RefreshTask extends TimerTask {
 
+        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
         @Override
         public void run() {
             boolean isHome = Utils.isHome(getApplicationContext());
