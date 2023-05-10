@@ -36,7 +36,8 @@ public class Utils {
                 }
                 Log.d(LOG_TAG,"顶部activity"+topActivity);
             }
-            return "com.android.launcher3".equals(topActivity);
+            return "com.android.launcher3".equals(topActivity)
+                    || "com.google.android.apps.nexuslauncher".equals(topActivity);
         }
         return true;
     }
