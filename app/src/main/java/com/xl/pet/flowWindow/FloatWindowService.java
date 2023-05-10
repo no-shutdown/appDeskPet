@@ -1,8 +1,6 @@
 package com.xl.pet.flowWindow;
 
-import android.app.ActivityManager;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
@@ -10,11 +8,12 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import com.xl.pet.constants.Constants;
 import com.xl.pet.utils.Utils;
 
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static com.xl.pet.constants.Constants.LOG_TAG;
 
 public class FloatWindowService extends Service {
 
@@ -47,12 +46,13 @@ public class FloatWindowService extends Service {
             timer.scheduleAtFixedRate(new RefreshTask(), 0, 500);
         }
 
-        Log.i(Constants.LOG_TAG,"服务开启");
+        Log.i(LOG_TAG,"服务开启");
         return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
     public void onDestroy() {
+        Log.i(LOG_TAG,"服务关闭");
         super.onDestroy();
         // Service被终止的同时也停止定时器继续运行
         if (timer != null){
@@ -69,13 +69,13 @@ public class FloatWindowService extends Service {
 
         @Override
         public void run() {
-            boolean isHome = Utils.isHome((ActivityManager) getSystemService(Context.ACTIVITY_SERVICE), getPackageName());
+            boolean isHome = Utils.isHome(getApplicationContext());
             // 当前界面是桌面，且没有悬浮窗显示，则创建悬浮窗。
             if (isHome && !floatManager.isWindowShowing()) {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        Log.i(Constants.LOG_TAG,"创建悬浮窗");
+                        Log.i(LOG_TAG,"创建悬浮窗");
                         floatManager.createPerson(getApplicationContext());
                     }
                 });
@@ -85,7 +85,7 @@ public class FloatWindowService extends Service {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        Log.i(Constants.LOG_TAG,"移除悬浮窗");
+                        Log.i(LOG_TAG,"移除悬浮窗");
                         floatManager.removePerson(getApplicationContext());
                     }
                 });
@@ -102,6 +102,5 @@ public class FloatWindowService extends Service {
         }
 
     }
-
 
 }
