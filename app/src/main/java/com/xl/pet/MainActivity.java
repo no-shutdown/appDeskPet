@@ -1,6 +1,9 @@
 package com.xl.pet;
 
 import android.app.AppOpsManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -10,7 +13,9 @@ import android.provider.Settings;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.xl.pet.flowWindow.FloatWindowService;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -18,12 +23,14 @@ import androidx.navigation.ui.NavigationUI;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int REQUEST_PACKAGE_USAGE_STATS = 1;
+    private static final int NOTIFICATION_ID = 1;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestOverlayPermission();
+        requestUsageStatsPermission();
         //创建UI界面
         createUI();
         //启动悬浮窗服务
@@ -43,10 +50,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startFloatWindowService() {
-        requestOverlayPermission();
-        requestUsageStatsPermission();
-        Intent intent = new Intent(MainActivity.this, FloatWindowService.class);
-        startService(intent);
+        Intent serviceIntent = new Intent(MainActivity.this, FloatWindowService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel("channel_id", "My Service", NotificationManager.IMPORTANCE_LOW);
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+
+            Notification notification = buildNotification();
+            startForegroundService(serviceIntent);
+            startForeground(NOTIFICATION_ID, notification);
+        } else {
+            startService(serviceIntent);
+        }
+    }
+
+    private Notification buildNotification() {
+        // 创建通知
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "channel_id");
+        builder.setSmallIcon(R.drawable.chopper_ball)
+                .setContentTitle("My Service")
+                .setContentText("My Service is running")
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setAutoCancel(false);
+        return builder.build();
     }
 
     private void requestOverlayPermission() {
