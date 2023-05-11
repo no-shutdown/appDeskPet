@@ -1,7 +1,12 @@
 package com.xl.pet.flowWindow;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
@@ -9,29 +14,61 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
 
+import com.xl.pet.R;
 import com.xl.pet.utils.Utils;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.xl.pet.constants.Constants.AUTH_TAG;
 import static com.xl.pet.constants.Constants.LOG_TAG;
 
 public class FloatWindowService extends Service {
 
-    /**
-     * 定时器，定时进行检测当前应该创建还是移除悬浮窗。
-     */
+
+
+    //定时器，定时进行检测当前应该创建还是移除悬浮窗。
     private Timer timer;
-    /**
-     * 用于在线程中创建或移除悬浮窗。
-     */
-    private Handler handler = new Handler();
-    /**
-     * 悬浮窗管理
-     */
+    //用于在线程中创建或移除悬浮窗
+    private final Handler handler = new Handler();
+    //悬浮窗管理
     private FloatWindowManager floatManager;
 
+    private static final String CHANNEL_ID = "petChannelId";
+    private static final String CHANNEL_NAME = "petChannelName";
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        //如果api大于26在通知栏显示一个通知
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+            NotificationChannel chan = new NotificationChannel(
+                    CHANNEL_ID,
+                    CHANNEL_NAME,
+                    NotificationManager.IMPORTANCE_LOW);
+            chan.setLightColor(Color.BLUE);
+            chan.setLockscreenVisibility(Notification.VISIBILITY_SECRET);
+
+            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            assert manager != null;
+            manager.createNotificationChannel(chan);
+
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(
+                    this, CHANNEL_ID);
+            Notification notification = notificationBuilder.setOngoing(true)
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setContentTitle(AUTH_TAG)
+                    .setPriority(NotificationManager.IMPORTANCE_LOW)
+                    .setCategory(Notification.CATEGORY_SERVICE)
+                    .setChannelId(CHANNEL_ID)
+                    .build();
+
+            startForeground(1, notification);
+        }
+    }
 
     @Nullable
     @Override
@@ -64,6 +101,7 @@ public class FloatWindowService extends Service {
         if (floatManager != null){
             floatManager.removeData(getApplicationContext());
         }
+        stopForeground(true);
     }
 
 
