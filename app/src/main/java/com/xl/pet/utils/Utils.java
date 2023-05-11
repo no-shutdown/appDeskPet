@@ -3,8 +3,12 @@ package com.xl.pet.utils;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.util.Log;
+import android.util.TypedValue;
 
 import androidx.annotation.RequiresApi;
 
@@ -40,6 +44,16 @@ public class Utils {
                     || "com.google.android.apps.nexuslauncher".equals(topActivity);
         }
         return true;
+    }
+
+
+    //解析资源
+    public static Bitmap decodeResource(Resources resources, int id) {
+        TypedValue value = new TypedValue();
+        resources.openRawResource(id, value);
+        BitmapFactory.Options opts = new BitmapFactory.Options();
+        opts.inTargetDensity = value.density;
+        return BitmapFactory.decodeResource(resources, id, opts);
     }
 
 }

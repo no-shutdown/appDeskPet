@@ -1,5 +1,6 @@
 package com.xl.pet;
 
+import android.app.ActivityManager;
 import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.Intent;
@@ -22,13 +23,23 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //请求Overlay权限
-        requestOverlayPermission();
+        requestOverlayPermissionIfNeed();
         //请求usageStats权限
-        requestUsageStatsPermission();
+        requestUsageStatsPermissionIfNeed();
         //创建UI界面
         createUI();
-        //启动悬浮窗服务
-        startFloatWindowService();
+        //如果没有启动浮窗服务则启动悬浮窗服务
+        boolean isServiceRunning = false;
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (FloatWindowService.class.getName().equals(service.service.getClassName())) {
+                isServiceRunning = true;
+                break;
+            }
+        }
+        if (!isServiceRunning) {
+            startFloatWindowService();
+        }
 //        finish();
     }
 
@@ -52,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void requestOverlayPermission() {
+    private void requestOverlayPermissionIfNeed() {
         //如果api大于23 startActivityForResult
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!Settings.canDrawOverlays(MainActivity.this)) {
@@ -65,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void requestUsageStatsPermission() {
+    private void requestUsageStatsPermissionIfNeed() {
         AppOpsManager appOps = (AppOpsManager) getSystemService(Context.APP_OPS_SERVICE);
         int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, android.os.Process.myUid(), getPackageName());
         boolean hasUsageStatsPermission =  mode == AppOpsManager.MODE_ALLOWED;

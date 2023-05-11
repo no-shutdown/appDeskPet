@@ -3,64 +3,110 @@ package com.xl.pet.flowWindow.pet;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.util.TypedValue;
+import android.os.Handler;
 import android.view.View;
+
+import com.xl.pet.R;
+import com.xl.pet.utils.Utils;
 
 /**
  * 抽象宠物父类
  */
-public abstract class Pet extends View implements Actionable{
+public abstract class Pet extends View {
 
-    //动画标识
-    protected Actionable.Action actionFlag;
-    //动画标识是否需要被渲染
-    protected boolean needDraw;
     //画笔
     protected Paint paint;
+    //图片
+    protected Bitmap bitmap;
     //资源
     protected Resources res;
     //界面大小
     protected int screenW, screenH;
     //人物图片的宽高
     protected int bmpW, bmpH;
+    //绘图矩阵
+    protected Matrix matrix = new Matrix();
     //动画大小比例
     protected float personSize = 1.0f;
     //当前坐标位置
     protected float x, y;
 
+    private final Handler handler = new Handler();
+    //得到每一帧的bitMap刷新view
+    private final DrawRunnable drawRunnable = new DrawRunnable();
+    //每帧间隔，默认150
+    private final int frameTime = 150;
+
 
     public Pet(Context context) {
         super(context);
+        init(context);
+        handler.postDelayed(drawRunnable, frameTime);
+    }
+    private void init(Context context) {
+        //初始化画笔
+        paint = new Paint();
+        paint.setColor(Color.WHITE);
+        paint.setStrokeWidth(20);
+        paint.setAntiAlias(true);        //抗边缘锯齿
+        paint.setFilterBitmap(true);    //滤波过滤
+        setFocusable(true);
+        res = context.getResources();
+        //获取界面大小
+        screenH = res.getDisplayMetrics().heightPixels;
+        screenW = res.getDisplayMetrics().widthPixels;
+        //获取资源大小
+        bmpW = Utils.decodeResource(res, R.drawable.chopper_ball).getWidth();
+        bmpH = Utils.decodeResource(res, R.drawable.chopper_ball).getHeight();
+        //初始化的xy,显示在屏幕上的位置
+        x = bmpW / 2;
+        y = bmpH / 2;
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-    }
-
-    //画出view
-    protected void canvasDraw(Canvas canvas, Bitmap bitmap, Matrix matrix, Paint paint) {
+        //不同子类自定义的行为
+        refreshFPSAction();
         if (bitmap != null) {
             canvas.drawBitmap(bitmap, matrix, paint);
         }
     }
 
-    protected Bitmap decodeResource(Resources resources, int id) {
-        TypedValue value = new TypedValue();
-        resources.openRawResource(id, value);
-        BitmapFactory.Options opts = new BitmapFactory.Options();
-        opts.inTargetDensity = value.density;
-        return BitmapFactory.decodeResource(resources, id, opts);
+    //停止渲染
+    public void stop() {
+        handler.removeCallbacks(drawRunnable);
     }
 
-    public void measureScreen() {
-        screenH = res.getDisplayMetrics().heightPixels;
-        screenW = res.getDisplayMetrics().widthPixels;
+    //每一帧的行为
+    protected abstract void refreshFPSAction();
+    //每一帧刷新后的回调
+    protected abstract void refreshFPSCallback();
+
+    class DrawRunnable implements Runnable {
+        @Override
+        public void run() {
+            long start = System.currentTimeMillis();
+            try {
+                invalidate();    //进行重绘，会再次调用onDraw
+                refreshFPSCallback();
+                long end = System.currentTimeMillis();
+                if (end - start < frameTime) {
+                    handler.postDelayed(this, frameTime - (end - start));
+                } else {
+                    handler.post(this);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
+
+
     public float getX() {
         return x;
     }

@@ -6,6 +6,7 @@ import android.os.Build;
 import android.view.Gravity;
 import android.view.WindowManager;
 
+
 import com.xl.pet.flowWindow.pet.DefaultPet;
 
 public class FloatWindowManager {
@@ -13,19 +14,17 @@ public class FloatWindowManager {
     //用于控制在屏幕上添加或移除悬浮窗
     private WindowManager windowManager;
     //悬浮窗布局
-    private WindowManager.LayoutParams layoutParams;
+    private final WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
     //宠物类
     private DefaultPet person;
-
 
     /**
      * 创建一个卡通人物
      */
     public void createPerson(Context context) {
-        layoutParams = new WindowManager.LayoutParams();
         WindowManager windowManager = getOrCreateWindowManager(context);
         //参数设置
-        if (Build.VERSION.SDK_INT >= 25) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
         } else {
             layoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
@@ -44,6 +43,7 @@ public class FloatWindowManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        person.bindWindowManager(windowManager, layoutParams);
         windowManager.addView(person, layoutParams);
     }
 
@@ -55,6 +55,8 @@ public class FloatWindowManager {
      */
     public void removePerson(Context context) {
         if (person != null) {
+            //停止pet的线程
+            person.stop();
             WindowManager windowManager = getOrCreateWindowManager(context);
             windowManager.removeView(person);
             person = null;
@@ -62,7 +64,7 @@ public class FloatWindowManager {
     }
 
 
-    public void removeData(Context context){
+    public void removeAll(Context context){
         removePerson(context);
     }
 

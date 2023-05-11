@@ -78,14 +78,13 @@ public class FloatWindowService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i(LOG_TAG,"服务开启");
         floatManager = new FloatWindowManager();
         // 开启定时器，每隔0.5秒刷新一次
         if (timer == null) {
             timer = new Timer();
             timer.scheduleAtFixedRate(new RefreshTask(), 0, 500);
         }
-
-        Log.i(LOG_TAG,"服务开启");
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -99,7 +98,7 @@ public class FloatWindowService extends Service {
         }
         timer = null;
         if (floatManager != null){
-            floatManager.removeData(getApplicationContext());
+            floatManager.removeAll(getApplicationContext());
         }
         stopForeground(true);
     }
