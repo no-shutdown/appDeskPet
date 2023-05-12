@@ -7,7 +7,7 @@ import android.view.Gravity;
 import android.view.WindowManager;
 
 
-import com.xl.pet.flowWindow.pet.DefaultPet;
+import com.xl.pet.flowWindow.pet.CatPet;
 
 public class FloatWindowManager {
 
@@ -16,7 +16,7 @@ public class FloatWindowManager {
     //悬浮窗布局
     private final WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
     //宠物类
-    private DefaultPet person;
+    private CatPet person;
 
     /**
      * 创建一个卡通人物
@@ -33,7 +33,7 @@ public class FloatWindowManager {
         layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
         layoutParams.gravity = Gravity.LEFT | Gravity.TOP;
         try {
-            person = new DefaultPet(context);
+            person = new CatPet(context);
             //参数设置
             layoutParams.x = (int) person.getX();
             layoutParams.y = (int) person.getY();

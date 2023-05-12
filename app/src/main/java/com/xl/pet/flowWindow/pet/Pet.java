@@ -11,17 +11,18 @@ import android.os.Handler;
 import android.view.View;
 
 import com.xl.pet.R;
+import com.xl.pet.flowWindow.pet.action.Actionable;
 import com.xl.pet.utils.Utils;
 
 /**
  * 抽象宠物父类
  */
-public abstract class Pet extends View {
+public abstract class Pet extends View implements Actionable {
 
     //画笔
     protected Paint paint;
     //图片
-    protected Bitmap bitmap;
+    protected Bitmap bitmapFPS;
     //资源
     protected Resources res;
     //界面大小
@@ -60,8 +61,8 @@ public abstract class Pet extends View {
         screenH = res.getDisplayMetrics().heightPixels;
         screenW = res.getDisplayMetrics().widthPixels;
         //获取资源大小
-        bmpW = Utils.decodeResource(res, R.drawable.cat_fight_12).getWidth();
-        bmpH = Utils.decodeResource(res, R.drawable.cat_fight_12).getHeight();
+        bmpW = Utils.decodeResource(res, R.drawable.cat_fight_1).getWidth();
+        bmpH = Utils.decodeResource(res, R.drawable.cat_fight_1).getHeight();
         //初始化的xy,显示在屏幕上的位置
         x = bmpW / 2;
         y = bmpH / 2;
@@ -70,22 +71,20 @@ public abstract class Pet extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        //不同子类自定义的行为
-        refreshFPSAction();
-        if (bitmap != null) {
-            canvas.drawBitmap(bitmap, matrix, paint);
+        actionFPS();
+        if (bitmapFPS != null) {
+            canvas.drawBitmap(bitmapFPS, matrix, paint);
         }
     }
 
+    //每一帧的动画
+    protected abstract void actionFPS();
+    //每一帧刷新后的回调
+    protected abstract void refreshFPSCallback();
     //停止渲染
     public void stop() {
         handler.removeCallbacks(drawRunnable);
     }
-
-    //每一帧的行为
-    protected abstract void refreshFPSAction();
-    //每一帧刷新后的回调
-    protected abstract void refreshFPSCallback();
 
     class DrawRunnable implements Runnable {
         @Override
