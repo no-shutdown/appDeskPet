@@ -20,7 +20,7 @@ public class DefaultPet extends Pet implements DefaultActionable {
     //左右判别，向左1，右-1。默认左
     protected int leftOrRight = 1;
     //上下判别，向上1，下-1
-    protected int upOrDown;
+    protected int upOrDown = 1;
 
 
     private WindowManager bindWindowManager;
@@ -29,14 +29,16 @@ public class DefaultPet extends Pet implements DefaultActionable {
     public DefaultPet(Context context) {
         super(context);
         //TODO 1、定义图片数组 2、取每一帧的图片
+        personSize = 0.8f; //百分之80比例缩放
         actionFlag = Action.ACTION_SIT; //默认动作是坐下
-        bmpImage[0] = Utils.decodeResource(res, R.drawable.chopper_sit);
+        bmpImage[0] = Utils.decodeResource(res, R.drawable.cat_fight_12);
     }
 
     @Override
     protected void refreshFPSAction() {
+        matrix.reset();
         float dis = (1 - personSize) * bmpW / 2;
-        matrix.postScale(personSize * leftOrRight, personSize, bmpW / 2, bmpH / 2);
+        matrix.postScale(personSize * leftOrRight, personSize * upOrDown, bmpW / 2, bmpH / 2);
         matrix.postTranslate(-dis, -dis);
         switch (actionFlag) {
             case ACTION_SIT:

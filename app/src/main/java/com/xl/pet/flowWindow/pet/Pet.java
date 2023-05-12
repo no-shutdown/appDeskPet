@@ -60,8 +60,8 @@ public abstract class Pet extends View {
         screenH = res.getDisplayMetrics().heightPixels;
         screenW = res.getDisplayMetrics().widthPixels;
         //获取资源大小
-        bmpW = Utils.decodeResource(res, R.drawable.chopper_ball).getWidth();
-        bmpH = Utils.decodeResource(res, R.drawable.chopper_ball).getHeight();
+        bmpW = Utils.decodeResource(res, R.drawable.cat_fight_12).getWidth();
+        bmpH = Utils.decodeResource(res, R.drawable.cat_fight_12).getHeight();
         //初始化的xy,显示在屏幕上的位置
         x = bmpW / 2;
         y = bmpH / 2;
