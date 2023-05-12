@@ -1,5 +1,6 @@
 package com.xl.pet.flowWindow.pet;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -26,6 +27,8 @@ public class CatPet extends Pet {
     //上下判别，向上1，下-1
     protected int upOrDown = 1;
 
+    //点击坐标
+    protected float touchX, touchY;
 
     private WindowManager bindWindowManager;
     private WindowManager.LayoutParams bindWindowManagerLayoutParams;
@@ -33,7 +36,7 @@ public class CatPet extends Pet {
     public CatPet(Context context) {
         super(context);
         personSize = 0.8f; //百分之80比例缩放
-        actionChange(Action.COLD);
+        actionChange(Action.DOUBT);
     }
 
     @Override
@@ -87,10 +90,31 @@ public class CatPet extends Pet {
                 break;
             case COLD:
                 actionImages[0] = Utils.decodeResource(res, R.drawable.cat_cold_1);
-                actionImages[1] = Utils.decodeResource(res, R.drawable.cat_cold_2);
-                actionImages[2] = Utils.decodeResource(res, R.drawable.cat_cold_3);
-                actionImages[3] = Utils.decodeResource(res, R.drawable.cat_cold_4);
-                actionImages[4] = Utils.decodeResource(res, R.drawable.cat_cold_5);
+                actionImages[1] = Utils.decodeResource(res, R.drawable.cat_cold_3);
+                break;
+            case BALL:
+                actionImages[0] = Utils.decodeResource(res, R.drawable.cat_ball_1);
+                actionImages[1] = Utils.decodeResource(res, R.drawable.cat_ball_2);
+                actionImages[2] = Utils.decodeResource(res, R.drawable.cat_ball_3);
+                actionImages[3] = Utils.decodeResource(res, R.drawable.cat_ball_4);
+                actionImages[4] = Utils.decodeResource(res, R.drawable.cat_ball_5);
+                break;
+            case HELLO:
+                actionImages[0] = Utils.decodeResource(res, R.drawable.cat_hello_1);
+                actionImages[1] = Utils.decodeResource(res, R.drawable.cat_hello_2);
+                actionImages[2] = Utils.decodeResource(res, R.drawable.cat_hello_3);
+                actionImages[3] = Utils.decodeResource(res, R.drawable.cat_hello_4);
+                actionImages[4] = Utils.decodeResource(res, R.drawable.cat_hello_5);
+                actionImages[5] = Utils.decodeResource(res, R.drawable.cat_hello_6);
+                actionImages[6] = Utils.decodeResource(res, R.drawable.cat_hello_7);
+                break;
+            case DOUBT:
+                actionImages[0] = Utils.decodeResource(res, R.drawable.cat_doubt_1);
+                actionImages[1] = Utils.decodeResource(res, R.drawable.cat_doubt_2);
+                actionImages[2] = Utils.decodeResource(res, R.drawable.cat_doubt_3);
+                actionImages[3] = Utils.decodeResource(res, R.drawable.cat_doubt_4);
+                actionImages[4] = Utils.decodeResource(res, R.drawable.cat_doubt_5);
+                actionImages[5] = Utils.decodeResource(res, R.drawable.cat_doubt_6);
                 break;
             default:
                 Log.w(Constants.LOG_TAG, "未知动作标识：" + flag);
@@ -102,15 +126,49 @@ public class CatPet extends Pet {
 
     }
 
+    /**
+     * 触屏事件
+     */
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        return false;
+        touchX = event.getRawX();
+        touchY = event.getRawY();        //以屏幕角为坐标点
+        int bmpW = (int) (this.bmpW * personSize), bmpH = (int) (this.bmpH * personSize);
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                actionChange(Action.BALL);
+//                onActionChange(FLAG_UP);
+//                touchPreX = touchX;
+//                titleBarH = touchY - event.getY() - y;
+                break;
+            case MotionEvent.ACTION_MOVE:
+                //触摸点的显示作用
+                x = touchX - bmpW / 2;
+                y = touchY - bmpH / 2;
+                break;
+            case MotionEvent.ACTION_UP:
+                System.out.println("UP");
+//                onActionChange(FLAG_DOWN);
+//                titleBarH = 0;
+//                //报时的绘制点
+//                if (drawTime) {
+//                    drawTimeNow = true;
+//                    drawTimeFlag = 10;
+//                }
+                break;
+            default:
+                actionChange(Action.FIGHT);
+        }
+        return true;
     }
 
     enum Action implements ActionFlag {
         FIGHT,
         COLD,
-
+        BALL,
+        HELLO,
+        DOUBT,
     }
 
 }

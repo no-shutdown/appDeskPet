@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         if (!isServiceRunning) {
             startFloatWindowService();
         }
-//        finish();
+        finish();
     }
 
     private void createUI() {

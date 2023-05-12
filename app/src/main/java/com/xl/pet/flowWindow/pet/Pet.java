@@ -48,6 +48,7 @@ public abstract class Pet extends View implements Actionable {
         init(context);
         handler.postDelayed(drawRunnable, frameTime);
     }
+
     private void init(Context context) {
         //初始化画笔
         paint = new Paint();
@@ -79,8 +80,10 @@ public abstract class Pet extends View implements Actionable {
 
     //每一帧的动画
     protected abstract void actionFPS();
+
     //每一帧刷新后的回调
     protected abstract void refreshFPSCallback();
+
     //停止渲染
     public void stop() {
         handler.removeCallbacks(drawRunnable);
@@ -109,12 +112,15 @@ public abstract class Pet extends View implements Actionable {
     public float getX() {
         return x;
     }
+
     public float getY() {
         return y;
     }
+
     public int getBmpW() {
         return (int) Math.ceil(bmpW * personSize);
     }
+
     public int getBmpH() {
         return (int) Math.ceil(bmpH * personSize);
     }
