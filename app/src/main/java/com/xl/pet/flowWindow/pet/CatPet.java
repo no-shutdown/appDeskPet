@@ -35,11 +35,11 @@ public class CatPet extends Pet {
 
     public CatPet(Context context) {
         super(context);
-        Bitmap bitmap = Utils.decodeResource(res, R.drawable.cat_hello_7);
-        bmpH = bitmap.getHeight();
-        bmpW = bitmap.getWidth();
+        Bitmap bitmap = Utils.decodeResource(res, R.drawable.cat_stand);
+        bmpH = bitmap.getHeight() + 10; //10伸缩空间
+        bmpW = bitmap.getWidth() + 30; //30伸缩空间
         personSize = 0.8f; //百分之80比例缩放
-        actionChange(Action.COLD);
+        actionChange(Action.DOUBT);
     }
 
     @Override
@@ -78,9 +78,16 @@ public class CatPet extends Pet {
 
     @Override
     public void actionChange(ActionFlag flag) {
+        if (actionFlag == flag) {
+            return;
+        }
         actionFlag = (Action) flag;
         actionIndex = 0; //重置动作下标
+        clearImages();
         switch (actionFlag) {
+            case STAND:
+                actionImages[0] = Utils.decodeResource(res, R.drawable.cat_stand);
+                break;
             case FIGHT:
                 actionImages[0] = Utils.decodeResource(res, R.drawable.cat_fight_1);
                 actionImages[1] = Utils.decodeResource(res, R.drawable.cat_fight_2);
@@ -91,10 +98,12 @@ public class CatPet extends Pet {
                 actionImages[6] = Utils.decodeResource(res, R.drawable.cat_fight_7);
                 actionImages[7] = Utils.decodeResource(res, R.drawable.cat_fight_8);
                 actionImages[8] = Utils.decodeResource(res, R.drawable.cat_fight_9);
+                this.postDelayed(() -> actionChange(Action.STAND), 5000);
                 break;
             case COLD:
                 actionImages[0] = Utils.decodeResource(res, R.drawable.cat_cold_1);
                 actionImages[1] = Utils.decodeResource(res, R.drawable.cat_cold_3);
+                this.postDelayed(() -> actionChange(Action.STAND), 5000);
                 break;
             case BALL:
                 actionImages[0] = Utils.decodeResource(res, R.drawable.cat_ball_1);
@@ -111,14 +120,14 @@ public class CatPet extends Pet {
                 actionImages[4] = Utils.decodeResource(res, R.drawable.cat_hello_5);
                 actionImages[5] = Utils.decodeResource(res, R.drawable.cat_hello_6);
                 actionImages[6] = Utils.decodeResource(res, R.drawable.cat_hello_7);
+                this.postDelayed(() -> actionChange(Action.STAND), 5000);
                 break;
             case DOUBT:
-                actionImages[0] = Utils.decodeResource(res, R.drawable.cat_doubt_1);
+                actionImages[0] = Utils.decodeResource(res, R.drawable.cat_doubt_2);
                 actionImages[1] = Utils.decodeResource(res, R.drawable.cat_doubt_2);
-                actionImages[2] = Utils.decodeResource(res, R.drawable.cat_doubt_2);
-                actionImages[3] = Utils.decodeResource(res, R.drawable.cat_doubt_2);
-                actionImages[4] = Utils.decodeResource(res, R.drawable.cat_doubt_2);
-                actionImages[5] = Utils.decodeResource(res, R.drawable.cat_doubt_1);
+                actionImages[2] = Utils.decodeResource(res, R.drawable.cat_doubt_5);
+                actionImages[3] = Utils.decodeResource(res, R.drawable.cat_doubt_5);
+                this.postDelayed(() -> actionChange(Action.STAND), 5000);
                 break;
             default:
                 Log.w(Constants.LOG_TAG, "未知动作标识：" + flag);
@@ -140,34 +149,33 @@ public class CatPet extends Pet {
         touchY = event.getRawY();
         int bmpW = getBmpW(), bmpH = getBmpH();
         switch (event.getAction()) {
+            //点击
             case MotionEvent.ACTION_DOWN:
-                actionChange(Action.BALL);
-//                onActionChange(FLAG_UP);
-//                touchPreX = touchX;
-//                titleBarH = touchY - event.getY() - y;
+                randomChange();
                 break;
+            //移动
             case MotionEvent.ACTION_MOVE:
+                actionChange(Action.BALL);
                 //触摸点的显示作用
                 x = touchX - bmpW / 2;
                 y = touchY - bmpH / 2;
                 break;
+            //抬起
             case MotionEvent.ACTION_UP:
-                System.out.println("UP");
-//                onActionChange(FLAG_DOWN);
-//                titleBarH = 0;
-//                //报时的绘制点
-//                if (drawTime) {
-//                    drawTimeNow = true;
-//                    drawTimeFlag = 10;
-//                }
+                actionChange(Action.STAND);
                 break;
-            default:
-                actionChange(Action.FIGHT);
         }
         return true;
     }
 
+    private void clearImages() {
+        for (int i = 0; i < MAX_IMAGES_INDEX; i++) {
+            actionImages[i] = null;
+        }
+    }
+
     enum Action implements ActionFlag {
+        STAND,
         FIGHT,
         COLD,
         BALL,

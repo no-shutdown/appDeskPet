@@ -29,7 +29,7 @@ public class FloatWindowManager {
         } else {
             layoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
         }
-        layoutParams.format = PixelFormat.RGBA_8888;//图片格式，背景透明
+        layoutParams.format = PixelFormat.RGB_565;//图片格式，背景透明
         layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
         layoutParams.gravity = Gravity.LEFT | Gravity.TOP;
         try {
