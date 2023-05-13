@@ -29,6 +29,7 @@ public class CatPet extends Pet {
 
     //点击坐标
     protected float touchX, touchY;
+    protected float lastTouchX, lastTouchY;
 
     private WindowManager bindWindowManager;
     private WindowManager.LayoutParams bindWindowManagerLayoutParams;
@@ -151,17 +152,31 @@ public class CatPet extends Pet {
         switch (event.getAction()) {
             //点击
             case MotionEvent.ACTION_DOWN:
-                randomChange();
+                lastTouchX = event.getX();
+                lastTouchY = event.getY();
                 break;
             //移动
             case MotionEvent.ACTION_MOVE:
                 actionChange(Action.BALL);
+                float currentX = event.getX();
+                float currentY = event.getY();
+                float deltaY = currentY - lastTouchY;
+                if (deltaY > 0) {
+                    // 向下移动
+                    upOrDown = 1;
+                } else {
+                    // 向上移动
+                    upOrDown = -1;
+                }
+                lastTouchX = currentX;
+                lastTouchY = currentY;
                 //触摸点的显示作用
                 x = touchX - bmpW / 2;
                 y = touchY - bmpH / 2;
                 break;
             //抬起
             case MotionEvent.ACTION_UP:
+                upOrDown = 1;
                 actionChange(Action.STAND);
                 break;
         }
