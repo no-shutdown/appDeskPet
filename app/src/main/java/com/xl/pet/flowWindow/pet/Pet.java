@@ -10,9 +10,7 @@ import android.graphics.Paint;
 import android.os.Handler;
 import android.view.View;
 
-import com.xl.pet.R;
 import com.xl.pet.flowWindow.pet.action.Actionable;
-import com.xl.pet.utils.Utils;
 
 /**
  * 抽象宠物父类
@@ -42,7 +40,6 @@ public abstract class Pet extends View implements Actionable {
     //每帧间隔，默认150
     private final int frameTime = 150;
 
-
     public Pet(Context context) {
         super(context);
         init(context);
@@ -61,12 +58,12 @@ public abstract class Pet extends View implements Actionable {
         //获取界面大小
         screenH = res.getDisplayMetrics().heightPixels;
         screenW = res.getDisplayMetrics().widthPixels;
-        //获取资源大小
-        bmpW = Utils.decodeResource(res, R.drawable.cat_fight_1).getWidth();
-        bmpH = Utils.decodeResource(res, R.drawable.cat_fight_1).getHeight();
-        //初始化的xy,显示在屏幕上的位置
-        x = bmpW / 2;
-        y = bmpH / 2;
+        //默认资源大小
+        bmpW = 300;
+        bmpH = 300;
+        //默认坐标
+        x = 100;
+        y = 200;
     }
 
     @Override

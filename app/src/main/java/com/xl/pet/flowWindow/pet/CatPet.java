@@ -35,13 +35,17 @@ public class CatPet extends Pet {
 
     public CatPet(Context context) {
         super(context);
+        Bitmap bitmap = Utils.decodeResource(res, R.drawable.cat_hello_7);
+        bmpH = bitmap.getHeight();
+        bmpW = bitmap.getWidth();
         personSize = 0.8f; //百分之80比例缩放
-        actionChange(Action.DOUBT);
+        actionChange(Action.COLD);
     }
 
     @Override
     protected void actionFPS() {
         matrix.reset();
+        int bmpW = getBmpW(), bmpH = getBmpH();
         float dis = (1 - personSize) * bmpW / 2;
         //调整缩放、方向
         matrix.postScale(personSize * leftOrRight, personSize * upOrDown, bmpW / 2, bmpH / 2);
@@ -111,10 +115,10 @@ public class CatPet extends Pet {
             case DOUBT:
                 actionImages[0] = Utils.decodeResource(res, R.drawable.cat_doubt_1);
                 actionImages[1] = Utils.decodeResource(res, R.drawable.cat_doubt_2);
-                actionImages[2] = Utils.decodeResource(res, R.drawable.cat_doubt_3);
-                actionImages[3] = Utils.decodeResource(res, R.drawable.cat_doubt_4);
-                actionImages[4] = Utils.decodeResource(res, R.drawable.cat_doubt_5);
-                actionImages[5] = Utils.decodeResource(res, R.drawable.cat_doubt_6);
+                actionImages[2] = Utils.decodeResource(res, R.drawable.cat_doubt_2);
+                actionImages[3] = Utils.decodeResource(res, R.drawable.cat_doubt_2);
+                actionImages[4] = Utils.decodeResource(res, R.drawable.cat_doubt_2);
+                actionImages[5] = Utils.decodeResource(res, R.drawable.cat_doubt_1);
                 break;
             default:
                 Log.w(Constants.LOG_TAG, "未知动作标识：" + flag);
@@ -133,8 +137,8 @@ public class CatPet extends Pet {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         touchX = event.getRawX();
-        touchY = event.getRawY();        //以屏幕角为坐标点
-        int bmpW = (int) (this.bmpW * personSize), bmpH = (int) (this.bmpH * personSize);
+        touchY = event.getRawY();
+        int bmpW = getBmpW(), bmpH = getBmpH();
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 actionChange(Action.BALL);
