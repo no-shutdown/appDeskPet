@@ -19,7 +19,7 @@ import java.util.Random;
 public class CatPet extends Pet {
 
     //一组图片最大数量
-    private static final int MAX_IMAGES_INDEX = 9;
+    private static final int MAX_IMAGES_INDEX = 10;
     //随机变动最大的时间间隔
     private static final int MAX_RANDOM_CHANGE_INTERVAL = 60000;
     //随机变动前至少静止的时间间隔
@@ -59,7 +59,7 @@ public class CatPet extends Pet {
         bmpH = bitmap.getHeight() + 10; //10伸缩空间
         bmpW = bitmap.getWidth() + 30; //30伸缩空间
         personSize = 0.8f; //百分之80比例缩放
-        actionChange(Action.DOUBT);
+        actionChange(Action.STAND);
         handler.postDelayed(randomRunnable, MAX_RANDOM_CHANGE_INTERVAL);
     }
 
@@ -124,24 +124,50 @@ public class CatPet extends Pet {
                 break;
             case COLD:
                 actionImages[0] = Utils.decodeResource(res, R.drawable.cat_cold_1);
-                actionImages[1] = Utils.decodeResource(res, R.drawable.cat_cold_3);
+                actionImages[1] = Utils.decodeResource(res, R.drawable.cat_cold_2);
                 this.postDelayed(() -> actionChange(Action.STAND), A_ACTION_INTERVAL);
                 break;
             case HELLO:
                 actionImages[0] = Utils.decodeResource(res, R.drawable.cat_hello_1);
                 actionImages[1] = Utils.decodeResource(res, R.drawable.cat_hello_2);
                 actionImages[2] = Utils.decodeResource(res, R.drawable.cat_hello_3);
-                actionImages[3] = Utils.decodeResource(res, R.drawable.cat_hello_4);
-                actionImages[4] = Utils.decodeResource(res, R.drawable.cat_hello_5);
-                actionImages[5] = Utils.decodeResource(res, R.drawable.cat_hello_6);
-                actionImages[6] = Utils.decodeResource(res, R.drawable.cat_hello_7);
+                actionImages[3] = Utils.decodeResource(res, R.drawable.cat_hello_2);
+                actionImages[4] = Utils.decodeResource(res, R.drawable.cat_hello_1);
+                actionImages[5] = Utils.decodeResource(res, R.drawable.cat_hello_2);
+                actionImages[6] = Utils.decodeResource(res, R.drawable.cat_hello_3);
                 this.postDelayed(() -> actionChange(Action.STAND), A_ACTION_INTERVAL);
                 break;
             case DOUBT:
-                actionImages[0] = Utils.decodeResource(res, R.drawable.cat_doubt_2);
-                actionImages[1] = Utils.decodeResource(res, R.drawable.cat_doubt_2);
-                actionImages[2] = Utils.decodeResource(res, R.drawable.cat_doubt_5);
-                actionImages[3] = Utils.decodeResource(res, R.drawable.cat_doubt_5);
+                actionImages[0] = Utils.decodeResource(res, R.drawable.cat_doubt_1);
+                actionImages[1] = Utils.decodeResource(res, R.drawable.cat_doubt_1);
+                actionImages[2] = Utils.decodeResource(res, R.drawable.cat_doubt_2);
+                actionImages[3] = Utils.decodeResource(res, R.drawable.cat_doubt_2);
+                this.postDelayed(() -> actionChange(Action.STAND), A_ACTION_INTERVAL);
+                break;
+            case AUHAUH:
+                actionImages[0] = Utils.decodeResource(res, R.drawable.cat_auhauh_1);
+                actionImages[1] = Utils.decodeResource(res, R.drawable.cat_auhauh_2);
+                actionImages[2] = Utils.decodeResource(res, R.drawable.cat_auhauh_3);
+                actionImages[3] = Utils.decodeResource(res, R.drawable.cat_auhauh_2);
+                actionImages[4] = Utils.decodeResource(res, R.drawable.cat_auhauh_1);
+                actionImages[5] = Utils.decodeResource(res, R.drawable.cat_auhauh_2);
+                actionImages[6] = Utils.decodeResource(res, R.drawable.cat_auhauh_3);
+                actionImages[7] = Utils.decodeResource(res, R.drawable.cat_auhauh_2);
+                this.postDelayed(() -> actionChange(Action.STAND), A_ACTION_INTERVAL);
+                break;
+            case EXERCISE:
+                actionImages[0] = Utils.decodeResource(res, R.drawable.cat_exercise_1);
+                actionImages[1] = Utils.decodeResource(res, R.drawable.cat_exercise_2);
+                actionImages[2] = Utils.decodeResource(res, R.drawable.cat_exercise_3);
+                actionImages[3] = Utils.decodeResource(res, R.drawable.cat_exercise_4);
+                actionImages[4] = Utils.decodeResource(res, R.drawable.cat_exercise_5);
+                actionImages[5] = Utils.decodeResource(res, R.drawable.cat_exercise_6);
+                actionImages[6] = Utils.decodeResource(res, R.drawable.cat_exercise_7);
+                this.postDelayed(() -> actionChange(Action.STAND), A_ACTION_INTERVAL);
+                break;
+            case CRY:
+                actionImages[0] = Utils.decodeResource(res, R.drawable.cat_cry_1);
+                actionImages[1] = Utils.decodeResource(res, R.drawable.cat_cry_2);
                 this.postDelayed(() -> actionChange(Action.STAND), A_ACTION_INTERVAL);
                 break;
             case BALL:
@@ -244,6 +270,9 @@ public class CatPet extends Pet {
         BALL,
         HELLO,
         DOUBT,
+        AUHAUH,
+        EXERCISE,
+        CRY,
     }
 
 }
