@@ -17,6 +17,9 @@ import com.xl.pet.flowWindow.pet.action.Actionable;
  */
 public abstract class Pet extends View implements Actionable {
 
+    //每帧间隔，默认150
+    private static final int FRAME_TIME = 150;
+
     //画笔
     protected Paint paint;
     //图片
@@ -37,13 +40,11 @@ public abstract class Pet extends View implements Actionable {
     private final Handler handler = new Handler();
     //得到每一帧的bitMap刷新view
     private final DrawRunnable drawRunnable = new DrawRunnable();
-    //每帧间隔，默认150
-    private final int frameTime = 150;
 
     public Pet(Context context) {
         super(context);
         init(context);
-        handler.postDelayed(drawRunnable, frameTime);
+        handler.postDelayed(drawRunnable, FRAME_TIME);
     }
 
     private void init(Context context) {
@@ -94,8 +95,8 @@ public abstract class Pet extends View implements Actionable {
                 invalidate();    //进行重绘，会再次调用onDraw
                 refreshFPSCallback();
                 long end = System.currentTimeMillis();
-                if (end - start < frameTime) {
-                    handler.postDelayed(this, frameTime - (end - start));
+                if (end - start < FRAME_TIME) {
+                    handler.postDelayed(this, FRAME_TIME - (end - start));
                 } else {
                     handler.post(this);
                 }

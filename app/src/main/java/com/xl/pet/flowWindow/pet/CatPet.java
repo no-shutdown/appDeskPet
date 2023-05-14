@@ -3,6 +3,7 @@ package com.xl.pet.flowWindow.pet;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.WindowManager;
@@ -17,16 +18,24 @@ import java.util.Random;
 
 public class CatPet extends Pet {
 
+    //一组图片最大数量
     private static final int MAX_IMAGES_INDEX = 9;
     //随机变动最大的时间间隔
-    private static final int MAX_RANDOM_CHANGE_INTERVAL = 10000;
+    private static final int MAX_RANDOM_CHANGE_INTERVAL = 60000;
+    //随机变动前至少静止的时间间隔
+    private static final int MIN_STAND_TIME_BEFORE_RANDOM = 10000;
+    //一个动作的时长
+    private static final int A_ACTION_INTERVAL = 3000;
 
     //动画标识
     Action actionFlag = null;
+
+    //随机变动
+    private final Handler handler = new Handler();
+    private final RandomRunnable randomRunnable = new RandomRunnable();
     Random random = new Random();
     Action[] randomChangeList = Action.values();
-    //上次行为变动的时间
-    private long lastActionChangeTime;
+    private long lastStandTime;
 
     //主图
     private final Bitmap[] actionImages = new Bitmap[MAX_IMAGES_INDEX];
@@ -38,6 +47,7 @@ public class CatPet extends Pet {
 
     //点击坐标
     protected float touchX, touchY;
+    private long lastTouchTime = 0;
     protected float lastTouchX, lastTouchY;
 
     private WindowManager bindWindowManager;
@@ -50,7 +60,7 @@ public class CatPet extends Pet {
         bmpW = bitmap.getWidth() + 30; //30伸缩空间
         personSize = 0.8f; //百分之80比例缩放
         actionChange(Action.DOUBT);
-        getHandler().postDelayed(this::randomChange, MAX_RANDOM_CHANGE_INTERVAL);
+        handler.postDelayed(randomRunnable, MAX_RANDOM_CHANGE_INTERVAL);
     }
 
     @Override
@@ -97,6 +107,7 @@ public class CatPet extends Pet {
         clearImages();
         switch (actionFlag) {
             case STAND:
+                lastStandTime = System.currentTimeMillis();
                 actionImages[0] = Utils.decodeResource(res, R.drawable.cat_stand);
                 break;
             case FIGHT:
@@ -109,19 +120,12 @@ public class CatPet extends Pet {
                 actionImages[6] = Utils.decodeResource(res, R.drawable.cat_fight_7);
                 actionImages[7] = Utils.decodeResource(res, R.drawable.cat_fight_8);
                 actionImages[8] = Utils.decodeResource(res, R.drawable.cat_fight_9);
-                this.postDelayed(() -> actionChange(Action.STAND), 5000);
+                this.postDelayed(() -> actionChange(Action.STAND), A_ACTION_INTERVAL);
                 break;
             case COLD:
                 actionImages[0] = Utils.decodeResource(res, R.drawable.cat_cold_1);
                 actionImages[1] = Utils.decodeResource(res, R.drawable.cat_cold_3);
-                this.postDelayed(() -> actionChange(Action.STAND), 5000);
-                break;
-            case BALL:
-                actionImages[0] = Utils.decodeResource(res, R.drawable.cat_ball_1);
-                actionImages[1] = Utils.decodeResource(res, R.drawable.cat_ball_2);
-                actionImages[2] = Utils.decodeResource(res, R.drawable.cat_ball_3);
-                actionImages[3] = Utils.decodeResource(res, R.drawable.cat_ball_4);
-                actionImages[4] = Utils.decodeResource(res, R.drawable.cat_ball_5);
+                this.postDelayed(() -> actionChange(Action.STAND), A_ACTION_INTERVAL);
                 break;
             case HELLO:
                 actionImages[0] = Utils.decodeResource(res, R.drawable.cat_hello_1);
@@ -131,14 +135,21 @@ public class CatPet extends Pet {
                 actionImages[4] = Utils.decodeResource(res, R.drawable.cat_hello_5);
                 actionImages[5] = Utils.decodeResource(res, R.drawable.cat_hello_6);
                 actionImages[6] = Utils.decodeResource(res, R.drawable.cat_hello_7);
-                this.postDelayed(() -> actionChange(Action.STAND), 5000);
+                this.postDelayed(() -> actionChange(Action.STAND), A_ACTION_INTERVAL);
                 break;
             case DOUBT:
                 actionImages[0] = Utils.decodeResource(res, R.drawable.cat_doubt_2);
                 actionImages[1] = Utils.decodeResource(res, R.drawable.cat_doubt_2);
                 actionImages[2] = Utils.decodeResource(res, R.drawable.cat_doubt_5);
                 actionImages[3] = Utils.decodeResource(res, R.drawable.cat_doubt_5);
-                this.postDelayed(() -> actionChange(Action.STAND), 5000);
+                this.postDelayed(() -> actionChange(Action.STAND), A_ACTION_INTERVAL);
+                break;
+            case BALL:
+                actionImages[0] = Utils.decodeResource(res, R.drawable.cat_ball_1);
+                actionImages[1] = Utils.decodeResource(res, R.drawable.cat_ball_2);
+                actionImages[2] = Utils.decodeResource(res, R.drawable.cat_ball_3);
+                actionImages[3] = Utils.decodeResource(res, R.drawable.cat_ball_4);
+                actionImages[4] = Utils.decodeResource(res, R.drawable.cat_ball_5);
                 break;
             default:
                 Log.w(Constants.LOG_TAG, "未知动作标识：" + flag);
@@ -150,15 +161,12 @@ public class CatPet extends Pet {
         if (actionFlag == Action.BALL) {
             return;
         }
-        int i = random.nextInt(MAX_IMAGES_INDEX);
+        int i = random.nextInt(randomChangeList.length);
         Action randomAction = randomChangeList[i];
         // 如果是球说明正在移动，就不变化
         if (Action.BALL != randomAction) {
             actionChange(randomAction);
         }
-        //提交下次随机变化的时间
-        int interval = random.nextInt(MAX_RANDOM_CHANGE_INTERVAL) + 10;
-        getHandler().postDelayed(this::randomChange, interval);
     }
 
     /**
@@ -173,9 +181,17 @@ public class CatPet extends Pet {
         switch (event.getAction()) {
             //点击
             case MotionEvent.ACTION_DOWN:
-                randomChange();
-                lastTouchX = event.getX();
-                lastTouchY = event.getY();
+                // 记录当前点击的时间和位置
+                long currentTime = System.currentTimeMillis();
+                // 判断是否双击
+                if (currentTime - lastTouchTime < 500
+                        && Math.abs(touchX - lastTouchX) < 50
+                        && Math.abs(touchY - lastTouchY) < 50) {
+                    randomChange();
+                }
+                lastTouchTime = currentTime;
+                lastTouchX = touchX;
+                lastTouchY = touchY;
                 break;
             //移动
             case MotionEvent.ACTION_MOVE:
@@ -193,11 +209,27 @@ public class CatPet extends Pet {
                 break;
             //抬起
             case MotionEvent.ACTION_UP:
-                actionChange(Action.STAND);
-                upOrDown = 1;
+                if (Action.BALL == actionFlag) {
+                    actionChange(Action.STAND);
+                    upOrDown = 1;
+                }
                 break;
         }
         return true;
+    }
+
+    class RandomRunnable implements Runnable {
+
+        @Override
+        public void run() {
+            if (actionFlag == Action.STAND
+                    && System.currentTimeMillis() - lastStandTime > MIN_STAND_TIME_BEFORE_RANDOM) {
+                randomChange();
+            }
+            //提交下次随机变化的时间
+            int interval = random.nextInt(MAX_RANDOM_CHANGE_INTERVAL);
+            handler.postDelayed(this, interval);
+        }
     }
 
     private void clearImages() {
@@ -205,14 +237,6 @@ public class CatPet extends Pet {
             actionImages[i] = null;
         }
     }
-
-    class RandomChangeRunnable implements Runnable {
-        @Override
-        public void run() {
-            randomChange();
-        }
-    }
-
     enum Action implements ActionFlag {
         STAND,
         FIGHT,
