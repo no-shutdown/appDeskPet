@@ -244,6 +244,12 @@ public class CatPet extends Pet {
         return true;
     }
 
+    @Override
+    public void destroy() {
+        super.destroy();
+        handler.removeCallbacks(randomRunnable);
+    }
+
     class RandomRunnable implements Runnable {
 
         @Override

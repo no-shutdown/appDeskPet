@@ -56,7 +56,7 @@ public class FloatWindowManager {
     public void removePerson(Context context) {
         if (person != null) {
             //停止pet的线程
-            person.stop();
+            person.destroy();
             WindowManager windowManager = getOrCreateWindowManager(context);
             windowManager.removeView(person);
             person = null;

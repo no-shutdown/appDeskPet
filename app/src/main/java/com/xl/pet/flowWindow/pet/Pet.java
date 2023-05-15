@@ -83,7 +83,7 @@ public abstract class Pet extends View implements Actionable {
     protected abstract void refreshFPSCallback();
 
     //停止渲染
-    public void stop() {
+    public void destroy() {
         handler.removeCallbacks(drawRunnable);
     }
 
