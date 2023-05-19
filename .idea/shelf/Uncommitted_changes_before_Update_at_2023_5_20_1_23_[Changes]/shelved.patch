@@ -1,0 +1,163 @@
+Index: app/src/main/java/com/xl/pet/flowWindow/pet/CatPet.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.xl.pet.flowWindow.pet;\n\nimport android.annotation.SuppressLint;\nimport android.content.Context;\nimport android.graphics.Bitmap;\nimport android.os.Handler;\nimport android.util.Log;\nimport android.view.MotionEvent;\nimport android.view.WindowManager;\n\nimport com.xl.pet.R;\nimport com.xl.pet.constants.Constants;\nimport com.xl.pet.flowWindow.pet.action.ActionFlag;\nimport com.xl.pet.utils.Utils;\n\nimport java.util.Random;\n\n\npublic class CatPet extends Pet {\n\n    //一组图片最大数量\n    private static final int MAX_IMAGES_INDEX = 10;\n    //随机变动最大的时间间隔\n    private static final int MAX_RANDOM_CHANGE_INTERVAL = 60000;\n    //随机变动前至少静止的时间间隔\n    private static final int MIN_STAND_TIME_BEFORE_RANDOM = 10000;\n    //一个动作的时长\n    private static final int A_ACTION_INTERVAL = 3000;\n\n    //动画标识\n    Action actionFlag = null;\n\n    //随机变动\n    private final Handler handler = new Handler();\n    private final RandomRunnable randomRunnable = new RandomRunnable();\n    Random random = new Random();\n    Action[] randomChangeList = Action.values();\n    private long lastStandTime;\n\n    //主图\n    private final Bitmap[] actionImages = new Bitmap[MAX_IMAGES_INDEX];\n    private int actionIndex = 0;\n    //左右判别，向左1，右-1。默认左\n    protected int leftOrRight = 1;\n    //上下判别，向上1，下-1\n    protected int upOrDown = 1;\n\n    //点击坐标\n    protected float touchX, touchY;\n    private long lastTouchTime = 0;\n    protected float lastTouchX, lastTouchY;\n\n    private WindowManager bindWindowManager;\n    private WindowManager.LayoutParams bindWindowManagerLayoutParams;\n\n    public CatPet(Context context) {\n        super(context);\n        Bitmap bitmap = Utils.decodeResource(res, R.drawable.cat_stand);\n        bmpH = bitmap.getHeight() + 10; //10伸缩空间\n        bmpW = bitmap.getWidth() + 30; //30伸缩空间\n        personSize = 0.8f; //百分之80比例缩放\n        actionChange(Action.STAND);\n        handler.postDelayed(randomRunnable, MAX_RANDOM_CHANGE_INTERVAL);\n    }\n\n    @Override\n    protected void actionFPS() {\n        matrix.reset();\n        int bmpW = getBmpW(), bmpH = getBmpH();\n        float dis = (1 - personSize) * bmpW / 2;\n        //调整缩放、方向\n        matrix.postScale(personSize * leftOrRight, personSize * upOrDown, bmpW / 2, bmpH / 2);\n        //调整位置\n        matrix.postTranslate(-dis, -dis);\n        //渲染帧图\n        actionIndex++;\n        if (actionIndex >= MAX_IMAGES_INDEX || actionImages[actionIndex] == null) {\n            actionIndex = 0;\n        }\n        bitmapFPS = actionImages[actionIndex];\n    }\n\n    @Override\n    protected void refreshFPSCallback() {\n        //渲染后刷新绑定的悬浮窗布局\n        if (bindWindowManager != null && bindWindowManagerLayoutParams != null) {\n            bindWindowManagerLayoutParams.x = (int) getX();\n            bindWindowManagerLayoutParams.y = (int) getY();\n            bindWindowManager.updateViewLayout(this, bindWindowManagerLayoutParams);\n        } else {\n            Log.w(Constants.LOG_TAG, \"未绑定windowManager或windowManagerLayoutParams\");\n        }\n    }\n\n    public void bindWindowManager(WindowManager windowManager, WindowManager.LayoutParams layoutParams) {\n        this.bindWindowManager = windowManager;\n        this.bindWindowManagerLayoutParams = layoutParams;\n    }\n\n    @Override\n    public void actionChange(ActionFlag flag) {\n        if (actionFlag == flag) {\n            return;\n        }\n        actionFlag = (Action) flag;\n        actionIndex = 0; //重置动作下标\n        clearImages();\n        switch (actionFlag) {\n            case STAND:\n                lastStandTime = System.currentTimeMillis();\n                actionImages[0] = Utils.decodeResource(res, R.drawable.cat_stand);\n                break;\n            case FIGHT:\n                actionImages[0] = Utils.decodeResource(res, R.drawable.cat_fight_1);\n                actionImages[1] = Utils.decodeResource(res, R.drawable.cat_fight_2);\n                actionImages[2] = Utils.decodeResource(res, R.drawable.cat_fight_3);\n                actionImages[3] = Utils.decodeResource(res, R.drawable.cat_fight_4);\n                actionImages[4] = Utils.decodeResource(res, R.drawable.cat_fight_5);\n                actionImages[5] = Utils.decodeResource(res, R.drawable.cat_fight_6);\n                actionImages[6] = Utils.decodeResource(res, R.drawable.cat_fight_7);\n                actionImages[7] = Utils.decodeResource(res, R.drawable.cat_fight_8);\n                actionImages[8] = Utils.decodeResource(res, R.drawable.cat_fight_9);\n                this.postDelayed(() -> actionChange(Action.STAND), A_ACTION_INTERVAL);\n                break;\n            case COLD:\n                actionImages[0] = Utils.decodeResource(res, R.drawable.cat_cold_1);\n                actionImages[1] = Utils.decodeResource(res, R.drawable.cat_cold_2);\n                this.postDelayed(() -> actionChange(Action.STAND), A_ACTION_INTERVAL);\n                break;\n            case HELLO:\n                actionImages[0] = Utils.decodeResource(res, R.drawable.cat_hello_1);\n                actionImages[1] = Utils.decodeResource(res, R.drawable.cat_hello_2);\n                actionImages[2] = Utils.decodeResource(res, R.drawable.cat_hello_3);\n                actionImages[3] = Utils.decodeResource(res, R.drawable.cat_hello_2);\n                actionImages[4] = Utils.decodeResource(res, R.drawable.cat_hello_1);\n                actionImages[5] = Utils.decodeResource(res, R.drawable.cat_hello_2);\n                actionImages[6] = Utils.decodeResource(res, R.drawable.cat_hello_3);\n                this.postDelayed(() -> actionChange(Action.STAND), A_ACTION_INTERVAL);\n                break;\n            case DOUBT:\n                actionImages[0] = Utils.decodeResource(res, R.drawable.cat_doubt_1);\n                actionImages[1] = Utils.decodeResource(res, R.drawable.cat_doubt_1);\n                actionImages[2] = Utils.decodeResource(res, R.drawable.cat_doubt_2);\n                actionImages[3] = Utils.decodeResource(res, R.drawable.cat_doubt_2);\n                this.postDelayed(() -> actionChange(Action.STAND), A_ACTION_INTERVAL);\n                break;\n            case AUHAUH:\n                actionImages[0] = Utils.decodeResource(res, R.drawable.cat_auhauh_1);\n                actionImages[1] = Utils.decodeResource(res, R.drawable.cat_auhauh_2);\n                actionImages[2] = Utils.decodeResource(res, R.drawable.cat_auhauh_3);\n                actionImages[3] = Utils.decodeResource(res, R.drawable.cat_auhauh_2);\n                actionImages[4] = Utils.decodeResource(res, R.drawable.cat_auhauh_1);\n                actionImages[5] = Utils.decodeResource(res, R.drawable.cat_auhauh_2);\n                actionImages[6] = Utils.decodeResource(res, R.drawable.cat_auhauh_3);\n                actionImages[7] = Utils.decodeResource(res, R.drawable.cat_auhauh_2);\n                this.postDelayed(() -> actionChange(Action.STAND), A_ACTION_INTERVAL);\n                break;\n            case EXERCISE:\n                actionImages[0] = Utils.decodeResource(res, R.drawable.cat_exercise_1);\n                actionImages[1] = Utils.decodeResource(res, R.drawable.cat_exercise_2);\n                actionImages[2] = Utils.decodeResource(res, R.drawable.cat_exercise_3);\n                actionImages[3] = Utils.decodeResource(res, R.drawable.cat_exercise_4);\n                actionImages[4] = Utils.decodeResource(res, R.drawable.cat_exercise_5);\n                actionImages[5] = Utils.decodeResource(res, R.drawable.cat_exercise_6);\n                actionImages[6] = Utils.decodeResource(res, R.drawable.cat_exercise_7);\n                this.postDelayed(() -> actionChange(Action.STAND), A_ACTION_INTERVAL);\n                break;\n            case CRY:\n                actionImages[0] = Utils.decodeResource(res, R.drawable.cat_cry_1);\n                actionImages[1] = Utils.decodeResource(res, R.drawable.cat_cry_2);\n                this.postDelayed(() -> actionChange(Action.STAND), A_ACTION_INTERVAL);\n                break;\n            case BALL:\n                actionImages[0] = Utils.decodeResource(res, R.drawable.cat_ball_1);\n                actionImages[1] = Utils.decodeResource(res, R.drawable.cat_ball_2);\n                actionImages[2] = Utils.decodeResource(res, R.drawable.cat_ball_3);\n                actionImages[3] = Utils.decodeResource(res, R.drawable.cat_ball_4);\n                actionImages[4] = Utils.decodeResource(res, R.drawable.cat_ball_5);\n                break;\n            default:\n                Log.w(Constants.LOG_TAG, \"未知动作标识：\" + flag);\n        }\n    }\n\n    @Override\n    public void randomChange() {\n        if (actionFlag == Action.BALL) {\n            return;\n        }\n        int i = random.nextInt(randomChangeList.length);\n        Action randomAction = randomChangeList[i];\n        // 如果是球说明正在移动，就不变化\n        if (Action.BALL != randomAction) {\n            actionChange(randomAction);\n        }\n    }\n\n    /**\n     * 触屏事件\n     */\n    @SuppressLint(\"ClickableViewAccessibility\")\n    @Override\n    public boolean onTouchEvent(MotionEvent event) {\n        touchX = event.getRawX();\n        touchY = event.getRawY();\n        int bmpW = getBmpW(), bmpH = getBmpH();\n        switch (event.getAction()) {\n            //点击\n            case MotionEvent.ACTION_DOWN:\n                // 记录当前点击的时间和位置\n                long currentTime = System.currentTimeMillis();\n                // 判断是否双击\n                if (currentTime - lastTouchTime < 500\n                        && Math.abs(touchX - lastTouchX) < 50\n                        && Math.abs(touchY - lastTouchY) < 50) {\n                    randomChange();\n                }\n                lastTouchTime = currentTime;\n                lastTouchX = touchX;\n                lastTouchY = touchY;\n                break;\n            //移动\n            case MotionEvent.ACTION_MOVE:\n                actionChange(Action.BALL);\n                float currentX = event.getX();\n                float currentY = event.getY();\n                float deltaY = currentY - lastTouchY;\n                // 大于0向下移动反之向上移动\n                upOrDown = deltaY > 0 ? 1 : -1;\n                lastTouchX = currentX;\n                lastTouchY = currentY;\n                //触摸点的显示作用\n                x = touchX - bmpW / 2;\n                y = touchY - bmpH / 2;\n                break;\n            //抬起\n            case MotionEvent.ACTION_UP:\n                if (Action.BALL == actionFlag) {\n                    actionChange(Action.STAND);\n                    upOrDown = 1;\n                }\n                break;\n        }\n        return true;\n    }\n\n    class RandomRunnable implements Runnable {\n\n        @Override\n        public void run() {\n            if (actionFlag == Action.STAND\n                    && System.currentTimeMillis() - lastStandTime > MIN_STAND_TIME_BEFORE_RANDOM) {\n                randomChange();\n            }\n            //提交下次随机变化的时间\n            int interval = random.nextInt(MAX_RANDOM_CHANGE_INTERVAL);\n            handler.postDelayed(this, interval);\n        }\n    }\n\n    private void clearImages() {\n        for (int i = 0; i < MAX_IMAGES_INDEX; i++) {\n            actionImages[i] = null;\n        }\n    }\n    enum Action implements ActionFlag {\n        STAND,\n        FIGHT,\n        COLD,\n        BALL,\n        HELLO,\n        DOUBT,\n        AUHAUH,\n        EXERCISE,\n        CRY,\n    }\n\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/xl/pet/flowWindow/pet/CatPet.java b/app/src/main/java/com/xl/pet/flowWindow/pet/CatPet.java
+--- a/app/src/main/java/com/xl/pet/flowWindow/pet/CatPet.java	(revision 793c5c76c19195331581c5ea28d666149e1b86ba)
++++ b/app/src/main/java/com/xl/pet/flowWindow/pet/CatPet.java	(date 1684516602989)
+@@ -26,6 +26,8 @@
+     private static final int MIN_STAND_TIME_BEFORE_RANDOM = 10000;
+     //一个动作的时长
+     private static final int A_ACTION_INTERVAL = 3000;
++    //移动阈值
++    private static final int MOVE_THRESHOLD = 50;
+ 
+     //动画标识
+     Action actionFlag = null;
+@@ -221,17 +223,20 @@
+                 break;
+             //移动
+             case MotionEvent.ACTION_MOVE:
+-                actionChange(Action.BALL);
+                 float currentX = event.getX();
+                 float currentY = event.getY();
++                float deltaX = currentX - lastTouchX;
+                 float deltaY = currentY - lastTouchY;
+-                // 大于0向下移动反之向上移动
+-                upOrDown = deltaY > 0 ? 1 : -1;
+-                lastTouchX = currentX;
+-                lastTouchY = currentY;
+-                //触摸点的显示作用
+-                x = touchX - bmpW / 2;
+-                y = touchY - bmpH / 2;
++                if (Math.abs(deltaX) > MOVE_THRESHOLD || Math.abs(deltaY) > MOVE_THRESHOLD) {
++                    actionChange(Action.BALL);
++                    // 大于0向下移动反之向上移动
++                    upOrDown = deltaY > 0 ? 1 : -1;
++                    //触摸点的显示作用
++                    x = touchX - bmpW / 2;
++                    y = touchY - bmpH / 2;
++                }
++                lastTouchX = currentX;
++                lastTouchY = currentY;
+                 break;
+             //抬起
+             case MotionEvent.ACTION_UP:
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_2023_5_12_19_45_[Changes]/shelved.patch
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_2023_5_12_19_45_[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Update_at_2023_5_12_19_45_[Changes]/shelved.patch
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_2023_5_12_19_45_[Changes]/shelved.patch	(revision 793c5c76c19195331581c5ea28d666149e1b86ba)
++++ /dev/null	(revision 793c5c76c19195331581c5ea28d666149e1b86ba)
+@@ -1,61 +0,0 @@
+-Index: .idea/misc.xml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><project version=\"4\">\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_1_8\" default=\"true\" project-jdk-name=\"corretto-1.8\" project-jdk-type=\"JavaSDK\">\n    <output url=\"file://$PROJECT_DIR$/build/classes\" />\n  </component>\n  <component name=\"ProjectType\">\n    <option name=\"id\" value=\"Android\" />\n  </component>\n</project>
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/.idea/misc.xml b/.idea/misc.xml
+---- a/.idea/misc.xml	(revision e0b175b2e53d73678eecfe2562a09220faf5e5a4)
+-+++ b/.idea/misc.xml	(date 1683891825615)
+-@@ -1,5 +1,5 @@
+- <project version="4">
+--  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="corretto-1.8" project-jdk-type="JavaSDK">
+-+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="corretto-11" project-jdk-type="JavaSDK">
+-     <output url="file://$PROJECT_DIR$/build/classes" />
+-   </component>
+-   <component name="ProjectType">
+-Index: .idea/deploymentTargetDropDown.xml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"deploymentTargetDropDown\">\n    <targetSelectedWithDropDown>\n      <Target>\n        <type value=\"QUICK_BOOT_TARGET\" />\n        <deviceKey>\n          <Key>\n            <type value=\"VIRTUAL_DEVICE_PATH\" />\n            <value value=\"C:\\Users\\Administrator\\.android\\avd\\Pixel_3a_XL_API_30.avd\" />\n          </Key>\n        </deviceKey>\n      </Target>\n    </targetSelectedWithDropDown>\n    <timeTargetWasSelectedWithDropDown value=\"2023-05-11T01:52:28.106880600Z\" />\n  </component>\n</project>
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/.idea/deploymentTargetDropDown.xml b/.idea/deploymentTargetDropDown.xml
+---- a/.idea/deploymentTargetDropDown.xml	(revision e0b175b2e53d73678eecfe2562a09220faf5e5a4)
+-+++ b/.idea/deploymentTargetDropDown.xml	(date 1683829371141)
+-@@ -7,11 +7,11 @@
+-         <deviceKey>
+-           <Key>
+-             <type value="VIRTUAL_DEVICE_PATH" />
+--            <value value="C:\Users\Administrator\.android\avd\Pixel_3a_XL_API_30.avd" />
+-+            <value value="C:\Users\13565\.android\avd\Pixel_3a_XL_API_31.avd" />
+-           </Key>
+-         </deviceKey>
+-       </Target>
+-     </targetSelectedWithDropDown>
+--    <timeTargetWasSelectedWithDropDown value="2023-05-11T01:52:28.106880600Z" />
+-+    <timeTargetWasSelectedWithDropDown value="2023-05-11T18:18:59.137392200Z" />
+-   </component>
+- </project>
+-\ No newline at end of file
+-Index: .idea/compiler.xml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"CompilerConfiguration\">\n    <bytecodeTargetLevel target=\"1.8\" />\n  </component>\n</project>
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/.idea/compiler.xml b/.idea/compiler.xml
+---- a/.idea/compiler.xml	(revision e0b175b2e53d73678eecfe2562a09220faf5e5a4)
+-+++ b/.idea/compiler.xml	(date 1683808332231)
+-@@ -1,6 +1,6 @@
+- <?xml version="1.0" encoding="UTF-8"?>
+- <project version="4">
+-   <component name="CompilerConfiguration">
+--    <bytecodeTargetLevel target="1.8" />
+-+    <bytecodeTargetLevel target="11" />
+-   </component>
+- </project>
+-\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_2023_5_12_19_45__Changes_.xml
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_2023_5_12_19_45__Changes_.xml b/.idea/shelf/Uncommitted_changes_before_Update_at_2023_5_12_19_45__Changes_.xml
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_2023_5_12_19_45__Changes_.xml	(revision 793c5c76c19195331581c5ea28d666149e1b86ba)
++++ /dev/null	(revision 793c5c76c19195331581c5ea28d666149e1b86ba)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Update_at_2023_5_12_19_45_[Changes]" date="1683891966831" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2023_5_12_19_45_[Changes]/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Update at 2023/5/12 19:45 [Changes]" />
+-</changelist>
+\ No newline at end of file
+Index: .idea/deploymentTargetDropDown.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"deploymentTargetDropDown\">\n    <targetSelectedWithDropDown>\n      <Target>\n        <type value=\"QUICK_BOOT_TARGET\" />\n        <deviceKey>\n          <Key>\n            <type value=\"VIRTUAL_DEVICE_PATH\" />\n            <value value=\"C:\\Users\\13565\\.android\\avd\\Pixel_3a_XL_API_31.avd\" />\n          </Key>\n        </deviceKey>\n      </Target>\n    </targetSelectedWithDropDown>\n    <timeTargetWasSelectedWithDropDown value=\"2023-05-11T18:18:59.137392200Z\" />\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/deploymentTargetDropDown.xml b/.idea/deploymentTargetDropDown.xml
+--- a/.idea/deploymentTargetDropDown.xml	(revision 793c5c76c19195331581c5ea28d666149e1b86ba)
++++ b/.idea/deploymentTargetDropDown.xml	(date 1684516790778)
+@@ -1,17 +1,17 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+   <component name="deploymentTargetDropDown">
+-    <targetSelectedWithDropDown>
++    <runningDeviceTargetSelectedWithDropDown>
+       <Target>
+-        <type value="QUICK_BOOT_TARGET" />
++        <type value="RUNNING_DEVICE_TARGET" />
+         <deviceKey>
+           <Key>
+-            <type value="VIRTUAL_DEVICE_PATH" />
+-            <value value="C:\Users\13565\.android\avd\Pixel_3a_XL_API_31.avd" />
++            <type value="SERIAL_NUMBER" />
++            <value value="7SQ0222120007874" />
+           </Key>
+         </deviceKey>
+       </Target>
+-    </targetSelectedWithDropDown>
+-    <timeTargetWasSelectedWithDropDown value="2023-05-11T18:18:59.137392200Z" />
++    </runningDeviceTargetSelectedWithDropDown>
++    <timeTargetWasSelectedWithDropDown value="2023-05-19T17:18:41.371445Z" />
+   </component>
+ </project>
+\ No newline at end of file

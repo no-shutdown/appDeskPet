@@ -26,6 +26,8 @@ public class CatPet extends Pet {
     private static final int MIN_STAND_TIME_BEFORE_RANDOM = 10000;
     //一个动作的时长
     private static final int A_ACTION_INTERVAL = 3000;
+    //移动的阈值
+    private static final int MOVE_THRESHOLD = 50;
 
     //动画标识
     Action actionFlag = null;
@@ -221,17 +223,21 @@ public class CatPet extends Pet {
                 break;
             //移动
             case MotionEvent.ACTION_MOVE:
-                actionChange(Action.BALL);
                 float currentX = event.getX();
                 float currentY = event.getY();
+                float deltaX = currentX - lastTouchX;
                 float deltaY = currentY - lastTouchY;
-                // 大于0向下移动反之向上移动
-                upOrDown = deltaY > 0 ? 1 : -1;
-                lastTouchX = currentX;
-                lastTouchY = currentY;
-                //触摸点的显示作用
-                x = touchX - bmpW / 2;
-                y = touchY - bmpH / 2;
+                // 检查移动距离是否超过阈值
+                if (Math.abs(deltaX) > MOVE_THRESHOLD || Math.abs(deltaY) > MOVE_THRESHOLD) {
+                    // 大于0向下移动反之向上移动
+                    upOrDown = deltaY > 0 ? 1 : -1;
+                    actionChange(Action.BALL);
+                    //触摸点的显示作用
+                    x = touchX - bmpW / 2;
+                    y = touchY - bmpH / 2;
+                    lastTouchX = currentX;
+                    lastTouchY = currentY;
+                }
                 break;
             //抬起
             case MotionEvent.ACTION_UP:
