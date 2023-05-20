@@ -223,10 +223,8 @@ public class CatPet extends Pet {
                 break;
             //移动
             case MotionEvent.ACTION_MOVE:
-                float currentX = event.getX();
-                float currentY = event.getY();
-                float deltaX = currentX - lastTouchX;
-                float deltaY = currentY - lastTouchY;
+                float deltaX = touchX - lastTouchX;
+                float deltaY = touchY - lastTouchY;
                 // 检查移动距离是否超过阈值
                 if (Math.abs(deltaX) > MOVE_THRESHOLD || Math.abs(deltaY) > MOVE_THRESHOLD) {
                     // 大于0向下移动反之向上移动
@@ -235,8 +233,6 @@ public class CatPet extends Pet {
                     //触摸点的显示作用
                     x = touchX - bmpW / 2;
                     y = touchY - bmpH / 2;
-                    lastTouchX = currentX;
-                    lastTouchY = currentY;
                 }
                 break;
             //抬起
@@ -275,6 +271,7 @@ public class CatPet extends Pet {
             actionImages[i] = null;
         }
     }
+
     enum Action implements ActionFlag {
         STAND,
         FIGHT,
