@@ -1,7 +1,5 @@
 package com.xl.pet.utils;
 
-import static com.xl.pet.constants.Constants.LOG_TAG;
-
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
@@ -9,7 +7,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
-import android.util.Log;
 import android.util.TypedValue;
 
 import androidx.annotation.RequiresApi;

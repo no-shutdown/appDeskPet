@@ -9,7 +9,7 @@ import android.view.MotionEvent;
 import android.view.WindowManager;
 
 import com.xl.pet.R;
-import com.xl.pet.constants.Constants;
+import com.xl.pet.globalConfig.Constants;
 import com.xl.pet.flowWindow.pet.action.ActionFlag;
 import com.xl.pet.utils.Utils;
 

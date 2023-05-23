@@ -15,6 +15,9 @@ import androidx.fragment.app.Fragment;
 import com.haibin.calendarview.Calendar;
 import com.haibin.calendarview.CalendarView;
 import com.xl.pet.R;
+import com.xl.pet.database.dao.MenstruationDao;
+import com.xl.pet.ui.menstruation.constants.TagEnum;
+import com.xl.pet.utils.DatabaseHelper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +28,10 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
     private Activity activity;
     private TextView tvMonth;
     private CalendarView mCalendarView;
+    private MenstruationDao menstruationDao;
+
+
+    private final Map<String, Calendar> map = new HashMap<>();
 
 
     @Override
@@ -37,20 +44,15 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         activity = getActivity();
-        findId();
         init();
         initData();
     }
 
-    /**
-     * 找id
-     */
-    private void findId() {
+    private void init() {
         tvMonth = activity.findViewById(R.id.tv_month);
         mCalendarView = activity.findViewById(R.id.calendarView);
-    }
+        menstruationDao = DatabaseHelper.menstruationDao();
 
-    private void init() {
         mCalendarView.setOnCalendarSelectListener(this);
         mCalendarView.setOnMonthChangeListener(this);
     }
@@ -59,106 +61,74 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
         int y = mCalendarView.getCurYear();//获取年
         int m = mCalendarView.getCurMonth();//获取月
         tvMonth.setText(y + "年" + m + "月");
-//        mCalendarView.setRange(m == 1 ? y - 1 : y, m == 1 ? 12 : m - 1, 1, m == 12 ? y + 1 : y, m == 12 ? 1 : m + 1, 31);//限制选择范围(限制只显示前后一个月)
+        mCalendarView.setRange(m < 6 ? y - 1 : y, m < 6 ? 12 : m - 6, 1,
+                m == 12 ? y + 1 : y, m == 12 ? 1 : m + 1, 31);//限制选择范围(限制只显示前6个月后1个月)
         mCalendarView.scrollToCurrent();//滚动到今天
-        setDatas(y, m);//填充数据,可自行计算或者后台返回，这里是固定数据
+        setDatas(y, m);
     }
 
-    @Override
-    public void onCalendarOutOfRange(Calendar calendar) {//超出日期选择范围
-        Toast.makeText(activity, "超出日期选择范围", Toast.LENGTH_SHORT).show();
-    }
-
-    /**
-     * @param year  年
-     * @param month 月
-     * @param day   日
-     * @param type  标记的文本(本示例不显示，只用于区分经期类型)
-     *              //@param color 标记的颜色(暂时不使用)
-     * @return
-     */
-    private Calendar getSchemeCalendar(int year, int month, int day, String type) {
-        Calendar calendar = new Calendar();
-        calendar.setYear(year);
-        calendar.setMonth(month);
-        calendar.setDay(day);
-        //     calendar.setSchemeColor(color);//优先级高于xml设置的颜色
-        calendar.setScheme(type);//优先级高于xml设置的文字
-        return calendar;
-    }
-
-    /**
-     * 后面可根据经期计算规则自由组装数据然后填充，或者叫后台直接返回，嘿嘿
-     * 目前经期数据为固定显示：10号为排卵日，月经期为24-28，易孕为6-9和11-15，其他均为安全期
-     * 这里暂时将标记类型作为不同经期判断处理： period为月经期 security为安全期 yiyun易孕期 ovulation排软日(只设置了一天)
-     * 如果需要用到标记，可下载他的library修改，按照Calendar类的getScheme()方式，自行添加字段，可参考 https://blog.csdn.net/a295268305/article/details/94877628
-     *
-     * @param y 年
-     * @param m 月
-     */
     private void setDatas(int y, int m) {
-        Map<String, Calendar> map = new HashMap<>();
-        map.put(getSchemeCalendar(y, m, 1, "security").toString(),
-                getSchemeCalendar(y, m, 1, "security"));
-        map.put(getSchemeCalendar(y, m, 2, "security").toString(),
-                getSchemeCalendar(y, m, 2, "security"));
-        map.put(getSchemeCalendar(y, m, 3, "security").toString(),
-                getSchemeCalendar(y, m, 3, "security"));
-        map.put(getSchemeCalendar(y, m, 4, "security").toString(),
-                getSchemeCalendar(y, m, 4, "security"));
-        map.put(getSchemeCalendar(y, m, 5, "security").toString(),
-                getSchemeCalendar(y, m, 5, "security"));
-        map.put(getSchemeCalendar(y, m, 6, "yiyun").toString(),
-                getSchemeCalendar(y, m, 6, "yiyun"));
-        map.put(getSchemeCalendar(y, m, 7, "yiyun").toString(),
-                getSchemeCalendar(y, m, 7, "yiyun"));
-        map.put(getSchemeCalendar(y, m, 8, "yiyun").toString(),
-                getSchemeCalendar(y, m, 8, "yiyun"));
-        map.put(getSchemeCalendar(y, m, 9, "yiyun").toString(),
-                getSchemeCalendar(y, m, 9, "yiyun"));
-        map.put(getSchemeCalendar(y, m, 10, "ovulation").toString(),
-                getSchemeCalendar(y, m, 10, "ovulation"));
-        map.put(getSchemeCalendar(y, m, 11, "yiyun").toString(),
-                getSchemeCalendar(y, m, 11, "yiyun"));
-        map.put(getSchemeCalendar(y, m, 12, "yiyun").toString(),
-                getSchemeCalendar(y, m, 12, "yiyun"));
-        map.put(getSchemeCalendar(y, m, 13, "yiyun").toString(),
-                getSchemeCalendar(y, m, 13, "yiyun"));
-        map.put(getSchemeCalendar(y, m, 14, "yiyun").toString(),
-                getSchemeCalendar(y, m, 14, "yiyun"));
-        map.put(getSchemeCalendar(y, m, 15, "yiyun").toString(),
-                getSchemeCalendar(y, m, 15, "yiyun"));
-        map.put(getSchemeCalendar(y, m, 16, "security").toString(),
-                getSchemeCalendar(y, m, 16, "security"));
-        map.put(getSchemeCalendar(y, m, 17, "security").toString(),
-                getSchemeCalendar(y, m, 17, "security"));
-        map.put(getSchemeCalendar(y, m, 18, "security").toString(),
-                getSchemeCalendar(y, m, 18, "security"));
-        map.put(getSchemeCalendar(y, m, 19, "security").toString(),
-                getSchemeCalendar(y, m, 19, "security"));
-        map.put(getSchemeCalendar(y, m, 20, "security").toString(),
-                getSchemeCalendar(y, m, 20, "security"));
-        map.put(getSchemeCalendar(y, m, 21, "security").toString(),
-                getSchemeCalendar(y, m, 21, "security"));
-        map.put(getSchemeCalendar(y, m, 22, "security").toString(),
-                getSchemeCalendar(y, m, 22, "security"));
-        map.put(getSchemeCalendar(y, m, 23, "security").toString(),
-                getSchemeCalendar(y, m, 23, "security"));
-        map.put(getSchemeCalendar(y, m, 24, "period").toString(),
-                getSchemeCalendar(y, m, 24, "period"));
-        map.put(getSchemeCalendar(y, m, 25, "period").toString(),
-                getSchemeCalendar(y, m, 25, "period"));
-        map.put(getSchemeCalendar(y, m, 26, "period").toString(),
-                getSchemeCalendar(y, m, 26, "period"));
-        map.put(getSchemeCalendar(y, m, 27, "period").toString(),
-                getSchemeCalendar(y, m, 27, "period"));
-        map.put(getSchemeCalendar(y, m, 28, "period").toString(),
-                getSchemeCalendar(y, m, 28, "period"));
+        map.put(getSchemeCalendar(y, m, 1, "SECURITY").toString(),
+                getSchemeCalendar(y, m, 1, "SECURITY"));
+        map.put(getSchemeCalendar(y, m, 2, "SECURITY").toString(),
+                getSchemeCalendar(y, m, 2, "SECURITY"));
+        map.put(getSchemeCalendar(y, m, 3, "SECURITY").toString(),
+                getSchemeCalendar(y, m, 3, "SECURITY"));
+        map.put(getSchemeCalendar(y, m, 4, "SECURITY").toString(),
+                getSchemeCalendar(y, m, 4, "SECURITY"));
+        map.put(getSchemeCalendar(y, m, 5, "SECURITY").toString(),
+                getSchemeCalendar(y, m, 5, "SECURITY"));
+        map.put(getSchemeCalendar(y, m, 6, "FERTILE").toString(),
+                getSchemeCalendar(y, m, 6, "FERTILE"));
+        map.put(getSchemeCalendar(y, m, 7, "FERTILE").toString(),
+                getSchemeCalendar(y, m, 7, "FERTILE"));
+        map.put(getSchemeCalendar(y, m, 8, "FERTILE").toString(),
+                getSchemeCalendar(y, m, 8, "FERTILE"));
+        map.put(getSchemeCalendar(y, m, 9, "FERTILE").toString(),
+                getSchemeCalendar(y, m, 9, "FERTILE"));
+        map.put(getSchemeCalendar(y, m, 10, "OVULATION").toString(),
+                getSchemeCalendar(y, m, 10, "OVULATION"));
+        map.put(getSchemeCalendar(y, m, 11, "FERTILE").toString(),
+                getSchemeCalendar(y, m, 11, "FERTILE"));
+        map.put(getSchemeCalendar(y, m, 12, "FERTILE").toString(),
+                getSchemeCalendar(y, m, 12, "FERTILE"));
+        map.put(getSchemeCalendar(y, m, 13, "FERTILE").toString(),
+                getSchemeCalendar(y, m, 13, "FERTILE"));
+        map.put(getSchemeCalendar(y, m, 14, "FERTILE").toString(),
+                getSchemeCalendar(y, m, 14, "FERTILE"));
+        map.put(getSchemeCalendar(y, m, 15, "FERTILE").toString(),
+                getSchemeCalendar(y, m, 15, "FERTILE"));
+        map.put(getSchemeCalendar(y, m, 16, "SECURITY").toString(),
+                getSchemeCalendar(y, m, 16, "SECURITY"));
+        map.put(getSchemeCalendar(y, m, 17, "SECURITY").toString(),
+                getSchemeCalendar(y, m, 17, "SECURITY"));
+        map.put(getSchemeCalendar(y, m, 18, "SECURITY").toString(),
+                getSchemeCalendar(y, m, 18, "SECURITY"));
+        map.put(getSchemeCalendar(y, m, 19, "SECURITY").toString(),
+                getSchemeCalendar(y, m, 19, "SECURITY"));
+        map.put(getSchemeCalendar(y, m, 20, "SECURITY").toString(),
+                getSchemeCalendar(y, m, 20, "SECURITY"));
+        map.put(getSchemeCalendar(y, m, 21, "SECURITY").toString(),
+                getSchemeCalendar(y, m, 21, "SECURITY"));
+        map.put(getSchemeCalendar(y, m, 22, "SECURITY").toString(),
+                getSchemeCalendar(y, m, 22, "SECURITY"));
+        map.put(getSchemeCalendar(y, m, 23, "SECURITY").toString(),
+                getSchemeCalendar(y, m, 23, "SECURITY"));
+        map.put(getSchemeCalendar(y, m, 24, "PERIOD").toString(),
+                getSchemeCalendar(y, m, 24, "PERIOD"));
+        map.put(getSchemeCalendar(y, m, 25, "PERIOD").toString(),
+                getSchemeCalendar(y, m, 25, "PERIOD"));
+        map.put(getSchemeCalendar(y, m, 26, "PERIOD").toString(),
+                getSchemeCalendar(y, m, 26, "PERIOD"));
+        map.put(getSchemeCalendar(y, m, 27, "PERIOD").toString(),
+                getSchemeCalendar(y, m, 27, "PERIOD"));
+        map.put(getSchemeCalendar(y, m, 28, "PERIOD").toString(),
+                getSchemeCalendar(y, m, 28, "PERIOD"));
         switch (m) {
             case 2://二月
                 if (y % 4 == 0 && y % 100 != 0 || y % 400 == 0) {//闰年
-                    map.put(getSchemeCalendar(y, m, 29, "security").toString(),
-                            getSchemeCalendar(y, m, 29, "security"));
+                    map.put(getSchemeCalendar(y, m, 29, "SECURITY").toString(),
+                            getSchemeCalendar(y, m, 29, "SECURITY"));
                 }
                 break;
             case 1://有31天
@@ -168,43 +138,71 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
             case 8:
             case 10:
             case 12:
-                map.put(getSchemeCalendar(y, m, 29, "security").toString(),
-                        getSchemeCalendar(y, m, 29, "security"));
-                map.put(getSchemeCalendar(y, m, 30, "security").toString(),
-                        getSchemeCalendar(y, m, 30, "security"));
-                map.put(getSchemeCalendar(y, m, 31, "security").toString(),
-                        getSchemeCalendar(y, m, 31, "security"));
+                map.put(getSchemeCalendar(y, m, 29, "SECURITY").toString(),
+                        getSchemeCalendar(y, m, 29, "SECURITY"));
+                map.put(getSchemeCalendar(y, m, 30, "SECURITY").toString(),
+                        getSchemeCalendar(y, m, 30, "SECURITY"));
+                map.put(getSchemeCalendar(y, m, 31, "SECURITY").toString(),
+                        getSchemeCalendar(y, m, 31, "SECURITY"));
                 break;
             default://只有30天
-                map.put(getSchemeCalendar(y, m, 29, "security").toString(),
-                        getSchemeCalendar(y, m, 29, "security"));
-                map.put(getSchemeCalendar(y, m, 30, "security").toString(),
-                        getSchemeCalendar(y, m, 30, "security"));
+                map.put(getSchemeCalendar(y, m, 29, "SECURITY").toString(),
+                        getSchemeCalendar(y, m, 29, "SECURITY"));
+                map.put(getSchemeCalendar(y, m, 30, "SECURITY").toString(),
+                        getSchemeCalendar(y, m, 30, "SECURITY"));
                 break;
         }
         //此方法在巨大的数据量上不影响遍历性能，推荐使用
         mCalendarView.setSchemeDate(map);
     }
 
-
-    int count = 0;
+    private Calendar getSchemeCalendar(int year, int month, int day, String type) {
+        Calendar calendar = new Calendar();
+        calendar.setYear(year);
+        calendar.setMonth(month);
+        calendar.setDay(day);
+        calendar.setScheme(type);
+        return calendar;
+    }
 
     @Override
-    public void onCalendarSelect(Calendar calendar, boolean isClick) {//选中事件
-        if ("period".equals(calendar.getScheme())) {
-            Toast.makeText(activity, "当前为月经期", Toast.LENGTH_SHORT).show();
-        } else if ("ovulation".equals(calendar.getScheme())) {
-            Toast.makeText(activity, "排卵期", Toast.LENGTH_SHORT).show();
-        } else {//初次加载会走两次方法是因为，你设置了日期范围和滚动到当天
-            if (count < 2)
-                count++;
-            else
-                Toast.makeText(activity, "选中：" + calendar.getDay(), Toast.LENGTH_SHORT).show();
+    public void onCalendarSelect(Calendar calendar, boolean isClick) {
+        //是否经期标记切换，Room操作数据库强制不能在主线程
+        if (isClick) {
+            System.out.println(calendar.getScheme());
+            new Thread(() -> switchPeriod(calendar, !TagEnum.PERIOD.name().equals(calendar.getScheme()))).start();
         }
+    }
+
+    private void switchPeriod(Calendar calendar, boolean tag) {
+        if (tag) {
+            calendar.setScheme(TagEnum.PERIOD.name());
+        } else {
+            calendar.setScheme(null);
+        }
+
+//        //数据库更新
+//        int year = calendar.getYear();
+//        int month = calendar.getMonth();
+//        int day = calendar.getDay();
+//        if (tag) {
+//            MenstruationDO menstruationDO = new MenstruationDO();
+//            menstruationDO.year = year;
+//            menstruationDO.month = month;
+//            menstruationDO.day = day;
+//            menstruationDao.insert(menstruationDO);
+//        } else {
+//            menstruationDao.deleteTag(year, month, day);
+//        }
     }
 
     @Override
     public void onMonthChange(int year, int month) {//月份改变事件
         tvMonth.setText(year + "年" + month + "月");
+    }
+
+    @Override
+    public void onCalendarOutOfRange(Calendar calendar) {//超出日期选择范围
+        Toast.makeText(activity, "超出日期选择范围", Toast.LENGTH_SHORT).show();
     }
 }

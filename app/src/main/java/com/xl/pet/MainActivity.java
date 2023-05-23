@@ -10,6 +10,7 @@ import android.provider.Settings;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.xl.pet.flowWindow.FloatWindowService;
+import com.xl.pet.utils.DatabaseHelper;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
@@ -40,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
         if (!isServiceRunning) {
             startFloatWindowService();
         }
+        //创建数据库实例
+        DatabaseHelper.createDatabase(this);
 //        finish();
     }
 

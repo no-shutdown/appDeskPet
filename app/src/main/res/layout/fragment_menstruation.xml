@@ -31,9 +31,6 @@
             app:scheme_text="假"
             app:scheme_theme_color="#F3B7D7"
             app:select_mode="single_mode"
-            app:selected_lunar_text_color="#ffffff"
-            app:selected_text_color="#ffffff"
-            app:selected_theme_color="#EE7CB6"
             app:week_background="#ffffff"
             app:week_text_color="#ACACAC" />
 

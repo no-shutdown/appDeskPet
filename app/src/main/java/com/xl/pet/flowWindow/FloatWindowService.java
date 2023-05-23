@@ -22,8 +22,8 @@ import com.xl.pet.utils.Utils;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static com.xl.pet.constants.Constants.AUTH_TAG;
-import static com.xl.pet.constants.Constants.LOG_TAG;
+import static com.xl.pet.globalConfig.Constants.AUTH_TAG;
+import static com.xl.pet.globalConfig.Constants.LOG_TAG;
 
 public class FloatWindowService extends Service {
 

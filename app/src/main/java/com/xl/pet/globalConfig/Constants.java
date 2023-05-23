@@ -1,4 +1,4 @@
-package com.xl.pet.constants;
+package com.xl.pet.globalConfig;
 
 public class Constants {
     public static String AUTH_TAG = "贫僧洗发水呢";

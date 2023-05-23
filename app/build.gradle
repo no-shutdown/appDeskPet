@@ -30,8 +30,11 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
-    //CalendarView日历
-    implementation 'com.haibin:calendarview:3.6.4'
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support:support-v4:28.0.0'
+    //CalendarView日历
+    implementation 'com.haibin:calendarview:3.6.4'
+    //数据库依赖
+    implementation 'androidx.room:room-runtime:2.3.0'
+    annotationProcessor 'androidx.room:room-compiler:2.3.0'
 }
