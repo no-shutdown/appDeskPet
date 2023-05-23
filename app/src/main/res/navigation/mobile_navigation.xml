@@ -12,10 +12,10 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="com.xl.pet.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        android:id="@+id/navigation_menstruation"
+        android:name="com.xl.pet.ui.menstruation.MenstruationFragment"
+        android:label="@string/title_menstruation"
+        tools:layout="@layout/fragment_menstruation" />
 
     <fragment
         android:id="@+id/navigation_notifications"
