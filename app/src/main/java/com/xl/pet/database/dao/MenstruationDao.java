@@ -10,7 +10,7 @@ import java.util.List;
 
 @Dao
 public interface MenstruationDao {
-    @Query("SELECT * FROM menstruation")
+    @Query("SELECT * FROM menstruation ORDER BY year,month,day ASC")
     List<MenstruationDO> findAll();
 
     @Query("SELECT * FROM menstruation WHERE id = :id")

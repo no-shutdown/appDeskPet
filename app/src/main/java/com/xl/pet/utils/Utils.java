@@ -11,6 +11,8 @@ import android.util.TypedValue;
 
 import androidx.annotation.RequiresApi;
 
+import com.haibin.calendarview.Calendar;
+
 import java.util.List;
 
 
@@ -21,7 +23,7 @@ public class Utils {
         String topActivity = "";
         //api 22以上
         UsageStatsManager m = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
-        if (null!=m){
+        if (null != m) {
             long now = System.currentTimeMillis();
             List<UsageStats> stats = m.queryUsageStats(UsageStatsManager.INTERVAL_BEST, now - 60 * 1000 * 60, now);
             if ((stats != null) && (!stats.isEmpty())) {
@@ -50,4 +52,18 @@ public class Utils {
         return BitmapFactory.decodeResource(resources, id, opts);
     }
 
+
+    //日历往后推n天
+    public static Calendar calendarAdd(Calendar calendar, int n) {
+        //TODO ? BUG??
+        java.util.Calendar javaCalendar = java.util.Calendar.getInstance();
+        javaCalendar.setTimeInMillis(calendar.getTimeInMillis());
+        javaCalendar.add(java.util.Calendar.DAY_OF_YEAR, n);
+
+        Calendar result = new Calendar();
+        result.setYear(javaCalendar.get(java.util.Calendar.YEAR));
+        result.setMonth(javaCalendar.get(java.util.Calendar.MONTH));
+        result.setDay(javaCalendar.get(java.util.Calendar.DATE));
+        return result;
+    }
 }
