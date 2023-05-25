@@ -28,7 +28,7 @@
             app:current_day_text_color="#EE7CB6"
             app:month_view="com.xl.pet.ui.menstruation.PeriodMonthView"
             app:month_view_show_mode="mode_only_current"
-            app:scheme_text="假"
+            app:scheme_text="NULL"
             app:scheme_theme_color="#F3B7D7"
             app:select_mode="single_mode"
             app:week_background="#ffffff"
@@ -113,6 +113,25 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="3dp"
                         android:text="月经期" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:background="#FFE4E1" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="3dp"
+                        android:text="预测期" />
                 </LinearLayout>
 
             </LinearLayout>

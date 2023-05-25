@@ -37,13 +37,14 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
     private TextView tvMonth;
     private CalendarView mCalendarView;
     private MenstruationDao menstruationDao;
-    private Long recentlyClick;
     private final Timer timer = new Timer();
+
+    //日历map
+    private final Map<String, Calendar> map = new HashMap<>();
+    //最近一次点击时间戳（用于延迟刷新周期数据）
+    private Long recentlyClick;
     //数据库所需更新缓存（<20230525,TRUE> 表示需要插入20230525数据）
     private final ConcurrentHashMap<Integer, Boolean> dataCache = new ConcurrentHashMap<>();
-
-
-    private final Map<String, Calendar> map = new HashMap<>();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -55,17 +56,12 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         activity = getActivity();
-        init();
-        initData();
-    }
-
-    private void init() {
         tvMonth = activity.findViewById(R.id.tv_month);
         mCalendarView = activity.findViewById(R.id.calendarView);
         menstruationDao = DatabaseHelper.menstruationDao();
-
         mCalendarView.setOnCalendarSelectListener(this);
         mCalendarView.setOnMonthChangeListener(this);
+        initData();
     }
 
     private void initData() {
@@ -80,11 +76,29 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
 
     private void refreshData() {
         map.clear();
+        //历史数据
+        List<MenstruationDO> databaseLog = menstruationDao.findAll();
+        List<Calendar> historyData = new ArrayList<>();
+        for (int index = 0; index < databaseLog.size(); index++) {
+            MenstruationDO i = databaseLog.get(index);
+            historyData.add(getSchemeCalendar(i.year, i.month, i.day, TagEnum.PERIOD.name()));
+        }
+        PreModel preModel = doRefreshData(historyData);
+
+        //预测数据
+        List<Calendar> preData = preModel.prePeriodData();
+        doRefreshData(preData);
+    }
+
+    private PreModel doRefreshData(List<Calendar> data) {
+        Calendar recentlyPeriod = null;
+        int avgInterval, avgDays;
+
         Calendar start = null, end = null, last = null;
-        List<MenstruationDO> all = menstruationDao.findAll();
-        for (int index = 0; index < all.size(); index++) {
-            MenstruationDO i = all.get(index);
-            Calendar current = getSchemeCalendar(i.year, i.month, i.day, TagEnum.PERIOD.name());
+        List<Integer> intervals = new ArrayList<>(); //记录所有周期天数算出平均周期
+        List<Integer> days = new ArrayList<>(); //记录所有经期天数算出平均天数
+        for (int index = 0; index < data.size(); index++) {
+            Calendar current = data.get(index);
             map.put(current.toString(), current);
             //第一次循环
             if (last == null) {
@@ -93,23 +107,34 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
                 continue;
             }
             //第N次循环
-            if (index != all.size() - 1 && current.differ(last) == 1) {
-                last = current;
-                continue;
+            if (index == data.size() - 1 || current.differ(last) != 1) {
+                end = current.differ(last) > 1 ? last : current;
+                //只会将经期天数至少3天的作为周期推断
+                int currentDays = end.differ(start) + 1;
+                if (currentDays > 2) {
+                    //安全期：经期第一天前7后8
+                    putSecurity(start, end, currentDays);
+                    //排卵日：经期第一天往前推14天 | 排卵期：排卵日前5后4
+                    putOvulation(start);
+
+                    //记录上次经期日期，周期天数和经期天数
+                    recentlyPeriod = start;
+                    days.add(currentDays);
+                    if (current != end) {
+                        intervals.add(current.differ(start));
+                    }
+                }
+                start = current;
             }
-            end = current.differ(last) > 1 ? last : current;
-            //只会将经期天数至少3天的作为周期推断
-            int days = end.differ(start);
-            if (days > 2) {
-                //安全期：经期第一天前7后8
-                putSecurity(start, end, days);
-                //排卵日：经期第一天往前推14天 | 排卵期：排卵日前5后4
-                putOvulation(start);
-            }
-            start = current;
             last = current;
         }
+        //计算平均周期天数和经期天数
+        last = data.get(data.size() - 1);
+        avgInterval = (int) Utils.avg(intervals);
+        avgDays = (int) Utils.avg(days);
+
         mCalendarView.setSchemeDate(map);
+        return new PreModel(recentlyPeriod, last, avgInterval, avgDays);
     }
 
     private void putSecurity(Calendar start, Calendar end, int days) {
@@ -191,6 +216,10 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
     }
 
     private void switchPeriod(Calendar calendar, boolean tag) {
+        Calendar today = Utils.todayCalendar();
+        if (calendar.compareTo(today) > 0) {
+            return;
+        }
         //更新界面
         if (tag) {
             calendar.setScheme(TagEnum.PERIOD.name());
@@ -232,5 +261,42 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
     @Override
     public void onCalendarOutOfRange(Calendar calendar) {//超出日期选择范围
         Toast.makeText(activity, "超出日期选择范围", Toast.LENGTH_SHORT).show();
+    }
+
+    //预测模型
+    static class PreModel {
+        //最近一次经期开始日期
+        public final Calendar recentlyPeriod;
+        //历史数据的最后一天日期（只会预测该天之后的数据）
+        public final Calendar last;
+        //平均周期天数
+        public final int avgInterval;
+        //平均经期天数
+        public final int avgDays;
+
+
+        public PreModel(Calendar recentlyPeriod, Calendar last, int avgInterval, int avgDays) {
+            this.recentlyPeriod = recentlyPeriod;
+            this.last = last;
+            this.avgInterval = avgInterval;
+            this.avgDays = avgDays;
+        }
+
+        public List<Calendar> prePeriodData() {
+            System.out.println(last);
+            List<Calendar> result = new ArrayList<>();
+            if (null == recentlyPeriod || 0 == avgInterval || 0 == avgDays) {
+                return result;
+            }
+            Calendar startPoint = Utils.calendarAdd(recentlyPeriod, avgInterval - 1);
+            for (int i = 1; i <= avgDays; i++) {
+                Calendar calendar = Utils.calendarAdd(startPoint, i);
+                if (calendar.compareTo(last) > 0) {
+                    calendar.setScheme(TagEnum.PRE_PERIOD.name());
+                    result.add(calendar);
+                }
+            }
+            return result;
+        }
     }
 }

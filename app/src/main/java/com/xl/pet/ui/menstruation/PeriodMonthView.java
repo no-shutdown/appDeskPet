@@ -18,6 +18,7 @@ public class PeriodMonthView extends MonthView {
     private final int mW;
     private final Paint mPointPaint = new Paint();//标记画笔
     private final Paint mClearPaint = new Paint();//清空画笔
+    private final Paint mPrePaint = new Paint(); //预测画笔
 
     private static final String TODAY = "今天";
 
@@ -29,9 +30,12 @@ public class PeriodMonthView extends MonthView {
         mPointPaint.setAntiAlias(true);
         mPointPaint.setStyle(Paint.Style.FILL);
         mPointPaint.setTextAlign(Paint.Align.CENTER);
-        mPointPaint.setColor(Color.RED);
-        mSelectedPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        mPointPaint.setColor(0xFFE4CFFB);
         mClearPaint.setColor(Color.TRANSPARENT);
+        mPrePaint.setAntiAlias(true);
+        mPrePaint.setStyle(Paint.Style.FILL);
+        mPrePaint.setTextAlign(Paint.Align.CENTER);
+        mPrePaint.setColor(0xFFFFE4E1);
     }
 
     @Override
@@ -53,11 +57,13 @@ public class PeriodMonthView extends MonthView {
             tagEnum = TagEnum.valueOf(calendar.getScheme());
         }
         switch (tagEnum) {
-            case PERIOD: //主题标记月经期
+            case PERIOD://标记经期
                 canvas.drawRect(x + mPadding, y + mPadding, x + mItemWidth - mPadding, y + mItemHeight - mPadding, mSchemePaint);
                 break;
+            case PRE_PERIOD://标记预测经期
+                canvas.drawRect(x + mPadding, y + mPadding, x + mItemWidth - mPadding, y + mItemHeight - mPadding, mPrePaint);
+                break;
             case OVULATION_DAY: //特别标记排卵日（底部横线表示）
-                mPointPaint.setColor(0xFFE4CFFB);
                 canvas.drawRect(x + mItemWidth / 2 - mW / 2,
                         y + mItemHeight - mH * 2 - mPadding,
                         x + mItemWidth / 2 + mW / 2,
@@ -79,7 +85,8 @@ public class PeriodMonthView extends MonthView {
             tagEnum = TagEnum.valueOf(calendar.getScheme());
         }
         switch (tagEnum) {
-            case PERIOD: //月经期，所有文本颜色都是白色
+            case PERIOD: //经期或预测经期，所有文本颜色都是白色
+            case PRE_PERIOD:
                 mSchemeTextPaint.setColor(0xFFFFFFFF);//标记的文本画笔
                 mSchemeLunarTextPaint.setColor(0xFFFFFFFF);//标记农历文本画笔
                 mCurMonthTextPaint.setColor(0xFFFFFFFF);//当前月份日期文本画笔

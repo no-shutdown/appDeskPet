@@ -13,6 +13,7 @@ import androidx.annotation.RequiresApi;
 
 import com.haibin.calendarview.Calendar;
 
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -64,5 +65,24 @@ public class Utils {
         result.setMonth(javaCalendar.get(java.util.Calendar.MONTH) + 1);
         result.setDay(javaCalendar.get(java.util.Calendar.DATE));
         return result;
+    }
+
+    //获取今天日历
+    public static Calendar todayCalendar() {
+        java.util.Calendar javaCalendar = java.util.Calendar.getInstance();
+        Calendar result = new Calendar();
+        result.setYear(javaCalendar.get(java.util.Calendar.YEAR));
+        result.setMonth(javaCalendar.get(java.util.Calendar.MONTH) + 1);
+        result.setDay(javaCalendar.get(java.util.Calendar.DATE));
+        return result;
+    }
+
+    //计算平均值
+    public static double avg(List<Integer> list) {
+        int sum = 0;
+        for (int num : list) {
+            sum += num;
+        }
+        return (double) sum / list.size();
     }
 }
