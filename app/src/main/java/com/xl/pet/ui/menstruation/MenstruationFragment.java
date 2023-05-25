@@ -21,9 +21,11 @@ import com.xl.pet.ui.menstruation.constants.TagEnum;
 import com.xl.pet.utils.DatabaseHelper;
 import com.xl.pet.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,8 +39,8 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
     private MenstruationDao menstruationDao;
     private Long recentlyClick;
     private final Timer timer = new Timer();
-    //TODO
-    private final ConcurrentHashMap<String, Integer> switchMap = new ConcurrentHashMap<>();
+    //数据库所需更新缓存（<20230525,TRUE> 表示需要插入20230525数据）
+    private final ConcurrentHashMap<Integer, Boolean> dataCache = new ConcurrentHashMap<>();
 
 
     private final Map<String, Calendar> map = new HashMap<>();
@@ -95,7 +97,7 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
                 last = current;
                 continue;
             }
-            end = index == all.size() - 1 ? current : last;
+            end = current.differ(last) > 1 ? last : current;
             //只会将经期天数至少3天的作为周期推断
             int days = end.differ(start);
             if (days > 2) {
@@ -181,6 +183,7 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
             @Override
             public void run() {
                 if (currentId == recentlyClick) {
+                    applyDataCache();
                     refreshData();
                 }
             }
@@ -188,30 +191,37 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
     }
 
     private void switchPeriod(Calendar calendar, boolean tag) {
+        //更新界面
         if (tag) {
             calendar.setScheme(TagEnum.PERIOD.name());
         } else {
             calendar.setScheme(null);
         }
+        //记录数据库所需更新
+        int id = Integer.parseInt(calendar.toString());
+        Boolean cache = dataCache.get(id);
+        if (null == cache) {
+            dataCache.put(id, tag);
+        } else if (cache != tag) {
+            dataCache.remove(id);
+        }
+    }
 
-        //数据库更新（Room操作数据库强制不能在主线程）
-        new Thread(() -> {
-            int id = Integer.parseInt(calendar.toString());
-            int year = calendar.getYear();
-            int month = calendar.getMonth();
-            int day = calendar.getDay();
-            if (tag) {
-                MenstruationDO menstruationDO = new MenstruationDO();
-                menstruationDO.id = id;
-                menstruationDO.year = year;
-                menstruationDO.month = month;
-                menstruationDO.day = day;
-                menstruationDao.insert(menstruationDO);
+    private void applyDataCache() {
+        List<MenstruationDO> inserts = new ArrayList<>();
+        List<MenstruationDO> deletes = new ArrayList<>();
+        Set<Integer> keys = dataCache.keySet();
+        for (Integer key : keys) {
+            Boolean data = dataCache.get(key);
+            if (Boolean.TRUE.equals(data)) {
+                inserts.add(new MenstruationDO(key));
             } else {
-                menstruationDao.delete(id);
+                deletes.add(new MenstruationDO(key));
             }
-        }).start();
-
+        }
+        menstruationDao.insertEntities(inserts);
+        menstruationDao.deleteEntities(deletes);
+        dataCache.clear();
     }
 
     @Override

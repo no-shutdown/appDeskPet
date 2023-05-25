@@ -56,7 +56,7 @@ public class PeriodMonthView extends MonthView {
             case PERIOD: //主题标记月经期
                 canvas.drawRect(x + mPadding, y + mPadding, x + mItemWidth - mPadding, y + mItemHeight - mPadding, mSchemePaint);
                 break;
-            case OVULATION_DAY: //特别标记易孕期（底部横线表示）
+            case OVULATION_DAY: //特别标记排卵日（底部横线表示）
                 mPointPaint.setColor(0xFFE4CFFB);
                 canvas.drawRect(x + mItemWidth / 2 - mW / 2,
                         y + mItemHeight - mH * 2 - mPadding,
@@ -95,8 +95,8 @@ public class PeriodMonthView extends MonthView {
                 mOtherMonthTextPaint.setColor(0xff8CD97C);
                 mOtherMonthLunarTextPaint.setColor(0xff8CD97C);
                 break;
-            case OVULATION_DAY://易孕期
-            case OVULATION://排卵日所有的文本颜色都是粉色
+            case OVULATION_DAY://排卵日
+            case OVULATION://排卵期所有的文本颜色都是粉色
                 mCurMonthTextPaint.setColor(0xffE4BBF8);
                 mCurMonthLunarTextPaint.setColor(0xffE4BBF8);
                 mSchemeTextPaint.setColor(0xffE4BBF8);
