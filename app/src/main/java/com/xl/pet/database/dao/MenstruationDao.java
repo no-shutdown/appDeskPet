@@ -14,10 +14,13 @@ public interface MenstruationDao {
     List<MenstruationDO> findAll();
 
     @Query("SELECT * FROM menstruation WHERE id = :id")
-    MenstruationDO findById(int id);
+    MenstruationDO find(int id);
 
     @Query("DELETE FROM menstruation WHERE year = :year AND month = :month AND day = :day")
-    void deleteTag(int year, int month, int day);
+    void delete(int year, int month, int day);
+
+    @Query("DELETE FROM menstruation WHERE id = :id")
+    void delete(int id);
 
     @Insert
     void insert(MenstruationDO menstruationDO);

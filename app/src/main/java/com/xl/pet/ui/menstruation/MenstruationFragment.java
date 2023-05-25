@@ -24,6 +24,9 @@ import com.xl.pet.utils.Utils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MenstruationFragment extends Fragment implements com.haibin.calendarview.CalendarView.OnCalendarSelectListener,
         com.haibin.calendarview.CalendarView.OnMonthChangeListener {
@@ -32,10 +35,13 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
     private TextView tvMonth;
     private CalendarView mCalendarView;
     private MenstruationDao menstruationDao;
+    private Long recentlyClick;
+    private final Timer timer = new Timer();
+    //TODO
+    private final ConcurrentHashMap<String, Integer> switchMap = new ConcurrentHashMap<>();
 
 
     private final Map<String, Calendar> map = new HashMap<>();
-    private final long ONE_DAY = 24 * 60 * 60 * 1000;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -67,10 +73,10 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
         mCalendarView.setRange(m < 6 ? y - 1 : y, m < 6 ? 12 : m - 6, 1,
                 m == 12 ? y + 1 : y, m == 12 ? 1 : m + 1, 31);//限制选择范围(限制只显示前6个月后1个月)
         mCalendarView.scrollToCurrent();//滚动到今天
-        new Thread(this::setDatas).start();
+        new Thread(this::refreshData).start();
     }
 
-    private void setDatas() {
+    private void refreshData() {
         map.clear();
         Calendar start = null, end = null, last = null;
         List<MenstruationDO> all = menstruationDao.findAll();
@@ -90,7 +96,7 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
                 continue;
             }
             end = index == all.size() - 1 ? current : last;
-            //只会将经期天数大于2天的作为周期推断
+            //只会将经期天数至少3天的作为周期推断
             int days = end.differ(start);
             if (days > 2) {
                 //安全期：经期第一天前7后8
@@ -107,11 +113,19 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
     private void putSecurity(Calendar start, Calendar end, int days) {
         for (int i = 1; i <= 7; i++) {
             Calendar calendar = Utils.calendarAdd(start, -i);
+            Calendar existsCalendar = map.get(calendar.toString());
+            if (null != existsCalendar && TagEnum.PERIOD.name().equals(existsCalendar.getScheme())) {
+                continue;
+            }
             calendar.setScheme(TagEnum.SECURITY.name());
             map.put(calendar.toString(), calendar);
         }
         for (int i = 1; i <= 8 - days; i++) {
             Calendar calendar = Utils.calendarAdd(end, i);
+            Calendar existsCalendar = map.get(calendar.toString());
+            if (null != existsCalendar && TagEnum.PERIOD.name().equals(existsCalendar.getScheme())) {
+                continue;
+            }
             calendar.setScheme(TagEnum.SECURITY.name());
             map.put(calendar.toString(), calendar);
         }
@@ -119,17 +133,28 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
 
     private void putOvulation(Calendar start) {
         Calendar ovulation = Utils.calendarAdd(start, -14);
-        ovulation.setScheme(TagEnum.OVULATION.name());
-        map.put(ovulation.toString(), ovulation);
+        Calendar existsCalendar = map.get(ovulation.toString());
+        if (null == existsCalendar || !TagEnum.PERIOD.name().equals(existsCalendar.getScheme())) {
+            ovulation.setScheme(TagEnum.OVULATION_DAY.name());
+            map.put(ovulation.toString(), ovulation);
+        }
 
         for (int i = 1; i <= 5; i++) {
             Calendar calendar = Utils.calendarAdd(ovulation, -i);
-            calendar.setScheme(TagEnum.FERTILE.name());
+            existsCalendar = map.get(calendar.toString());
+            if (null != existsCalendar && TagEnum.PERIOD.name().equals(existsCalendar.getScheme())) {
+                continue;
+            }
+            calendar.setScheme(TagEnum.OVULATION.name());
             map.put(calendar.toString(), calendar);
         }
         for (int i = 1; i <= 4; i++) {
             Calendar calendar = Utils.calendarAdd(ovulation, i);
-            calendar.setScheme(TagEnum.FERTILE.name());
+            existsCalendar = map.get(calendar.toString());
+            if (null != existsCalendar && TagEnum.PERIOD.name().equals(existsCalendar.getScheme())) {
+                continue;
+            }
+            calendar.setScheme(TagEnum.OVULATION.name());
             map.put(calendar.toString(), calendar);
         }
     }
@@ -145,11 +170,21 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
 
     @Override
     public void onCalendarSelect(Calendar calendar, boolean isClick) {
-        //是否经期标记切换，Room操作数据库强制不能在主线程
+        long currentId = System.currentTimeMillis();
+        recentlyClick = currentId;
+        //是否经期标记切换
         if (isClick) {
-            System.out.println(calendar.getScheme());
-            new Thread(() -> switchPeriod(calendar, !TagEnum.PERIOD.name().equals(calendar.getScheme()))).start();
+            switchPeriod(calendar, !TagEnum.PERIOD.name().equals(calendar.getScheme()));
         }
+        //2s后运行，如果2s后未有任何点击则刷新数据
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (currentId == recentlyClick) {
+                    refreshData();
+                }
+            }
+        }, 2000);
     }
 
     private void switchPeriod(Calendar calendar, boolean tag) {
@@ -159,19 +194,24 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
             calendar.setScheme(null);
         }
 
-        //数据库更新
-        int year = calendar.getYear();
-        int month = calendar.getMonth();
-        int day = calendar.getDay();
-        if (tag) {
-            MenstruationDO menstruationDO = new MenstruationDO();
-            menstruationDO.year = year;
-            menstruationDO.month = month;
-            menstruationDO.day = day;
-            menstruationDao.insert(menstruationDO);
-        } else {
-            menstruationDao.deleteTag(year, month, day);
-        }
+        //数据库更新（Room操作数据库强制不能在主线程）
+        new Thread(() -> {
+            int id = Integer.parseInt(calendar.toString());
+            int year = calendar.getYear();
+            int month = calendar.getMonth();
+            int day = calendar.getDay();
+            if (tag) {
+                MenstruationDO menstruationDO = new MenstruationDO();
+                menstruationDO.id = id;
+                menstruationDO.year = year;
+                menstruationDO.month = month;
+                menstruationDO.day = day;
+                menstruationDao.insert(menstruationDO);
+            } else {
+                menstruationDao.delete(id);
+            }
+        }).start();
+
     }
 
     @Override

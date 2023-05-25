@@ -55,14 +55,13 @@ public class Utils {
 
     //日历往后推n天
     public static Calendar calendarAdd(Calendar calendar, int n) {
-        //TODO ? BUG??
         java.util.Calendar javaCalendar = java.util.Calendar.getInstance();
         javaCalendar.setTimeInMillis(calendar.getTimeInMillis());
-        javaCalendar.add(java.util.Calendar.DAY_OF_YEAR, n);
+        javaCalendar.add(java.util.Calendar.DATE, n);
 
         Calendar result = new Calendar();
         result.setYear(javaCalendar.get(java.util.Calendar.YEAR));
-        result.setMonth(javaCalendar.get(java.util.Calendar.MONTH));
+        result.setMonth(javaCalendar.get(java.util.Calendar.MONTH) + 1);
         result.setDay(javaCalendar.get(java.util.Calendar.DATE));
         return result;
     }

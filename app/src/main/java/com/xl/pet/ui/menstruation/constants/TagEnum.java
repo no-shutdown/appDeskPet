@@ -4,6 +4,6 @@ public enum TagEnum {
     SECURITY,
     PERIOD,
     OVULATION,
-    FERTILE,
+    OVULATION_DAY,
     NULL,
 }
