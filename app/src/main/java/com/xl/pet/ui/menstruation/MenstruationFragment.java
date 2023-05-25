@@ -101,7 +101,7 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
     }
 
     private PreModel doRefreshCalendar(List<Calendar> data) {
-        Calendar recentlyPeriod = null;
+        Calendar lastPeriodStart = null;
         int avgInterval, avgDays;
 
         Calendar start = null, end = null, last = null;
@@ -128,11 +128,11 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
                     putOvulation(start);
 
                     //记录上次经期日期，周期天数和经期天数
-                    recentlyPeriod = start;
                     days.add(currentDays);
-                    if (current != end) {
-                        intervals.add(current.differ(start));
+                    if (null != lastPeriodStart) {
+                        intervals.add(start.differ(lastPeriodStart));
                     }
+                    lastPeriodStart = start;
                 }
                 start = current;
             }
@@ -144,7 +144,7 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
         avgDays = (int) Utils.avg(days);
 
         mCalendarView.setSchemeDate(map);
-        return new PreModel(recentlyPeriod, last, avgInterval, avgDays);
+        return new PreModel(lastPeriodStart, last, avgInterval, avgDays);
     }
 
     private void putSecurity(Calendar start, Calendar end, int days) {
