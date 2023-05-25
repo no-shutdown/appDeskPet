@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.haibin.calendarview.Calendar;
 import com.haibin.calendarview.CalendarView;
@@ -36,6 +37,9 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
     private Activity activity;
     private TextView tvMonth;
     private CalendarView mCalendarView;
+    private MenstruationViewModel viewModel;
+
+
     private MenstruationDao menstruationDao;
     private final Timer timer = new Timer();
 
@@ -49,6 +53,9 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+        viewModel = ViewModelProviders.of(this).get(MenstruationViewModel.class);
+        viewModel.getmMonth().observe(getViewLifecycleOwner(), s -> tvMonth.setText(s));
+        viewModel.getData().observe(getViewLifecycleOwner(), this::refreshData);
         return inflater.inflate(R.layout.fragment_menstruation, container, false);
     }
 
@@ -61,23 +68,23 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
         menstruationDao = DatabaseHelper.menstruationDao();
         mCalendarView.setOnCalendarSelectListener(this);
         mCalendarView.setOnMonthChangeListener(this);
-        initData();
-    }
 
-    private void initData() {
         int y = mCalendarView.getCurYear();//获取年
         int m = mCalendarView.getCurMonth();//获取月
-        tvMonth.setText(y + "年" + m + "月");
         mCalendarView.setRange(m < 6 ? y - 1 : y, m < 6 ? 12 : m - 6, 1,
                 m == 12 ? y + 1 : y, m == 12 ? 1 : m + 1, 31);//限制选择范围(限制只显示前6个月后1个月)
-        mCalendarView.scrollToCurrent();//滚动到今天
-        new Thread(this::refreshData).start();
+        mCalendarView.scrollToCurrent(); //滚动到今天
+        new Thread(() -> loadData(y, m)).start();
     }
 
-    private void refreshData() {
+    private void loadData(int y, int m) {
+        viewModel.getmMonth().setValue(y + "年" + m + "月");
+        viewModel.getData().setValue(menstruationDao.findAll());
+    }
+
+    private void refreshData(List<MenstruationDO> databaseLog) {
         map.clear();
         //历史数据
-        List<MenstruationDO> databaseLog = menstruationDao.findAll();
         List<Calendar> historyData = new ArrayList<>();
         for (int index = 0; index < databaseLog.size(); index++) {
             MenstruationDO i = databaseLog.get(index);
@@ -186,6 +193,7 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
         }
     }
 
+
     private Calendar getSchemeCalendar(int year, int month, int day, String type) {
         Calendar calendar = new Calendar();
         calendar.setYear(year);
@@ -209,7 +217,7 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
             public void run() {
                 if (currentId == recentlyClick) {
                     applyDataCache();
-                    refreshData();
+                    refreshData(menstruationDao.findAll());
                 }
             }
         }, 2000);
@@ -283,7 +291,6 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
         }
 
         public List<Calendar> prePeriodData() {
-            System.out.println(last);
             List<Calendar> result = new ArrayList<>();
             if (null == recentlyPeriod || 0 == avgInterval || 0 == avgDays) {
                 return result;
