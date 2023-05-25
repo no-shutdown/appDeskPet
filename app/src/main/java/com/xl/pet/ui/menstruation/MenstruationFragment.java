@@ -36,6 +36,7 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
 
     private Activity activity;
     private TextView tvMonth;
+    private TextView tvTip;
     private CalendarView mCalendarView;
     private MenstruationViewModel viewModel;
 
@@ -55,10 +56,14 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
                              ViewGroup container, Bundle savedInstanceState) {
         viewModel = ViewModelProviders.of(this).get(MenstruationViewModel.class);
         View root = inflater.inflate(R.layout.fragment_menstruation, container, false);
+
         tvMonth = root.findViewById(R.id.tv_month);
         mCalendarView = root.findViewById(R.id.calendarView);
         viewModel.getmMonth().observe(getViewLifecycleOwner(), s -> tvMonth.setText(s));
         viewModel.getData().observe(getViewLifecycleOwner(), this::refreshCalendar);
+
+        tvTip = root.findViewById(R.id.tv_tip);
+
         return root;
     }
 
@@ -98,6 +103,15 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
         //预测数据
         List<Calendar> preData = preModel.prePeriodData();
         doRefreshCalendar(preData);
+
+        //提醒
+        if (!preData.isEmpty()) {
+            Calendar calendar = preData.get(0);
+            int days = calendar.differ(Utils.todayCalendar());
+            tvTip.setText("还有 " + days + " 天可能就要来了噢");
+        } else {
+            tvTip.setText("");
+        }
     }
 
     private PreModel doRefreshCalendar(List<Calendar> data) {
