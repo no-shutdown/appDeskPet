@@ -118,8 +118,8 @@ public class PeriodMonthView extends MonthView {
         int top = y - mItemHeight / 6;
         if (isSelected) {
             //如果选中
-            canvas.drawText(String.valueOf(calendar.getDay()), cx, mTextBaseLine + top, mSelectTextPaint);//日期
-            canvas.drawText(calendar.isCurrentDay() ? TODAY : calendar.getLunar(), cx, mTextBaseLine + y + mItemHeight / 10, mSelectedLunarTextPaint);//农历
+            canvas.drawText(String.valueOf(calendar.getDay()), cx, mTextBaseLine + top, mSchemeTextPaint);//日期
+            canvas.drawText(calendar.isCurrentDay() ? TODAY : calendar.getLunar(), cx, mTextBaseLine + y + mItemHeight / 10, mSchemeLunarTextPaint);//农历
         } else if (hasScheme) {
             //如果有标记
             canvas.drawText(String.valueOf(calendar.getDay()), cx, mTextBaseLine + top, calendar.isCurrentMonth() ? mSchemeTextPaint : mOtherMonthTextPaint);//日期
