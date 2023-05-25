@@ -54,21 +54,21 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         viewModel = ViewModelProviders.of(this).get(MenstruationViewModel.class);
+        View root = inflater.inflate(R.layout.fragment_menstruation, container, false);
+        tvMonth = root.findViewById(R.id.tv_month);
+        mCalendarView = root.findViewById(R.id.calendarView);
         viewModel.getmMonth().observe(getViewLifecycleOwner(), s -> tvMonth.setText(s));
-        viewModel.getData().observe(getViewLifecycleOwner(), this::refreshData);
-        return inflater.inflate(R.layout.fragment_menstruation, container, false);
+        viewModel.getData().observe(getViewLifecycleOwner(), this::refreshCalendar);
+        return root;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         activity = getActivity();
-        tvMonth = activity.findViewById(R.id.tv_month);
-        mCalendarView = activity.findViewById(R.id.calendarView);
         menstruationDao = DatabaseHelper.menstruationDao();
         mCalendarView.setOnCalendarSelectListener(this);
         mCalendarView.setOnMonthChangeListener(this);
-
         int y = mCalendarView.getCurYear();//获取年
         int m = mCalendarView.getCurMonth();//获取月
         mCalendarView.setRange(m < 6 ? y - 1 : y, m < 6 ? 12 : m - 6, 1,
@@ -78,11 +78,14 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
     }
 
     private void loadData(int y, int m) {
-        viewModel.getmMonth().setValue(y + "年" + m + "月");
-        viewModel.getData().setValue(menstruationDao.findAll());
+        List<MenstruationDO> data = menstruationDao.findAll();
+        activity.runOnUiThread(() -> {
+            viewModel.getmMonth().setValue(y + "年" + m + "月");
+            viewModel.getData().setValue(data);
+        });
     }
 
-    private void refreshData(List<MenstruationDO> databaseLog) {
+    private void refreshCalendar(List<MenstruationDO> databaseLog) {
         map.clear();
         //历史数据
         List<Calendar> historyData = new ArrayList<>();
@@ -90,14 +93,14 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
             MenstruationDO i = databaseLog.get(index);
             historyData.add(getSchemeCalendar(i.year, i.month, i.day, TagEnum.PERIOD.name()));
         }
-        PreModel preModel = doRefreshData(historyData);
+        PreModel preModel = doRefreshCalendar(historyData);
 
         //预测数据
         List<Calendar> preData = preModel.prePeriodData();
-        doRefreshData(preData);
+        doRefreshCalendar(preData);
     }
 
-    private PreModel doRefreshData(List<Calendar> data) {
+    private PreModel doRefreshCalendar(List<Calendar> data) {
         Calendar recentlyPeriod = null;
         int avgInterval, avgDays;
 
@@ -136,7 +139,7 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
             last = current;
         }
         //计算平均周期天数和经期天数
-        last = data.get(data.size() - 1);
+        last = data.size() > 0 ? data.get(data.size() - 1) : null;
         avgInterval = (int) Utils.avg(intervals);
         avgDays = (int) Utils.avg(days);
 
@@ -217,7 +220,7 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
             public void run() {
                 if (currentId == recentlyClick) {
                     applyDataCache();
-                    refreshData(menstruationDao.findAll());
+                    refreshCalendar(menstruationDao.findAll());
                 }
             }
         }, 2000);
@@ -262,7 +265,7 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
     }
 
     @Override
-    public void onMonthChange(int year, int month) {//月份改变事件
+    public void onMonthChange(int year, int month) {
         tvMonth.setText(year + "年" + month + "月");
     }
 
