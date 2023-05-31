@@ -76,7 +76,7 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
         mCalendarView.setOnMonthChangeListener(this);
         int y = mCalendarView.getCurYear();//获取年
         int m = mCalendarView.getCurMonth();//获取月
-        mCalendarView.setRange(m < 6 ? y - 1 : y, m < 6 ? 12 : m - 6, 1,
+        mCalendarView.setRange(m <= 6 ? y - 1 : y, m <= 6 ? 12 - (6 - m) : m - 6, 1,
                 m == 12 ? y + 1 : y, m == 12 ? 1 : m + 1, 31);//限制选择范围(限制只显示前6个月后1个月)
         mCalendarView.scrollToCurrent(); //滚动到今天
         new Thread(() -> loadData(y, m)).start();
