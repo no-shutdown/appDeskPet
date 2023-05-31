@@ -14,6 +14,9 @@ import com.xl.pet.utils.Utils;
 
 public class FieldView extends View {
 
+
+    private final int bmpW;
+    private final int bmpH;
     //图片
     protected Bitmap fieldBitmap;
     //绘图矩阵
@@ -25,14 +28,18 @@ public class FieldView extends View {
 
     public FieldView(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
-//        matrix.setScale(0.3f, 0.3f);
+        matrix.setScale(0.3f, 0.3f);
         res = context.getResources();
+        bmpW = dipToPx(context, 63);
+        bmpH = dipToPx(context, 75);
     }
 
     public FieldView(Context context) {
         super(context);
-//        matrix.setScale(0.3f, 0.3f);
+        matrix.setScale(0.3f, 0.3f);
         res = context.getResources();
+        bmpW = dipToPx(context, 63);
+        bmpH = dipToPx(context, 75);
     }
 
 
@@ -43,6 +50,20 @@ public class FieldView extends View {
         if (fieldBitmap != null) {
             canvas.drawBitmap(fieldBitmap, matrix, paint);
         }
+    }
+
+
+    public int getBmpW() {
+        return bmpW;
+    }
+
+    public int getBmpH() {
+        return bmpH;
+    }
+
+    private int dipToPx(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
     }
 
 }
