@@ -9,8 +9,10 @@ import android.widget.RelativeLayout;
 public class FieldViewGroup extends RelativeLayout {
 
     public FieldView[][] fieldViews;
+    public BuildingView[][] buildingViews;
 
-    private float scale;
+    //顶部预留空间
+    private static final int MAX_HEIGHT = 150;
 
     public FieldViewGroup(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -19,17 +21,19 @@ public class FieldViewGroup extends RelativeLayout {
 
     private void createFields(Context context) {
         int widthPixels = context.getResources().getDisplayMetrics().widthPixels;
-        int n = 8; //n*n
-        scale = computeScale(widthPixels, n, 297); //计算缩放比例 297是图片长宽的斜边dp，即x轴长度
+        int n = 6; //n*n
+        float scale = computeScale(widthPixels, n, 297); //计算缩放比例 297是图片长宽的斜边dp，即x轴长度
         int offset_top = dipToPx(60 * scale); //偏移量 60固定偏移量才能刚好重合
         int offset_left = dipToPx(103 * scale); //偏移量 103固定偏移量才能刚好重合
 
         fieldViews = new FieldView[n][n];
+        buildingViews = new BuildingView[n][n];
         int startMarginLeft = (n - 1) * offset_left;
         for (int i = 0; i < n; i++) {
-            int baseTop = offset_top * i;
+            int baseTop = MAX_HEIGHT + offset_top * i;
             int baseLeft = startMarginLeft - offset_left * i;
             for (int j = 0; j < n; j++) {
+                // field
                 FieldView fieldView = new FieldView(context, scale);
                 RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
                         ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -42,6 +46,22 @@ public class FieldViewGroup extends RelativeLayout {
                 fieldView.setLayoutParams(layoutParams);
                 fieldViews[i][j] = fieldView;
                 this.addView(fieldView);
+
+                // building
+                BuildingView buildingView = new BuildingView(context, scale);
+                RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                );
+                int offsetYByField = buildingView.getBmpH() - fieldView.getBmpH() / 2;
+                int offsetXByField = fieldView.getBmpW() / 2 - buildingView.getBmpW() / 2;
+                layoutParams1.topMargin = baseTop + offset_top * j - offsetYByField;
+                layoutParams1.leftMargin = baseLeft + offset_left * j + offsetXByField;
+                layoutParams1.width = buildingView.getBmpW();
+                layoutParams1.height = buildingView.getBmpH();
+                buildingView.setLayoutParams(layoutParams1);
+                buildingViews[i][j] = buildingView;
+                this.addView(buildingView);
             }
         }
     }
@@ -54,10 +74,6 @@ public class FieldViewGroup extends RelativeLayout {
     @Override
     public boolean performClick() {
         return super.performClick();
-    }
-
-    public float getScale() {
-        return scale;
     }
 
     private int dipToPx(float dpValue) {
