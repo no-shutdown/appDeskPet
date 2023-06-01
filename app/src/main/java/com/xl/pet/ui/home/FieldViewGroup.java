@@ -12,6 +12,8 @@ public class FieldViewGroup extends RelativeLayout {
     private DraggableView draggableView;
     public FieldView[][] fieldViews;
 
+    private float scale;
+
     public FieldViewGroup(Context context, AttributeSet attrs) {
         super(context, attrs);
         createFields(context);
@@ -20,7 +22,7 @@ public class FieldViewGroup extends RelativeLayout {
     private void createFields(Context context) {
         int widthPixels = context.getResources().getDisplayMetrics().widthPixels;
         int n = 8; //n*n
-        float scale = computeScale(widthPixels, n, 297); //计算缩放比例 297是图片长宽的斜边dp，即x轴长度
+        scale = computeScale(widthPixels, n, 297); //计算缩放比例 297是图片长宽的斜边dp，即x轴长度
         int offset_top = dipToPx(60 * scale); //偏移量 60固定偏移量才能刚好重合
         int offset_left = dipToPx(103 * scale); //偏移量 103固定偏移量才能刚好重合
 
@@ -50,6 +52,10 @@ public class FieldViewGroup extends RelativeLayout {
     private float computeScale(int parentWidth, int n, int viewDp) {
         //100px伸缩空间
         return 1.0f * (parentWidth - 100) / n / viewDp / 2;
+    }
+
+    public float getScale() {
+        return scale;
     }
 
     private int dipToPx(float dpValue) {
