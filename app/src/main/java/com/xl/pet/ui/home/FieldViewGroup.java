@@ -7,11 +7,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
-public class FieldsView extends RelativeLayout {
+import java.util.ArrayList;
+import java.util.List;
 
+public class FieldViewGroup extends RelativeLayout {
+
+    private float touchX;
+    private float touchY;
+    private DraggableView draggableView;
     private FieldView[][] fieldViews;
 
-    public FieldsView(Context context, AttributeSet attrs) {
+    public FieldViewGroup(Context context, AttributeSet attrs) {
         super(context, attrs);
         createFields(context);
     }
@@ -44,9 +50,10 @@ public class FieldsView extends RelativeLayout {
             }
         }
 
-        fieldViews[n - 1][n - 1].setOnTouchListener(new ItemDragTouchListener());
 
+        fieldViews[n - 1][n - 1].setOnTouchListener(new DraggableViewTouchListener());
     }
+
 
     private float computeScale(int parentWidth, int n, int viewDp) {
         //100px伸缩空间
@@ -59,54 +66,48 @@ public class FieldsView extends RelativeLayout {
     }
 
 
-    public class ItemDragTouchListener implements OnTouchListener {
-        private int initialX;
-        private int initialY;
-        private int offsetX;
-        private int offsetY;
+    public class DraggableViewTouchListener implements OnTouchListener {
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
+            DraggableView draggableView = (DraggableView) v;
+            touchX = event.getRawX();
+            touchY = event.getRawY();
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
-                    initialX = (int) event.getX();
-                    initialY = (int) event.getY();
-                    offsetX = (int) (event.getRawX() - event.getX());
-                    offsetY = (int) (event.getRawY() - event.getY());
                     break;
                 case MotionEvent.ACTION_MOVE:
-                    int newX = (int) event.getX();
-                    int newY = (int) event.getY();
-                    int deltaX = newX - initialX;
-                    int deltaY = newY - initialY;
-                    int newRawX = (int) (event.getRawX() - offsetX);
-                    int newRawY = (int) (event.getRawY() - offsetY);
-
-                    // 更新被拖拽物品的位置
-                    int draggedItemX = calculateDraggedItemX(newRawX);
-                    int draggedItemY = calculateDraggedItemY(newRawY);
-                    fieldViews[draggedItemX][draggedItemY].freeLight();
-
-                    fieldViews[7][7].hecticLight();
+                    List<FieldLight> fieldLights = computeLight(touchX, touchY, draggableView.n, draggableView.m);
+                    for (FieldLight fieldLight : fieldLights) {
+                        fieldViews[fieldLight.xI][fieldLight.yI].light(fieldLight.free);
+                    }
                     break;
                 case MotionEvent.ACTION_UP:
-                case MotionEvent.ACTION_CANCEL:
-                    // 清除被拖拽物品的位置
                     break;
+
             }
             return true;
         }
+    }
 
-        private int calculateDraggedItemX(int rawX) {
-            // 根据实际需求计算被拖拽物品的横坐标
-            // ...
-            return 0;
-        }
+    private List<FieldLight> computeLight(float x, float y, int n, int m) {
+        List<FieldLight> result = new ArrayList<>();
+        result.add(new FieldLight(1, 1, true));
+        result.add(new FieldLight(2, 1, true));
+        result.add(new FieldLight(1, 2, true));
+        result.add(new FieldLight(2, 2, false));
+        return result;
+    }
 
-        private int calculateDraggedItemY(int rawY) {
-            // 根据实际需求计算被拖拽物品的纵坐标
-            // ...
-            return 0;
+    protected static class FieldLight {
+        public int xI;
+        public int yI;
+        public boolean free;
+
+        public FieldLight(int xI, int yI, boolean free) {
+            this.xI = xI;
+            this.yI = yI;
+            this.free = free;
         }
     }
 

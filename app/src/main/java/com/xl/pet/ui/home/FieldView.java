@@ -72,19 +72,13 @@ public class FieldView extends View {
         invalidate();
     }
 
-    public void freeLight() {
+    public void light(boolean free) {
         this.light = true;
-        lightPaint.setColor(0xFF4169E1);
+        lightPaint.setColor(free ? 0xFF4169E1 : 0xFFDB7093);
         lightPaint.setAlpha(100); // 设置透明度
         invalidate();
     }
 
-    public void hecticLight() {
-        this.light = true;
-        lightPaint.setColor(0xFFDB7093);
-        lightPaint.setAlpha(100); // 设置透明度
-        invalidate();
-    }
 
     public int getBmpW() {
         return bmpW;
