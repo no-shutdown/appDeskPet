@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -18,6 +20,21 @@ public class HomeFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         HomeViewModel homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
+
+        FieldViewGroup fieldGroup = root.findViewById(R.id.layout_fields);
+
+        LinearLayout topLayout = root.findViewById(R.id.layout_dragItems);
+        DraggableView draggableView = new DraggableView(root.getContext(), 0.3f);
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        layoutParams.width = draggableView.getBmpW();
+        layoutParams.height = draggableView.getBmpH();
+        draggableView.setLayoutParams(layoutParams);
+        draggableView.setOnTouchListener(new DraggableViewTouchListener(fieldGroup));
+        topLayout.addView(draggableView);
+
         return root;
     }
 

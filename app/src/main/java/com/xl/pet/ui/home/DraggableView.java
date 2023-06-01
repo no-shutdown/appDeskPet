@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.util.AttributeSet;
@@ -15,8 +16,8 @@ import com.xl.pet.utils.Utils;
 public class DraggableView extends View {
 
     //预设大小（dp）
-    private static final int WIDTH_DP = 210;
-    private static final int HEIGHT_DP = 145;
+    private static final int WIDTH_DP = 180;
+    private static final int HEIGHT_DP = 200;
     //实际大小（px）
     private final int bmpW;
     private final int bmpH;
@@ -44,9 +45,8 @@ public class DraggableView extends View {
         bmpH = dipToPx(context, HEIGHT_DP * scale);
     }
 
-    public DraggableView(Context context, AttributeSet attributeSet) {
-        super(context, attributeSet);
-        float scale = 0.3f;
+    public DraggableView(Context context, float scale) {
+        super(context);
         res = context.getResources();
         matrix.setScale(scale, scale);
         bmpW = dipToPx(context, WIDTH_DP * scale);
@@ -58,6 +58,7 @@ public class DraggableView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         fieldBitmap = Utils.decodeResource(res, R.drawable.tree);
+        canvas.drawColor(Color.BLUE);
         if (fieldBitmap != null) {
             canvas.drawBitmap(fieldBitmap, matrix, paint);
         }
@@ -68,4 +69,11 @@ public class DraggableView extends View {
         return (int) (dpValue * scale + 0.5f);
     }
 
+    public int getBmpW() {
+        return bmpW;
+    }
+
+    public int getBmpH() {
+        return bmpH;
+    }
 }

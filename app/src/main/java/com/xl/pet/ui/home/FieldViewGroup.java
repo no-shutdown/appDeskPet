@@ -2,20 +2,15 @@ package com.xl.pet.ui.home;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class FieldViewGroup extends RelativeLayout {
 
-    private float touchX;
-    private float touchY;
+
     private DraggableView draggableView;
-    private FieldView[][] fieldViews;
+    public FieldView[][] fieldViews;
 
     public FieldViewGroup(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -49,9 +44,6 @@ public class FieldViewGroup extends RelativeLayout {
                 this.addView(fieldView);
             }
         }
-
-
-        fieldViews[n - 1][n - 1].setOnTouchListener(new DraggableViewTouchListener());
     }
 
 
@@ -66,40 +58,7 @@ public class FieldViewGroup extends RelativeLayout {
     }
 
 
-    public class DraggableViewTouchListener implements OnTouchListener {
-
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            DraggableView draggableView = (DraggableView) v;
-            touchX = event.getRawX();
-            touchY = event.getRawY();
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    List<FieldLight> fieldLights = computeLight(touchX, touchY, draggableView.n, draggableView.m);
-                    for (FieldLight fieldLight : fieldLights) {
-                        fieldViews[fieldLight.xI][fieldLight.yI].light(fieldLight.free);
-                    }
-                    break;
-                case MotionEvent.ACTION_UP:
-                    break;
-
-            }
-            return true;
-        }
-    }
-
-    private List<FieldLight> computeLight(float x, float y, int n, int m) {
-        List<FieldLight> result = new ArrayList<>();
-        result.add(new FieldLight(1, 1, true));
-        result.add(new FieldLight(2, 1, true));
-        result.add(new FieldLight(1, 2, true));
-        result.add(new FieldLight(2, 2, false));
-        return result;
-    }
-
-    protected static class FieldLight {
+    public static class FieldLight {
         public int xI;
         public int yI;
         public boolean free;
