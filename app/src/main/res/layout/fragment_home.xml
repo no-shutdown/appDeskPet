@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
 
-    <RelativeLayout
+    <com.xl.pet.ui.home.FieldsView
         android:id="@+id/layout_fields"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

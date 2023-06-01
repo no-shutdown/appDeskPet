@@ -20,31 +20,42 @@ import androidx.navigation.ui.NavigationUI;
 
 public class MainActivity extends AppCompatActivity {
 
+    //开发阶段先暂时去掉不必要功能
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //请求Overlay权限
-        requestOverlayPermissionIfNeed();
-        //请求usageStats权限
-        requestUsageStatsPermissionIfNeed();
         //创建UI界面
         createUI();
-        //如果没有启动浮窗服务则启动悬浮窗服务
-        boolean isServiceRunning = false;
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (FloatWindowService.class.getName().equals(service.service.getClassName())) {
-                isServiceRunning = true;
-                break;
-            }
-        }
-        if (!isServiceRunning) {
-            startFloatWindowService();
-        }
         //创建数据库实例
         DatabaseHelper.createDatabase(this);
 //        finish();
     }
+
+//    @Override
+//    protected void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        //请求Overlay权限
+//        requestOverlayPermissionIfNeed();
+//        //请求usageStats权限
+//        requestUsageStatsPermissionIfNeed();
+//        //创建UI界面
+//        createUI();
+//        //如果没有启动浮窗服务则启动悬浮窗服务
+//        boolean isServiceRunning = false;
+//        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+//        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+//            if (FloatWindowService.class.getName().equals(service.service.getClassName())) {
+//                isServiceRunning = true;
+//                break;
+//            }
+//        }
+//        if (!isServiceRunning) {
+//            startFloatWindowService();
+//        }
+//        //创建数据库实例
+//        DatabaseHelper.createDatabase(this);
+////        finish();
+//    }
 
     private void createUI() {
         setContentView(R.layout.activity_main);
