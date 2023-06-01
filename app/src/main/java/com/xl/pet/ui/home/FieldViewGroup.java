@@ -8,8 +8,6 @@ import android.widget.RelativeLayout;
 
 public class FieldViewGroup extends RelativeLayout {
 
-
-    private DraggableView draggableView;
     public FieldView[][] fieldViews;
 
     private float scale;
@@ -48,10 +46,14 @@ public class FieldViewGroup extends RelativeLayout {
         }
     }
 
-
     private float computeScale(int parentWidth, int n, int viewDp) {
         //100px伸缩空间
         return 1.0f * (parentWidth - 100) / n / viewDp / 2;
+    }
+
+    @Override
+    public boolean performClick() {
+        return super.performClick();
     }
 
     public float getScale() {

@@ -7,13 +7,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.util.AttributeSet;
 import android.view.View;
 
 import com.xl.pet.R;
 import com.xl.pet.utils.Utils;
 
-public class DraggableView extends View {
+public class BuildingView extends View {
 
     //预设大小（dp）
     private static final int WIDTH_DP = 180;
@@ -36,7 +35,7 @@ public class DraggableView extends View {
     public int n;
     public int m;
 
-    public DraggableView(Context context) {
+    public BuildingView(Context context) {
         super(context);
         float scale = 0.3f;
         res = context.getResources();
@@ -45,7 +44,7 @@ public class DraggableView extends View {
         bmpH = dipToPx(context, HEIGHT_DP * scale);
     }
 
-    public DraggableView(Context context, float scale) {
+    public BuildingView(Context context, float scale) {
         super(context);
         res = context.getResources();
         matrix.setScale(scale, scale);

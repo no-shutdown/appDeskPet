@@ -24,16 +24,18 @@ public class HomeFragment extends Fragment {
         FieldViewGroup fieldGroup = root.findViewById(R.id.layout_fields);
 
         LinearLayout topLayout = root.findViewById(R.id.layout_dragItems);
-        DraggableView draggableView = new DraggableView(root.getContext(), fieldGroup.getScale());
+        BuildingView buildingView = new BuildingView(root.getContext(), fieldGroup.getScale());
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
         );
-        layoutParams.width = draggableView.getBmpW();
-        layoutParams.height = draggableView.getBmpH();
-        draggableView.setLayoutParams(layoutParams);
-        draggableView.setOnTouchListener(new DraggableViewTouchListener(fieldGroup));
-        topLayout.addView(draggableView);
+        layoutParams.width = buildingView.getBmpW();
+        layoutParams.height = buildingView.getBmpH();
+        buildingView.setLayoutParams(layoutParams);
+        topLayout.addView(buildingView);
+
+        fieldGroup.setOnTouchListener(new FieldViewGroupTouchListener(fieldGroup, buildingView));
+
 
         return root;
     }
