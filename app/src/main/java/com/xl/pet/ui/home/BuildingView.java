@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.view.View;
@@ -17,8 +18,8 @@ import com.xl.pet.utils.Utils;
 public class BuildingView extends View {
 
     //预设大小（dp）
-    private static final int WIDTH_DP = 130; //TODO 预设值比例
-    private static final int HEIGHT_DP = 145;
+    private static final int WIDTH_DP = 105; //固定宽度
+    private static int HEIGHT_DP;//根据图片比例计算预设高度
     //实际大小（px）
     private final int bmpW;
     private final int bmpH;
@@ -31,7 +32,7 @@ public class BuildingView extends View {
     protected Paint paint = new Paint();
     //资源
     protected Resources res;
-    //透明度 (0 完全透明 -255 完全可见)
+    //透明度 (0 完全透明 | 255 完全可见)
     protected int alpha = 255;
 
 
@@ -43,6 +44,8 @@ public class BuildingView extends View {
         super(context);
         float scale = 0.3f;
         res = context.getResources();
+        buildingBitmap = Utils.decodeResource(res, R.drawable.tree3);
+        HEIGHT_DP = (int) (1.0f * buildingBitmap.getHeight() / buildingBitmap.getWidth() * WIDTH_DP);
         bmpW = dipToPx(context, WIDTH_DP * scale);
         bmpH = dipToPx(context, HEIGHT_DP * scale);
     }
@@ -50,6 +53,8 @@ public class BuildingView extends View {
     public BuildingView(Context context, float scale) {
         super(context);
         res = context.getResources();
+        buildingBitmap = Utils.decodeResource(res, R.drawable.tree3);
+        HEIGHT_DP = (int) (1.0f * buildingBitmap.getHeight() / buildingBitmap.getWidth() * WIDTH_DP);
         bmpW = dipToPx(context, WIDTH_DP * scale);
         bmpH = dipToPx(context, HEIGHT_DP * scale);
     }
@@ -58,7 +63,6 @@ public class BuildingView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        buildingBitmap = Utils.decodeResource(res, R.drawable.tree3);
         if (buildingBitmap != null) {
             // 计算缩放比例，使得图片适应画布的尺寸
             float scaleX = (float) getWidth() / buildingBitmap.getWidth();

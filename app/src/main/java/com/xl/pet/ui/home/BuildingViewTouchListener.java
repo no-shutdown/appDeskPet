@@ -41,7 +41,8 @@ public class BuildingViewTouchListener implements View.OnTouchListener {
                 areaViewGroup.buildingDoAlpha();
                 break;
             case MotionEvent.ACTION_MOVE:
-                areaViewGroup.light(finLightFields(touchX, touchY, buildingView.n, buildingView.m));
+                //高亮区域（偏移量是为了高亮点不被手指挡住）
+                areaViewGroup.light(finLightFields(touchX - 200, touchY + 100, buildingView.n, buildingView.m));
                 break;
             case MotionEvent.ACTION_UP:
                 areaViewGroup.buildingUndoAlpha();
