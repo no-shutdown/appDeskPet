@@ -14,7 +14,7 @@ import java.util.List;
 public class AreaViewGroup extends RelativeLayout {
 
     public FieldView[][] fieldViews;
-    public BuildingView[][] buildingViews;
+    public BaseBuildingView[][] buildingViews;
 
     //当前高亮区域
     private final List<FieldLight> fieldLights = new ArrayList<>();
@@ -32,13 +32,13 @@ public class AreaViewGroup extends RelativeLayout {
     //绘制区域内的子组件
     private void createFields(Context context) {
         int widthPixels = context.getResources().getDisplayMetrics().widthPixels;
-        int n = 6; //n*n
+        int n = 8; //n*n
         float scale = computeScale(widthPixels, n, 297); //计算缩放比例 297是图片长宽的斜边dp，即x轴长度
         int offset_top = dipToPx(60 * scale); //偏移量 60固定偏移量才能刚好重合
         int offset_left = dipToPx(103 * scale); //偏移量 103固定偏移量才能刚好重合
 
         fieldViews = new FieldView[n][n];
-        buildingViews = new BuildingView[n][n];
+        buildingViews = new BaseBuildingView[n][n];
         int startMarginLeft = (n - 1) * offset_left;
 
         //fields
@@ -68,25 +68,26 @@ public class AreaViewGroup extends RelativeLayout {
             int baseTop = MAX_HEIGHT + offset_top * i;
             int baseLeft = startMarginLeft - offset_left * i;
             FieldView fieldView = fieldViews[i][j];
-            BuildingView buildingView = new BuildingView(context, scale, mode.resId);
+            BaseBuildingView buildingView = BaseBuildingView.buildingView(context, scale, mode.resId, mode.n, mode.m, mode.widthP);
             RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
             );
-            int offsetYByField = 0, offsetXByField = 0;
+            float offsetYByField, offsetXByField;
             //如果是1*1则移动到中心位置。否则按占地面积去移动
             if (buildingView instanceof BuildingView) {
                 //移动到中心位置
-                offsetYByField = buildingView.getBmpH() - fieldView.getBmpH() / 2;
-                offsetXByField = fieldView.getBmpW() / 2 - buildingView.getBmpW() / 2;
+                offsetYByField = -1 * (buildingView.getBmpH() - fieldView.getBmpH() / 2f);
+                offsetXByField = fieldView.getBmpW() / 2f - buildingView.getBmpW() / 2f;
             } else {
                 //占地参考点（占地区域的左上角）移动到building图片左上角
-
+                offsetYByField = -1.0f * (buildingView.getBmpH() * mode.offsetX);
+                offsetXByField = -1.0f * (buildingView.getBmpW() * mode.offsetY);
                 //再移动到field显示效果的左上角
-                offsetXByField = fieldView.getBmpW() / 2;
+                offsetXByField = offsetXByField + (fieldView.getBmpW() / 2f);
             }
-            layoutParams1.topMargin = baseTop + offset_top * j - offsetYByField;
-            layoutParams1.leftMargin = baseLeft + offset_left * j + offsetXByField;
+            layoutParams1.topMargin = (int) (baseTop + offset_top * j + offsetYByField);
+            layoutParams1.leftMargin = (int) (baseLeft + offset_left * j + offsetXByField);
             layoutParams1.width = buildingView.getBmpW();
             layoutParams1.height = buildingView.getBmpH();
             buildingView.setLayoutParams(layoutParams1);
@@ -98,11 +99,11 @@ public class AreaViewGroup extends RelativeLayout {
     //所有building透明
     public void buildingDoAlpha() {
         if (!buildingAlpha) {
-            for (BuildingView[] row : buildingViews) {
+            for (BaseBuildingView[] row : buildingViews) {
                 if (null == row) {
                     continue;
                 }
-                for (BuildingView buildingView : row) {
+                for (BaseBuildingView buildingView : row) {
                     if (null == buildingView) {
                         continue;
                     }
@@ -117,11 +118,11 @@ public class AreaViewGroup extends RelativeLayout {
     public void buildingUndoAlpha() {
         if (buildingAlpha) {
             //building不透明
-            for (BuildingView[] row : buildingViews) {
+            for (BaseBuildingView[] row : buildingViews) {
                 if (null == row) {
                     continue;
                 }
-                for (BuildingView buildingView : row) {
+                for (BaseBuildingView buildingView : row) {
                     if (null == buildingView) {
                         continue;
                     }

@@ -31,6 +31,14 @@ public abstract class BaseBuildingView extends View {
     //透明度 (0 完全透明 | 255 完全可见)
     protected int alpha = 255;
 
+    public static BaseBuildingView buildingView(Context context, float scale, int resId, int n, int m, float widthP) {
+        if (1 == n && 1 == m) {
+            return new BuildingView(context, scale, resId);
+        } else {
+            return new MultBuildingView(context, scale, resId, n, m, widthP);
+        }
+    }
+
     public BaseBuildingView(Context context, float scale, int resId, int widthDP) {
         super(context);
         res = context.getResources();
@@ -48,7 +56,7 @@ public abstract class BaseBuildingView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         if (buildingBitmap != null) {
-            canvas.drawColor(Color.BLUE);
+//            canvas.drawColor(Color.RED);
             // 计算缩放比例，使得图片适应画布的尺寸
             float scaleX = (float) getWidth() / buildingBitmap.getWidth();
             float scaleY = (float) getHeight() / buildingBitmap.getHeight();

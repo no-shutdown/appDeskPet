@@ -8,8 +8,8 @@ public class MultBuildingView extends BaseBuildingView {
     public int n;
     public int m;
 
-    public MultBuildingView(Context context, float scale, int resId, int n, int m) {
-        super(context, scale, resId, n * 190);
+    public MultBuildingView(Context context, float scale, int resId, int n, int m, float widthP) {
+        super(context, scale, resId, (int) (n * 105 / widthP));
         this.n = n;
         this.m = m;
     }
