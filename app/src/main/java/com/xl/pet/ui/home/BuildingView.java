@@ -40,23 +40,15 @@ public class BuildingView extends View {
     public int n;
     public int m;
 
-    public BuildingView(Context context) {
+    public BuildingView(Context context, float scale, int resId, int n, int m) {
         super(context);
-        float scale = 0.3f;
         res = context.getResources();
-        buildingBitmap = Utils.decodeResource(res, R.drawable.tree3);
+        buildingBitmap = Utils.decodeResource(res, resId);
         HEIGHT_DP = (int) (1.0f * buildingBitmap.getHeight() / buildingBitmap.getWidth() * WIDTH_DP);
         bmpW = dipToPx(context, WIDTH_DP * scale);
         bmpH = dipToPx(context, HEIGHT_DP * scale);
-    }
-
-    public BuildingView(Context context, float scale) {
-        super(context);
-        res = context.getResources();
-        buildingBitmap = Utils.decodeResource(res, R.drawable.tree3);
-        HEIGHT_DP = (int) (1.0f * buildingBitmap.getHeight() / buildingBitmap.getWidth() * WIDTH_DP);
-        bmpW = dipToPx(context, WIDTH_DP * scale);
-        bmpH = dipToPx(context, HEIGHT_DP * scale);
+        this.n = n;
+        this.m = m;
     }
 
 

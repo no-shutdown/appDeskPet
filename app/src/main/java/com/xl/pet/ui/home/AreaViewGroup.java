@@ -40,6 +40,8 @@ public class AreaViewGroup extends RelativeLayout {
         fieldViews = new FieldView[n][n];
         buildingViews = new BuildingView[n][n];
         int startMarginLeft = (n - 1) * offset_left;
+
+        //fields
         for (int i = 0; i < n; i++) {
             int baseTop = MAX_HEIGHT + offset_top * i;
             int baseLeft = startMarginLeft - offset_left * i;
@@ -57,23 +59,29 @@ public class AreaViewGroup extends RelativeLayout {
                 fieldView.setLayoutParams(layoutParams);
                 fieldViews[i][j] = fieldView;
                 this.addView(fieldView);
-
-                // building
-                BuildingView buildingView = new BuildingView(context, scale);
-                RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
-                );
-                int offsetYByField = buildingView.getBmpH() - fieldView.getBmpH() / 2;
-                int offsetXByField = fieldView.getBmpW() / 2 - buildingView.getBmpW() / 2;
-                layoutParams1.topMargin = baseTop + offset_top * j - offsetYByField;
-                layoutParams1.leftMargin = baseLeft + offset_left * j + offsetXByField;
-                layoutParams1.width = buildingView.getBmpW();
-                layoutParams1.height = buildingView.getBmpH();
-                buildingView.setLayoutParams(layoutParams1);
-                buildingViews[i][j] = buildingView;
-                this.addView(buildingView);
             }
+        }
+
+        // buildings
+        for (TB.Mode mode : TB.modes) {
+            int i = mode.xI, j = mode.yI;
+            int baseTop = MAX_HEIGHT + offset_top * i;
+            int baseLeft = startMarginLeft - offset_left * i;
+            FieldView fieldView = fieldViews[i][j];
+            BuildingView buildingView = new BuildingView(context, scale, mode.resId, mode.n, mode.m);
+            RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            int offsetYByField = buildingView.getBmpH() - fieldView.getBmpH() / 2;
+            int offsetXByField = fieldView.getBmpW() / 2 - buildingView.getBmpW() / 2;
+            layoutParams1.topMargin = baseTop + offset_top * j - offsetYByField;
+            layoutParams1.leftMargin = baseLeft + offset_left * j + offsetXByField;
+            layoutParams1.width = buildingView.getBmpW();
+            layoutParams1.height = buildingView.getBmpH();
+            buildingView.setLayoutParams(layoutParams1);
+            buildingViews[i][j] = buildingView;
+            this.addView(buildingView);
         }
     }
 
@@ -81,7 +89,13 @@ public class AreaViewGroup extends RelativeLayout {
     public void buildingDoAlpha() {
         if (!buildingAlpha) {
             for (BuildingView[] row : buildingViews) {
+                if (null == row) {
+                    continue;
+                }
                 for (BuildingView buildingView : row) {
+                    if (null == buildingView) {
+                        continue;
+                    }
                     buildingView.doAlpha();
                 }
             }
@@ -94,7 +108,13 @@ public class AreaViewGroup extends RelativeLayout {
         if (buildingAlpha) {
             //building不透明
             for (BuildingView[] row : buildingViews) {
+                if (null == row) {
+                    continue;
+                }
                 for (BuildingView buildingView : row) {
+                    if (null == buildingView) {
+                        continue;
+                    }
                     buildingView.undoAlpha();
                 }
             }
