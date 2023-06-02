@@ -15,8 +15,10 @@ public class TB {
         modes.add(new Mode(0, 1, R.drawable.tree3));
         modes.add(new Mode(0, 2, R.drawable.tree3));
         modes.add(new Mode(0, 3, R.drawable.tree3));
-        modes.add(new Mode(5, 0, R.drawable.room1,
-                0.455f, 0.599f, 0.41f, 1, 2));
+        modes.add(new Mode(1, 0, R.drawable.room1,
+                0.5596f, 0.4774f, 0.41f, 1, 3));
+        modes.add(new Mode(3, 0, R.drawable.car,
+                0.2344f, 0f, 0.7619f, 4, 3));
     }
 
     static class Mode {

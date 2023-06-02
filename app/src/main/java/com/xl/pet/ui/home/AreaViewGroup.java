@@ -73,7 +73,7 @@ public class AreaViewGroup extends RelativeLayout {
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
             );
-            float offsetYByField, offsetXByField;
+            float offsetYByField = 0, offsetXByField = 0;
             //如果是1*1则移动到中心位置。否则按占地面积去移动
             if (buildingView instanceof BuildingView) {
                 //移动到中心位置
@@ -81,8 +81,8 @@ public class AreaViewGroup extends RelativeLayout {
                 offsetXByField = fieldView.getBmpW() / 2f - buildingView.getBmpW() / 2f;
             } else {
                 //占地参考点（占地区域的左上角）移动到building图片左上角
-                offsetYByField = -1.0f * (buildingView.getBmpH() * mode.offsetX);
-                offsetXByField = -1.0f * (buildingView.getBmpW() * mode.offsetY);
+                offsetYByField = -1.0f * (buildingView.getBmpH() * mode.offsetY);
+                offsetXByField = -1.0f * (buildingView.getBmpW() * mode.offsetX);
                 //再移动到field显示效果的左上角
                 offsetXByField = offsetXByField + (fieldView.getBmpW() / 2f);
             }
