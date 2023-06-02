@@ -8,21 +8,24 @@ import com.xl.pet.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FieldViewGroupTouchListener implements View.OnTouchListener {
+/**
+ * 建筑触摸监听器
+ */
+public class BuildingViewTouchListener implements View.OnTouchListener {
     private float touchX;
     private float touchY;
 
     private BuildingView buildingView;
-    private final FieldView[][] fieldViews;
+    private final AreaViewGroup areaViewGroup;
 
 
     private final int[] minDistancePoint = new int[2];
     private final int[] minDistanceIndex = new int[2];
-    private final List<FieldViewGroup.FieldLight> lightFields = new ArrayList<>();
+    private final List<AreaViewGroup.FieldLight> findLightFields = new ArrayList<>();
 
-    public FieldViewGroupTouchListener(FieldViewGroup fieldViewGroup, BuildingView buildingView) {
+    public BuildingViewTouchListener(AreaViewGroup areaViewGroup, BuildingView buildingView) {
         this.buildingView = buildingView;
-        fieldViews = fieldViewGroup.fieldViews;
+        this.areaViewGroup = areaViewGroup;
     }
 
     public void setBuildingView(BuildingView buildingView) {
@@ -35,36 +38,31 @@ public class FieldViewGroupTouchListener implements View.OnTouchListener {
         touchY = event.getRawY();
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                unLightOld();
-                lightNew(touchX, touchY, buildingView.n, buildingView.m);
+                areaViewGroup.buildingDoAlpha();
                 break;
             case MotionEvent.ACTION_MOVE:
-                System.out.println("123");
+                areaViewGroup.light(finLightFields(touchX, touchY, buildingView.n, buildingView.m));
                 break;
             case MotionEvent.ACTION_UP:
-                System.out.println(456);
+                areaViewGroup.buildingUndoAlpha();
+                areaViewGroup.unLight();
                 break;
-
         }
         return true;
     }
 
-    private void unLightOld() {
-        for (FieldViewGroup.FieldLight fieldLight : lightFields) {
-            fieldViews[fieldLight.xI][fieldLight.yI].unLight();
-        }
-    }
 
-    private void lightNew(float x, float y, int n, int m) {
-        lightFields.clear();
-        FieldViewGroup.FieldLight lightField = findRecentlyField(x, y);
-        lightFields.add(lightField);
-        fieldViews[lightField.xI][lightField.yI].light(lightField.free);
+    private List<AreaViewGroup.FieldLight> finLightFields(float x, float y, int n, int m) {
+        findLightFields.clear();
+        AreaViewGroup.FieldLight lightField = findRecentlyField(x, y);
+        findLightFields.add(lightField);
         //TODO 寻找周边区域
+        return findLightFields;
     }
 
-    private FieldViewGroup.FieldLight findRecentlyField(float x, float y) {
+    private AreaViewGroup.FieldLight findRecentlyField(float x, float y) {
         double minDistance = -1;
+        FieldView[][] fieldViews = areaViewGroup.fieldViews;
         for (int i = 0; i < fieldViews.length; i++) {
             FieldView[] row = fieldViews[i];
             for (int j = 0; j < row.length; j++) {
@@ -78,6 +76,6 @@ public class FieldViewGroupTouchListener implements View.OnTouchListener {
                 }
             }
         }
-        return new FieldViewGroup.FieldLight(minDistanceIndex[0], minDistanceIndex[1], true);
+        return new AreaViewGroup.FieldLight(minDistanceIndex[0], minDistanceIndex[1], true);
     }
 }

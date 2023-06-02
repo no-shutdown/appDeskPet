@@ -11,6 +11,9 @@ import android.view.View;
 import com.xl.pet.R;
 import com.xl.pet.utils.Utils;
 
+/**
+ * 建筑组件
+ */
 public class BuildingView extends View {
 
     //预设大小（dp）
@@ -28,6 +31,8 @@ public class BuildingView extends View {
     protected Paint paint = new Paint();
     //资源
     protected Resources res;
+    //透明度 (0 完全透明 -255 完全可见)
+    protected int alpha = 255;
 
 
     //n*m
@@ -60,13 +65,21 @@ public class BuildingView extends View {
             float scaleY = (float) getHeight() / buildingBitmap.getHeight();
             float imgScale = Math.min(scaleX, scaleY); // 使用最小的缩放比例，以保持图片完整显示
             matrix.setScale(imgScale, imgScale);
+            paint.setAlpha(alpha);
             canvas.drawBitmap(buildingBitmap, matrix, paint);
         }
     }
 
-    private int dipToPx(Context context, float dpValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (dpValue * scale + 0.5f);
+    //透明
+    public void doAlpha() {
+        alpha = 100;
+        invalidate();
+    }
+
+    //取消透明
+    public void undoAlpha() {
+        alpha = 255;
+        invalidate();
     }
 
     public int getBmpW() {
@@ -76,4 +89,16 @@ public class BuildingView extends View {
     public int getBmpH() {
         return bmpH;
     }
+
+
+    @Override
+    public boolean performClick() {
+        return super.performClick();
+    }
+
+    private int dipToPx(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
+    }
+
 }

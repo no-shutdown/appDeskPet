@@ -5,20 +5,31 @@ import android.util.AttributeSet;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import java.util.ArrayList;
+import java.util.List;
 
-public class FieldViewGroup extends RelativeLayout {
+/**
+ * 区域组件
+ */
+public class AreaViewGroup extends RelativeLayout {
 
     public FieldView[][] fieldViews;
     public BuildingView[][] buildingViews;
 
+    //当前高亮区域
+    private final List<FieldLight> fieldLights = new ArrayList<>();
+    //建筑是否透明
+    private boolean buildingAlpha;
+
     //顶部预留空间
     private static final int MAX_HEIGHT = 150;
 
-    public FieldViewGroup(Context context, AttributeSet attrs) {
+    public AreaViewGroup(Context context, AttributeSet attrs) {
         super(context, attrs);
         createFields(context);
     }
 
+    //绘制区域内的子组件
     private void createFields(Context context) {
         int widthPixels = context.getResources().getDisplayMetrics().widthPixels;
         int n = 6; //n*n
@@ -66,6 +77,50 @@ public class FieldViewGroup extends RelativeLayout {
         }
     }
 
+    //所有building透明
+    public void buildingDoAlpha() {
+        if (!buildingAlpha) {
+            for (BuildingView[] row : buildingViews) {
+                for (BuildingView buildingView : row) {
+                    buildingView.doAlpha();
+                }
+            }
+            buildingAlpha = true;
+        }
+    }
+
+    //所有building不透明
+    public void buildingUndoAlpha() {
+        if (buildingAlpha) {
+            //building不透明
+            for (BuildingView[] row : buildingViews) {
+                for (BuildingView buildingView : row) {
+                    buildingView.undoAlpha();
+                }
+            }
+            buildingAlpha = false;
+        }
+    }
+
+    //高亮区域
+    public void light(List<FieldLight> findFieldLights) {
+        unLight();
+        //高亮新的特定区域
+        fieldLights.addAll(findFieldLights);
+        for (FieldLight fieldLight : fieldLights) {
+            fieldViews[fieldLight.xI][fieldLight.yI].light(fieldLight.free);
+        }
+    }
+
+    //取消高亮
+    public void unLight() {
+        //取消特定区域的高亮
+        for (FieldLight fieldLight : fieldLights) {
+            fieldViews[fieldLight.xI][fieldLight.yI].unLight();
+        }
+        fieldLights.clear();
+    }
+
     private float computeScale(int parentWidth, int n, int viewDp) {
         //100px伸缩空间
         return 1.0f * (parentWidth - 100) / n / viewDp / 2;
@@ -80,7 +135,6 @@ public class FieldViewGroup extends RelativeLayout {
         final float scale = this.getResources().getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
     }
-
 
     public static class FieldLight {
         public int xI;

@@ -14,7 +14,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:orientation="horizontal" />
 
-    <com.xl.pet.ui.home.FieldViewGroup
+    <com.xl.pet.ui.home.AreaViewGroup
         android:id="@+id/layout_fields"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

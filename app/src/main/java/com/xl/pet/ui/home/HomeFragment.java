@@ -21,7 +21,7 @@ public class HomeFragment extends Fragment {
         HomeViewModel homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
 
-        FieldViewGroup fieldGroup = root.findViewById(R.id.layout_fields);
+        AreaViewGroup fieldGroup = root.findViewById(R.id.layout_fields);
 
         LinearLayout topLayout = root.findViewById(R.id.layout_dragItems);
         BuildingView buildingView = new BuildingView(root.getContext(), 0.5f);
@@ -34,7 +34,7 @@ public class HomeFragment extends Fragment {
         buildingView.setLayoutParams(layoutParams);
         topLayout.addView(buildingView);
 
-        fieldGroup.setOnTouchListener(new FieldViewGroupTouchListener(fieldGroup, buildingView));
+        buildingView.setOnTouchListener(new BuildingViewTouchListener(fieldGroup, buildingView));
 
 
         return root;

@@ -11,6 +11,9 @@ import android.view.View;
 import com.xl.pet.R;
 import com.xl.pet.utils.Utils;
 
+/**
+ * 单个田地组件
+ */
 public class FieldView extends View {
 
     //预设大小（dp）
@@ -75,7 +78,7 @@ public class FieldView extends View {
     public void light(boolean free) {
         this.light = true;
         lightPaint.setColor(free ? 0xFF4169E1 : 0xFFDB7093);
-        lightPaint.setAlpha(100); // 设置透明度
+        lightPaint.setAlpha(200); // 设置透明度
         invalidate();
     }
 
