@@ -42,7 +42,12 @@ public class BuildingViewTouchListener implements View.OnTouchListener {
                 break;
             case MotionEvent.ACTION_MOVE:
                 //高亮区域（偏移量是为了高亮点不被手指挡住）
-                areaViewGroup.light(finLightFields(touchX - 200, touchY + 100, buildingView.n, buildingView.m));
+                if (v instanceof BuildingView) {
+                    areaViewGroup.light(finLightFields(touchX - 200, touchY + 100));
+                } else if (v instanceof MultBuildingView) {
+                    MultBuildingView multBuildingView = (MultBuildingView) v;
+                    areaViewGroup.light(finLightFields(touchX - 200, touchY + 100, multBuildingView.n, multBuildingView.m));
+                }
                 break;
             case MotionEvent.ACTION_UP:
                 areaViewGroup.buildingUndoAlpha();
@@ -52,6 +57,13 @@ public class BuildingViewTouchListener implements View.OnTouchListener {
         return true;
     }
 
+
+    private List<AreaViewGroup.FieldLight> finLightFields(float x, float y) {
+        findLightFields.clear();
+        AreaViewGroup.FieldLight lightField = findRecentlyField(x, y);
+        findLightFields.add(lightField);
+        return findLightFields;
+    }
 
     private List<AreaViewGroup.FieldLight> finLightFields(float x, float y, int n, int m) {
         findLightFields.clear();

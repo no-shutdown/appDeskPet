@@ -14,7 +14,7 @@ public class TB {
         modes.add(new Mode(0, 1, R.drawable.tree3, 1, 1));
         modes.add(new Mode(0, 2, R.drawable.tree3, 1, 1));
         modes.add(new Mode(0, 3, R.drawable.tree3, 1, 1));
-        modes.add(new Mode(2, 0, R.drawable.room, 3, 2));
+        modes.add(new Mode(3, 2, R.drawable.room_floor, 2, 2));
     }
 
     static class Mode {

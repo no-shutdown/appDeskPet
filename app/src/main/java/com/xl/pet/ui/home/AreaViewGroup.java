@@ -68,13 +68,23 @@ public class AreaViewGroup extends RelativeLayout {
             int baseTop = MAX_HEIGHT + offset_top * i;
             int baseLeft = startMarginLeft - offset_left * i;
             FieldView fieldView = fieldViews[i][j];
-            BuildingView buildingView = new BuildingView(context, scale, mode.resId, mode.n, mode.m);
+            BuildingView buildingView = new BuildingView(context, scale, mode.resId);
             RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
             );
-            int offsetYByField = buildingView.getBmpH() - fieldView.getBmpH() / 2;
-            int offsetXByField = fieldView.getBmpW() / 2 - buildingView.getBmpW() / 2;
+            int offsetYByField = 0, offsetXByField = 0;
+            //如果是1*1则移动到中心位置。否则按占地面积去移动
+            if (buildingView instanceof BuildingView) {
+                //移动到中心位置
+                offsetYByField = buildingView.getBmpH() - fieldView.getBmpH() / 2;
+                offsetXByField = fieldView.getBmpW() / 2 - buildingView.getBmpW() / 2;
+            } else {
+                //占地参考点（占地区域的左上角）移动到building图片左上角
+
+                //再移动到field显示效果的左上角
+                offsetXByField = fieldView.getBmpW() / 2;
+            }
             layoutParams1.topMargin = baseTop + offset_top * j - offsetYByField;
             layoutParams1.leftMargin = baseLeft + offset_left * j + offsetXByField;
             layoutParams1.width = buildingView.getBmpW();
