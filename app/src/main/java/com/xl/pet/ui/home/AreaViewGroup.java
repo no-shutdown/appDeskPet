@@ -14,15 +14,25 @@ import java.util.List;
 public class AreaViewGroup extends RelativeLayout {
 
     public FieldView[][] fieldViews;
-    public BaseBuildingView[][] buildingViews;
+    public AbstractBuildingView[][] buildingViews;
+
+    //n*n
+    public int n;
+    //缩放
+    private float scale;
+    //起点左边距
+    private int startMarginLeft;
+    //field重合偏移量
+    private int offset_top;
+    private int offset_left;
 
     //当前高亮区域
-    private final List<FieldLight> fieldLights = new ArrayList<>();
+    private final List<FieldPoint> fieldPoints = new ArrayList<>();
     //建筑是否透明
     private boolean buildingAlpha;
 
     //顶部预留空间
-    private static final int MAX_HEIGHT = 150;
+    private static final int PRE_TOP = 150;
 
     public AreaViewGroup(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -32,18 +42,18 @@ public class AreaViewGroup extends RelativeLayout {
     //绘制区域内的子组件
     private void createFields(Context context) {
         int widthPixels = context.getResources().getDisplayMetrics().widthPixels;
-        int n = 10; //n*n
-        float scale = computeScale(widthPixels, n, 297); //计算缩放比例 297是图片长宽的斜边dp，即x轴长度
-        int offset_top = dipToPx(60 * scale); //偏移量 60固定偏移量才能刚好重合
-        int offset_left = dipToPx(103 * scale); //偏移量 103固定偏移量才能刚好重合
+        n = 10; //n*n
+        scale = computeScale(widthPixels, n, 297); //计算缩放比例 297是图片长宽的斜边dp，即x轴长度
+        offset_top = dipToPx(60 * scale); //偏移量 60固定偏移量才能刚好重合
+        offset_left = dipToPx(103 * scale); //偏移量 103固定偏移量才能刚好重合
 
         fieldViews = new FieldView[n][n];
-        buildingViews = new BaseBuildingView[n][n];
-        int startMarginLeft = (n - 1) * offset_left;
+        buildingViews = new AbstractBuildingView[n][n];
+        startMarginLeft = (n - 1) * offset_left;
 
         //fields
         for (int i = 0; i < n; i++) {
-            int baseTop = MAX_HEIGHT + offset_top * i;
+            int baseTop = PRE_TOP + offset_top * i;
             int baseLeft = startMarginLeft - offset_left * i;
             for (int j = 0; j < n; j++) {
                 // field
@@ -54,8 +64,8 @@ public class AreaViewGroup extends RelativeLayout {
                 );
                 layoutParams.topMargin = baseTop + offset_top * j;
                 layoutParams.leftMargin = baseLeft + offset_left * j;
-                layoutParams.width = fieldView.getBmpW();
-                layoutParams.height = fieldView.getBmpH();
+                layoutParams.width = fieldView.bmpW;
+                layoutParams.height = fieldView.bmpH;
                 fieldView.setLayoutParams(layoutParams);
                 fieldViews[i][j] = fieldView;
                 this.addView(fieldView);
@@ -63,47 +73,65 @@ public class AreaViewGroup extends RelativeLayout {
         }
 
         // buildings
-        for (TB.Mode mode : TB.modes) {
-            int i = mode.xI, j = mode.yI;
-            int baseTop = MAX_HEIGHT + offset_top * i;
-            int baseLeft = startMarginLeft - offset_left * i;
-            FieldView fieldView = fieldViews[i][j];
-            BaseBuildingView buildingView = BaseBuildingView.buildingView(context, scale, mode.resId, mode.n, mode.m, mode.widthP);
-            RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            );
-            float offsetYByField = 0, offsetXByField = 0;
-            //如果是1*1则移动到中心位置。否则将占地面积的左上角移动到所在地块的左上角
-            if (buildingView instanceof BuildingView) {
-                //移动到中心位置
-                offsetYByField = -1 * (buildingView.getBmpH() - fieldView.getBmpH() / 2f);
-                offsetXByField = fieldView.getBmpW() / 2f - buildingView.getBmpW() / 2f;
-            } else {
-                //占地参考点（占地区域的左上角）移动到building图片左上角
-                offsetYByField = buildingView.getBmpH() * mode.offsetY;
-                offsetXByField = buildingView.getBmpW() * mode.offsetX;
-                //再移动到field显示效果的左上角
-                offsetXByField = offsetXByField + (fieldView.getBmpW() / 2f);
-            }
-            layoutParams1.topMargin = (int) (baseTop + offset_top * j + offsetYByField);
-            layoutParams1.leftMargin = (int) (baseLeft + offset_left * j + offsetXByField);
-            layoutParams1.width = buildingView.getBmpW();
-            layoutParams1.height = buildingView.getBmpH();
-            buildingView.setLayoutParams(layoutParams1);
-            buildingViews[i][j] = buildingView;
-            this.addView(buildingView);
+        List<BuildingViewMode.Mode> modes = DatabaseTB.findModesFromDatabase();
+        for (BuildingViewMode.Mode mode : modes) {
+            createBuilding(new FieldPoint(mode.xI, mode.yI), mode.resId, mode.multiParam);
         }
+    }
+
+    //新建建筑
+    public void createBuilding(FieldPoint point, int resId, BuildingViewMode.MultiParam multiParam) {
+        int i = point.i, j = point.j;
+        int baseTop = PRE_TOP + offset_top * i;
+        int baseLeft = startMarginLeft - offset_left * i;
+        FieldView fieldView = fieldViews[i][j];
+        AbstractBuildingView buildingView = AbstractBuildingView.buildingView(this.getContext(), scale, resId, multiParam);
+        RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        float offsetYByField = 0, offsetXByField = 0;
+        //如果是1*1则移动到中心位置。否则将占地面积的左上角移动到所在地块的左上角
+        if (buildingView instanceof BuildingView) {
+            //移动到中心位置
+            offsetYByField = -1 * (buildingView.bmpH - fieldView.bmpH / 2f);
+            offsetXByField = fieldView.bmpW / 2f - buildingView.bmpW / 2f;
+
+            //标记地域忙碌状态
+            fieldViews[i][j].free = false;
+        } else if (buildingView instanceof MultiBuildingView) {
+            MultiBuildingView multiBuildingView = (MultiBuildingView) buildingView;
+            //占地参考点（占地区域的左上角）移动到building图片左上角
+            offsetYByField = buildingView.bmpH * multiParam.offsetY;
+            offsetXByField = buildingView.bmpW * multiParam.offsetX;
+            //再移动到field显示效果的左上角
+            offsetXByField = offsetXByField + (fieldView.bmpW / 2f);
+
+            //标记地域忙碌状态
+            fieldViews[i][j].free = false;
+            for (int mm = 0; mm < multiBuildingView.m; mm++) {
+                for (int nn = 0; nn < multiBuildingView.n; nn++) {
+                    fieldViews[i + mm][j + nn].free = false;
+                }
+            }
+        }
+        layoutParams1.topMargin = (int) (baseTop + offset_top * j + offsetYByField);
+        layoutParams1.leftMargin = (int) (baseLeft + offset_left * j + offsetXByField);
+        layoutParams1.width = buildingView.bmpW;
+        layoutParams1.height = buildingView.bmpH;
+        buildingView.setLayoutParams(layoutParams1);
+        buildingViews[i][j] = buildingView;
+        this.addView(buildingView);
     }
 
     //所有building透明
     public void buildingDoAlpha() {
         if (!buildingAlpha) {
-            for (BaseBuildingView[] row : buildingViews) {
+            for (AbstractBuildingView[] row : buildingViews) {
                 if (null == row) {
                     continue;
                 }
-                for (BaseBuildingView buildingView : row) {
+                for (AbstractBuildingView buildingView : row) {
                     if (null == buildingView) {
                         continue;
                     }
@@ -118,11 +146,11 @@ public class AreaViewGroup extends RelativeLayout {
     public void buildingUndoAlpha() {
         if (buildingAlpha) {
             //building不透明
-            for (BaseBuildingView[] row : buildingViews) {
+            for (AbstractBuildingView[] row : buildingViews) {
                 if (null == row) {
                     continue;
                 }
-                for (BaseBuildingView buildingView : row) {
+                for (AbstractBuildingView buildingView : row) {
                     if (null == buildingView) {
                         continue;
                     }
@@ -134,22 +162,35 @@ public class AreaViewGroup extends RelativeLayout {
     }
 
     //高亮区域
-    public void light(List<FieldLight> findFieldLights) {
+    public void light(List<FieldPoint> findFieldPoints) {
         unLight();
         //高亮新的特定区域
-        fieldLights.addAll(findFieldLights);
-        for (FieldLight fieldLight : fieldLights) {
-            fieldViews[fieldLight.xI][fieldLight.yI].light(fieldLight.free);
+        fieldPoints.addAll(findFieldPoints);
+        for (FieldPoint fieldPoint : fieldPoints) {
+            fieldViews[fieldPoint.i][fieldPoint.j].light();
         }
     }
 
     //取消高亮
     public void unLight() {
         //取消特定区域的高亮
-        for (FieldLight fieldLight : fieldLights) {
-            fieldViews[fieldLight.xI][fieldLight.yI].unLight();
+        for (FieldPoint fieldPoint : fieldPoints) {
+            fieldViews[fieldPoint.i][fieldPoint.j].unLight();
         }
-        fieldLights.clear();
+        fieldPoints.clear();
+    }
+
+    //判断区域是否全部可用，如果为空，则返回false
+    public boolean isAllFieldsFree(List<FieldPoint> findFieldPoints) {
+        if (findFieldPoints.isEmpty()) {
+            return false;
+        }
+        for (FieldPoint findFieldPoint : findFieldPoints) {
+            if (!fieldViews[findFieldPoint.i][findFieldPoint.j].free) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private float computeScale(int parentWidth, int n, int viewDp) {
@@ -167,15 +208,13 @@ public class AreaViewGroup extends RelativeLayout {
         return (int) (dpValue * scale + 0.5f);
     }
 
-    public static class FieldLight {
-        public int xI;
-        public int yI;
-        public boolean free;
+    public static class FieldPoint {
+        public int i;
+        public int j;
 
-        public FieldLight(int xI, int yI, boolean free) {
-            this.xI = xI;
-            this.yI = yI;
-            this.free = free;
+        public FieldPoint(int i, int j) {
+            this.i = i;
+            this.j = j;
         }
     }
 

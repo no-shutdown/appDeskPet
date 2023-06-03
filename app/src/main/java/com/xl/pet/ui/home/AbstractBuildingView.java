@@ -4,51 +4,52 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.view.View;
 
 import com.xl.pet.utils.Utils;
 
-public abstract class BaseBuildingView extends View {
+public abstract class AbstractBuildingView extends View {
 
-    //预设大小（dp）
-    private static int WIDTH_DP; //固定宽度
-    private static int HEIGHT_DP;//根据图片比例计算预设高度
     //实际大小（px）
-    private final int bmpW;
-    private final int bmpH;
+    protected final int bmpW;
+    protected final int bmpH;
 
+    //资源id
+    protected final int resId;
     //图片
-    protected Bitmap buildingBitmap;
+    protected final Bitmap buildingBitmap;
     //绘图矩阵
-    protected Matrix matrix = new Matrix();
+    protected final Matrix matrix = new Matrix();
     //画笔
-    protected Paint paint = new Paint();
+    protected final Paint paint = new Paint();
     //资源
-    protected Resources res;
+    protected final Resources res;
     //透明度 (0 完全透明 | 255 完全可见)
     protected int alpha = 255;
 
-    public static BaseBuildingView buildingView(Context context, float scale, int resId, int n, int m, float widthP) {
-        if (1 == n && -1 == m) {
-            return new BuildingView(context, scale, resId);
-        } else {
-            return new MultBuildingView(context, scale, resId, n, m, widthP);
-        }
+    public static AbstractBuildingView buildingView(Context context, float scale, int resId) {
+        return new BuildingView(context, scale, resId);
     }
 
-    public BaseBuildingView(Context context, float scale, int resId, int widthDP) {
+    public static AbstractBuildingView buildingView(Context context, float scale, int resId, BuildingViewMode.MultiParam multiParam) {
+        if (null == multiParam) {
+            return new BuildingView(context, scale, resId);
+        }
+        return new MultiBuildingView(context, scale, resId, multiParam.n, multiParam.m, (int) ((multiParam.n * 105) / multiParam.widthP));
+    }
+
+    public AbstractBuildingView(Context context, float scale, int resId, int widthDP) {
         super(context);
-        res = context.getResources();
+        this.res = context.getResources();
+        this.resId = resId;
         buildingBitmap = Utils.decodeResource(res, resId);
 
-        WIDTH_DP = widthDP;
-        //根据图片比例计算高度
-        HEIGHT_DP = (int) (1.0f * buildingBitmap.getHeight() / buildingBitmap.getWidth() * WIDTH_DP);
-        bmpW = dipToPx(context, WIDTH_DP * scale);
-        bmpH = dipToPx(context, HEIGHT_DP * scale);
+        //根据图片比例计算预设高度
+        int heightDP = (int) (1.0f * buildingBitmap.getHeight() / buildingBitmap.getWidth() * widthDP);
+        bmpW = dipToPx(context, widthDP * scale);
+        bmpH = dipToPx(context, heightDP * scale);
     }
 
 
@@ -78,15 +79,6 @@ public abstract class BaseBuildingView extends View {
         alpha = 255;
         invalidate();
     }
-
-    public int getBmpW() {
-        return bmpW;
-    }
-
-    public int getBmpH() {
-        return bmpH;
-    }
-
 
     @Override
     public boolean performClick() {

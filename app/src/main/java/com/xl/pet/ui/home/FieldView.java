@@ -20,20 +20,23 @@ public class FieldView extends View {
     private static final int WIDTH_DP = 210;
     private static final int HEIGHT_DP = 145;
     //实际大小（px）
-    private final int bmpW;
-    private final int bmpH;
+    protected final int bmpW;
+    protected final int bmpH;
 
+
+    //绘图矩阵
+    protected final Matrix matrix = new Matrix();
+    //画笔
+    protected final Paint paint = new Paint();
+    //资源
+    protected final Resources res;
     //图片
     protected Bitmap fieldBitmap;
-    //绘图矩阵
-    protected Matrix matrix = new Matrix();
-    //画笔
-    protected Paint paint = new Paint();
-    //资源
-    protected Resources res;
 
     //是否高亮
     protected boolean light;
+    //是否空闲
+    protected boolean free = true;
     //圆点半径
     protected int radius = 10;
     //高亮画笔
@@ -61,7 +64,7 @@ public class FieldView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 //        canvas.drawColor(Color.BLUE);
-        fieldBitmap = Utils.decodeResource(res, R.drawable.b_field);
+        fieldBitmap = Utils.decodeResource(res, R.drawable.b_floor);
         if (fieldBitmap != null) {
             canvas.drawBitmap(fieldBitmap, matrix, paint);
         }
@@ -76,20 +79,11 @@ public class FieldView extends View {
         invalidate();
     }
 
-    public void light(boolean free) {
+    public void light() {
         this.light = true;
         lightPaint.setColor(free ? 0xFF4169E1 : 0xFFDB7093);
         lightPaint.setAlpha(200); // 设置透明度
         invalidate();
-    }
-
-
-    public int getBmpW() {
-        return bmpW;
-    }
-
-    public int getBmpH() {
-        return bmpH;
     }
 
     private int dipToPx(Context context, float dpValue) {

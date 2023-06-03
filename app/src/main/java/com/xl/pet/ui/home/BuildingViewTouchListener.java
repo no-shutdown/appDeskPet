@@ -1,5 +1,7 @@
 package com.xl.pet.ui.home;
 
+import static com.xl.pet.ui.home.BuildingViewMode.MULTI_PARAM_MAP;
+
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -12,68 +14,79 @@ import java.util.List;
  * 建筑触摸监听器
  */
 public class BuildingViewTouchListener implements View.OnTouchListener {
-    private float touchX;
-    private float touchY;
 
-    private BuildingView buildingView;
     private final AreaViewGroup areaViewGroup;
 
 
     private final int[] minDistancePoint = new int[2];
     private final int[] minDistanceIndex = new int[2];
-    private final List<AreaViewGroup.FieldLight> findLightFields = new ArrayList<>();
+    private final List<AreaViewGroup.FieldPoint> findFields = new ArrayList<>();
 
-    public BuildingViewTouchListener(AreaViewGroup areaViewGroup, BuildingView buildingView) {
-        this.buildingView = buildingView;
+    public BuildingViewTouchListener(AreaViewGroup areaViewGroup) {
         this.areaViewGroup = areaViewGroup;
     }
 
-    public void setBuildingView(BuildingView buildingView) {
-        this.buildingView = buildingView;
-    }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        touchX = event.getRawX();
-        touchY = event.getRawY();
+        float touchX = event.getRawX();
+        float touchY = event.getRawY();
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                //建筑透明
                 areaViewGroup.buildingDoAlpha();
                 break;
             case MotionEvent.ACTION_MOVE:
                 //高亮区域（偏移量是为了高亮点不被手指挡住）
                 if (v instanceof BuildingView) {
-                    areaViewGroup.light(finLightFields(touchX - 200, touchY + 100));
-                } else if (v instanceof MultBuildingView) {
-                    MultBuildingView multBuildingView = (MultBuildingView) v;
-                    areaViewGroup.light(finLightFields(touchX - 200, touchY + 100, multBuildingView.n, multBuildingView.m));
+                    areaViewGroup.light(finLightFields(touchX - 150, touchY + 100));
+                } else if (v instanceof MultiBuildingView) {
+                    MultiBuildingView multiBuildingView = (MultiBuildingView) v;
+                    areaViewGroup.light(finLightFields(touchX - 150, touchY + 100, multiBuildingView.n, multiBuildingView.m));
                 }
                 break;
             case MotionEvent.ACTION_UP:
+                //取消建筑透明
                 areaViewGroup.buildingUndoAlpha();
+                //取消区域高亮
                 areaViewGroup.unLight();
+                //如果全部空间空闲，则新建建筑
+                if (areaViewGroup.isAllFieldsFree(findFields)) {
+                    AreaViewGroup.FieldPoint point = findFields.get(0);
+                    if (v instanceof BuildingView) {
+                        areaViewGroup.createBuilding(point, ((BuildingView) v).resId, null);
+                    } else if (v instanceof MultiBuildingView) {
+                        MultiBuildingView multiBuildingView = (MultiBuildingView) v;
+                        BuildingViewMode.MultiParam multiParam = MULTI_PARAM_MAP.get(multiBuildingView.resId);
+                        areaViewGroup.createBuilding(point, multiBuildingView.resId, multiParam);
+                    }
+                }
                 break;
         }
         return true;
     }
 
 
-    private List<AreaViewGroup.FieldLight> finLightFields(float x, float y) {
-        findLightFields.clear();
-        AreaViewGroup.FieldLight lightField = findRecentlyField(x, y);
-        findLightFields.add(lightField);
-        return findLightFields;
+    private List<AreaViewGroup.FieldPoint> finLightFields(float x, float y) {
+        findFields.clear();
+        AreaViewGroup.FieldPoint lightField = findRecentlyField(x, y);
+        findFields.add(lightField);
+        return findFields;
     }
 
-    private List<AreaViewGroup.FieldLight> finLightFields(float x, float y, int n, int m) {
-        findLightFields.clear();
-        AreaViewGroup.FieldLight lightField = findRecentlyField(x, y);
-        findLightFields.add(lightField);
-        //TODO 寻找周边区域
-        return findLightFields;
+    private List<AreaViewGroup.FieldPoint> finLightFields(float x, float y, int n, int m) {
+        findFields.clear();
+        AreaViewGroup.FieldPoint lightField = findRecentlyField(x, y);
+        int i = Math.min(lightField.i, areaViewGroup.n - m), j = Math.min(lightField.j, areaViewGroup.n - n);
+        for (int mm = 0; mm < m; mm++) {
+            for (int nn = 0; nn < n; nn++) {
+                findFields.add(new AreaViewGroup.FieldPoint(i + mm, j + nn));
+            }
+        }
+        return findFields;
     }
 
-    private AreaViewGroup.FieldLight findRecentlyField(float x, float y) {
+    private AreaViewGroup.FieldPoint findRecentlyField(float x, float y) {
         double minDistance = -1;
         FieldView[][] fieldViews = areaViewGroup.fieldViews;
         for (int i = 0; i < fieldViews.length; i++) {
@@ -89,6 +102,6 @@ public class BuildingViewTouchListener implements View.OnTouchListener {
                 }
             }
         }
-        return new AreaViewGroup.FieldLight(minDistanceIndex[0], minDistanceIndex[1], true);
+        return new AreaViewGroup.FieldPoint(minDistanceIndex[0], minDistanceIndex[1]);
     }
 }

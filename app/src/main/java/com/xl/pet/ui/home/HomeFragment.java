@@ -1,5 +1,7 @@
 package com.xl.pet.ui.home;
 
+import static com.xl.pet.ui.home.BuildingViewMode.MULTI_PARAM_MAP;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,17 +26,30 @@ public class HomeFragment extends Fragment {
         AreaViewGroup fieldGroup = root.findViewById(R.id.layout_fields);
 
         LinearLayout topLayout = root.findViewById(R.id.layout_dragItems);
-        BuildingView buildingView = new BuildingView(root.getContext(), 0.5f, R.drawable.b_tree3);
+
+        AbstractBuildingView buildingView = AbstractBuildingView.buildingView(root.getContext(), 0.3f, R.drawable.b_tree3);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
         );
-        layoutParams.width = buildingView.getBmpW();
-        layoutParams.height = buildingView.getBmpH();
+        layoutParams.width = buildingView.bmpW;
+        layoutParams.height = buildingView.bmpH;
         buildingView.setLayoutParams(layoutParams);
         topLayout.addView(buildingView);
+        buildingView.setOnTouchListener(new BuildingViewTouchListener(fieldGroup));
 
-        buildingView.setOnTouchListener(new BuildingViewTouchListener(fieldGroup, buildingView));
+
+        BuildingViewMode.MultiParam multiParam = MULTI_PARAM_MAP.get(R.drawable.b_room1);
+        AbstractBuildingView multiBuildingView = AbstractBuildingView.buildingView(root.getContext(), 0.2f, R.drawable.b_room1, multiParam);
+        RelativeLayout.LayoutParams multiLayoutParams = new RelativeLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        multiLayoutParams.width = multiBuildingView.bmpW;
+        multiLayoutParams.height = multiBuildingView.bmpH;
+        multiBuildingView.setLayoutParams(multiLayoutParams);
+        topLayout.addView(multiBuildingView);
+        multiBuildingView.setOnTouchListener(new BuildingViewTouchListener(fieldGroup));
 
 
         return root;
