@@ -32,7 +32,7 @@ public abstract class BaseBuildingView extends View {
     protected int alpha = 255;
 
     public static BaseBuildingView buildingView(Context context, float scale, int resId, int n, int m, float widthP) {
-        if (1 == n && 1 == m) {
+        if (1 == n && -1 == m) {
             return new BuildingView(context, scale, resId);
         } else {
             return new MultBuildingView(context, scale, resId, n, m, widthP);

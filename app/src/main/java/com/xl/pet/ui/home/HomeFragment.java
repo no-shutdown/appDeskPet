@@ -24,7 +24,7 @@ public class HomeFragment extends Fragment {
         AreaViewGroup fieldGroup = root.findViewById(R.id.layout_fields);
 
         LinearLayout topLayout = root.findViewById(R.id.layout_dragItems);
-        BuildingView buildingView = new BuildingView(root.getContext(), 0.5f, R.drawable.tree3);
+        BuildingView buildingView = new BuildingView(root.getContext(), 0.5f, R.drawable.b_tree3);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT

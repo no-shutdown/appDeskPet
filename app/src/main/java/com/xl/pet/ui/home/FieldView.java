@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.view.View;
@@ -62,7 +61,7 @@ public class FieldView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 //        canvas.drawColor(Color.BLUE);
-        fieldBitmap = Utils.decodeResource(res, R.drawable.field);
+        fieldBitmap = Utils.decodeResource(res, R.drawable.b_field);
         if (fieldBitmap != null) {
             canvas.drawBitmap(fieldBitmap, matrix, paint);
         }

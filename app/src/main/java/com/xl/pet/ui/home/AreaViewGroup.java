@@ -32,7 +32,7 @@ public class AreaViewGroup extends RelativeLayout {
     //绘制区域内的子组件
     private void createFields(Context context) {
         int widthPixels = context.getResources().getDisplayMetrics().widthPixels;
-        int n = 8; //n*n
+        int n = 10; //n*n
         float scale = computeScale(widthPixels, n, 297); //计算缩放比例 297是图片长宽的斜边dp，即x轴长度
         int offset_top = dipToPx(60 * scale); //偏移量 60固定偏移量才能刚好重合
         int offset_left = dipToPx(103 * scale); //偏移量 103固定偏移量才能刚好重合
@@ -74,15 +74,15 @@ public class AreaViewGroup extends RelativeLayout {
                     ViewGroup.LayoutParams.WRAP_CONTENT
             );
             float offsetYByField = 0, offsetXByField = 0;
-            //如果是1*1则移动到中心位置。否则按占地面积去移动
+            //如果是1*1则移动到中心位置。否则将占地面积的左上角移动到所在地块的左上角
             if (buildingView instanceof BuildingView) {
                 //移动到中心位置
                 offsetYByField = -1 * (buildingView.getBmpH() - fieldView.getBmpH() / 2f);
                 offsetXByField = fieldView.getBmpW() / 2f - buildingView.getBmpW() / 2f;
             } else {
                 //占地参考点（占地区域的左上角）移动到building图片左上角
-                offsetYByField = -1.0f * (buildingView.getBmpH() * mode.offsetY);
-                offsetXByField = -1.0f * (buildingView.getBmpW() * mode.offsetX);
+                offsetYByField = buildingView.getBmpH() * mode.offsetY;
+                offsetXByField = buildingView.getBmpW() * mode.offsetX;
                 //再移动到field显示效果的左上角
                 offsetXByField = offsetXByField + (fieldView.getBmpW() / 2f);
             }
