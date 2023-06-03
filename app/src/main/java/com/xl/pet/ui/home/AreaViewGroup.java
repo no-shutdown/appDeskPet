@@ -124,6 +124,24 @@ public class AreaViewGroup extends RelativeLayout {
         this.addView(buildingView);
     }
 
+    //刷新参数点以下的所有建筑，避免后面的建筑显示在前面
+    public void refreshAreaAfterPoint(FieldPoint point) {
+        boolean first = true;
+        for (int i = point.i; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (first) {
+                    first = false;
+                    continue;
+                }
+                if (null == buildingViews[i][j]) {
+                    continue;
+                }
+                this.removeView(buildingViews[i][j]);
+                this.addView(buildingViews[i][j]);
+            }
+        }
+    }
+
     //所有building透明
     public void buildingDoAlpha() {
         if (!buildingAlpha) {

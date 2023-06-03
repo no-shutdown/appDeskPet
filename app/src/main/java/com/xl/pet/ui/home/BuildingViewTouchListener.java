@@ -55,10 +55,12 @@ public class BuildingViewTouchListener implements View.OnTouchListener {
                     AreaViewGroup.FieldPoint point = findFields.get(0);
                     if (v instanceof BuildingView) {
                         areaViewGroup.createBuilding(point, ((BuildingView) v).resId, null);
+                        areaViewGroup.refreshAreaAfterPoint(point);
                     } else if (v instanceof MultiBuildingView) {
                         MultiBuildingView multiBuildingView = (MultiBuildingView) v;
                         BuildingViewMode.MultiParam multiParam = MULTI_PARAM_MAP.get(multiBuildingView.resId);
                         areaViewGroup.createBuilding(point, multiBuildingView.resId, multiParam);
+                        areaViewGroup.refreshAreaAfterPoint(point);
                     }
                 }
                 break;
