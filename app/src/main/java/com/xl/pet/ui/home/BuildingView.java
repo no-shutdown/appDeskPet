@@ -11,7 +11,7 @@ public class BuildingView extends AbstractBuildingView {
 
 
     public BuildingView(Context context, float scale, int resId) {
-        super(context, scale, resId, 105);
+        super(context, scale, resId, 170);
     }
 
 

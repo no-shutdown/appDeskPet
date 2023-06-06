@@ -42,7 +42,7 @@ public class AreaViewGroup extends RelativeLayout {
     //绘制区域内的子组件
     private void createFields(Context context) {
         int widthPixels = context.getResources().getDisplayMetrics().widthPixels;
-        n = 10; //n*n
+        n = 6; //n*n
         scale = computeScale(widthPixels, n, 297); //计算缩放比例 297是图片长宽的斜边dp，即x轴长度
         offset_top = dipToPx(60 * scale); //偏移量 60固定偏移量才能刚好重合
         offset_left = dipToPx(103 * scale); //偏移量 103固定偏移量才能刚好重合
