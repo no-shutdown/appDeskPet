@@ -64,7 +64,7 @@ public class FieldView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 //        canvas.drawColor(Color.BLUE);
-        fieldBitmap = Utils.decodeResource(res, R.drawable.b_floor);
+        fieldBitmap = Utils.decodeResource(res, R.drawable.b_field1);
         if (fieldBitmap != null) {
             canvas.drawBitmap(fieldBitmap, matrix, paint);
         }
