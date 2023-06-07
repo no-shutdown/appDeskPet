@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="SegmentView">
+        <attr name="data" format="string"/>
+        <attr name="index" format="integer"/>
+        <attr name="textSize" format="dimension"/>
+        <attr name="bgColor" format="color"/>
+        <attr name="fgColor" format="color"/>
+    </declare-styleable>
+</resources>

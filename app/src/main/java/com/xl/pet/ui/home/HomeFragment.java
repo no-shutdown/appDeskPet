@@ -1,14 +1,11 @@
 package com.xl.pet.ui.home;
 
-import static com.xl.pet.ui.home.BuildingViewMode.MULTI_PARAM_MAP;
 
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridLayout;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -30,36 +27,18 @@ public class HomeFragment extends Fragment {
         TextView topTitle = root.findViewById(R.id.top_title);
         topTitle.setText("2023-06");
 
-        AreaViewGroup fieldGroup = root.findViewById(R.id.layout_fields);
-
-        GridLayout dragItemsLayout = root.findViewById(R.id.layout_dragItems);
-        AbstractBuildingView buildingView = AbstractBuildingView.buildingView(root.getContext(), 0.3f, R.drawable.b_tree3);
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        );
-        layoutParams.width = buildingView.bmpW;
-        layoutParams.height = buildingView.bmpH;
-        buildingView.setLayoutParams(layoutParams);
-        buildingView.setOnTouchListener(new BuildingViewTouchListener(fieldGroup));
-        dragItemsLayout.addView(buildingView);
-
-
-        BuildingViewMode.MultiParam multiParam = MULTI_PARAM_MAP.get(R.drawable.b_room1);
-        AbstractBuildingView multiBuildingView = AbstractBuildingView.buildingView(root.getContext(), 0.2f, R.drawable.b_room1, multiParam);
-        RelativeLayout.LayoutParams multiLayoutParams = new RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        );
-        multiLayoutParams.width = multiBuildingView.bmpW;
-        multiLayoutParams.height = multiBuildingView.bmpH;
-        multiBuildingView.setLayoutParams(multiLayoutParams);
-        multiBuildingView.setOnTouchListener(new BuildingViewTouchListener(fieldGroup));
-        dragItemsLayout.addView(multiBuildingView);
-
+        CardView cardView = root.findViewById(R.id.card_data_count);
+        ViewGroup.LayoutParams layoutParams = cardView.getLayoutParams();
+        layoutParams.width = (int) (fetchScreenWidth() * 0.9);
+        cardView.setLayoutParams(layoutParams);
 
         return root;
     }
 
+    public int fetchScreenWidth() {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        return displayMetrics.widthPixels;
+    }
 
 }
