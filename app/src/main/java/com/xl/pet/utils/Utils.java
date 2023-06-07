@@ -13,11 +13,16 @@ import androidx.annotation.RequiresApi;
 
 import com.haibin.calendarview.Calendar;
 
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class Utils {
+
+
+    private static final Map<Integer, Bitmap> RES_CACHE = new HashMap<>();
+
     // 判断是否在桌面
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
     public static boolean isHome(Context context) {
@@ -46,11 +51,16 @@ public class Utils {
 
     //解析资源
     public static Bitmap decodeResource(Resources resources, int id) {
-        TypedValue value = new TypedValue();
-        resources.openRawResource(id, value);
-        BitmapFactory.Options opts = new BitmapFactory.Options();
-        opts.inTargetDensity = value.density;
-        return BitmapFactory.decodeResource(resources, id, opts);
+        Bitmap cache = RES_CACHE.get(id);
+        if (null == cache) {
+            TypedValue value = new TypedValue();
+            resources.openRawResource(id, value);
+            BitmapFactory.Options opts = new BitmapFactory.Options();
+            opts.inTargetDensity = value.density;
+            cache = BitmapFactory.decodeResource(resources, id, opts);
+            RES_CACHE.put(id, cache);
+        }
+        return cache;
     }
 
 

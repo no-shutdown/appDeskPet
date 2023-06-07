@@ -37,4 +37,6 @@ dependencies {
     //数据库依赖
     implementation 'androidx.room:room-runtime:2.3.0'
     annotationProcessor 'androidx.room:room-compiler:2.3.0'
+    //图表工具
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 }

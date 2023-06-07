@@ -1,88 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
 
-    <LinearLayout
-        android:id="@+id/layout_fields_parent"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="50dp"
-        android:background="#0D5A3C"
-        android:gravity="center"
-        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <LinearLayout
+            android:id="@+id/layout_fields_parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="50dp"
+            android:background="#0D5A3C"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center">
+
+                <com.xl.pet.ui.home.SegmentView
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    app:bgColor="#FFFFFF"
+                    app:data="日,周,月,年"
+                    app:fgColor="#2C3E2D"
+                    app:index="0"
+                    app:textSize="13sp" />
+            </LinearLayout>
+
+
+            <TextView
+                android:id="@+id/top_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:gravity="center"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.xl.pet.ui.home.AreaViewGroup
+                android:id="@+id/layout_fields"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp" />
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:gravity="center">
-
-            <com.xl.pet.ui.home.SegmentView
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                app:data="日,周,月,年"
-                app:textSize="13sp"
-                app:index="0"
-                app:bgColor="#FFFFFF"
-                app:fgColor="#2C3E2D"/>
-        </LinearLayout>
+            android:layout_height="40dp"
+            android:background="#0D5A3C"
+            app:layout_constraintTop_toBottomOf="@+id/layout_fields_parent" />
 
 
-        <TextView
-            android:id="@+id/top_title"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_data_count"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:textSize="16sp"
-            android:gravity="center"
-            android:textColor="#FFFFFF"
+            app:cardCornerRadius="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/layout_fields_parent">
 
-        <com.xl.pet.ui.home.AreaViewGroup
-            android:id="@+id/layout_fields"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-    </LinearLayout>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp"
+                    android:background="#FF9800" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:background="#0D5A3C"
-        app:layout_constraintTop_toBottomOf="@+id/layout_fields_parent" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:text="专注时间统计"
+                    android:textColor="#000000"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <com.xl.pet.ui.common.DividerView
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp" />
+
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:layout_marginBottom="10dp"/>
 
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/card_data_count"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/layout_fields_parent">
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="专注时间统计"
-            android:textSize="18sp"
-            android:padding="16dp"
-            android:textColor="#000000"
-            android:textStyle="bold"/>
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#CDCDCD" />
-
-    </androidx.cardview.widget.CardView>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
