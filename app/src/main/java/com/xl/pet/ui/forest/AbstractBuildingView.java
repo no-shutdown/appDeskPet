@@ -1,4 +1,4 @@
-package com.xl.pet.ui.home;
+package com.xl.pet.ui.forest;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -8,6 +8,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.view.View;
 
+import com.xl.pet.ui.forest.mode.BuildingMode;
 import com.xl.pet.utils.Utils;
 
 public abstract class AbstractBuildingView extends View {
@@ -33,7 +34,7 @@ public abstract class AbstractBuildingView extends View {
         return new BuildingView(context, scale, resId);
     }
 
-    public static AbstractBuildingView buildingView(Context context, float scale, int resId, BuildingViewMode.MultiParam multiParam) {
+    public static AbstractBuildingView buildingView(Context context, float scale, int resId, BuildingMode.MultiParam multiParam) {
         if (null == multiParam) {
             return new BuildingView(context, scale, resId);
         }

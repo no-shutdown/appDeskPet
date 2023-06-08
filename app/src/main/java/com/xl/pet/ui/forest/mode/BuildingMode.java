@@ -1,4 +1,4 @@
-package com.xl.pet.ui.home;
+package com.xl.pet.ui.forest.mode;
 
 
 import com.xl.pet.R;
@@ -6,7 +6,7 @@ import com.xl.pet.R;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BuildingViewMode {
+public class BuildingMode {
 
 
     public static Map<Integer, MultiParam> MULTI_PARAM_MAP = new HashMap<>();

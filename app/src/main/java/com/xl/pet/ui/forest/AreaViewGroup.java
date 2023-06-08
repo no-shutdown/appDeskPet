@@ -1,9 +1,11 @@
-package com.xl.pet.ui.home;
+package com.xl.pet.ui.forest;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+
+import com.xl.pet.ui.forest.mode.BuildingMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,14 +75,14 @@ public class AreaViewGroup extends RelativeLayout {
         }
 
         // buildings
-        List<BuildingViewMode.Mode> modes = DatabaseTB.findModesFromDatabase();
-        for (BuildingViewMode.Mode mode : modes) {
+        List<BuildingMode.Mode> modes = DatabaseTB.findModesFromDatabase();
+        for (BuildingMode.Mode mode : modes) {
             createBuilding(new FieldPoint(mode.xI, mode.yI), mode.resId, mode.multiParam);
         }
     }
 
     //新建建筑
-    public void createBuilding(FieldPoint point, int resId, BuildingViewMode.MultiParam multiParam) {
+    public void createBuilding(FieldPoint point, int resId, BuildingMode.MultiParam multiParam) {
         int i = point.i, j = point.j;
         int baseTop = PRE_TOP + offset_top * i;
         int baseLeft = startMarginLeft - offset_left * i;

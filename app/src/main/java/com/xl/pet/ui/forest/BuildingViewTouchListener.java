@@ -1,17 +1,19 @@
-package com.xl.pet.ui.home;
+package com.xl.pet.ui.forest;
 
-import static com.xl.pet.ui.home.BuildingViewMode.MULTI_PARAM_MAP;
+import static com.xl.pet.ui.forest.mode.BuildingMode.MULTI_PARAM_MAP;
 
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.xl.pet.ui.forest.mode.BuildingMode;
 import com.xl.pet.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 建筑触摸监听器
+ * 暂时不用这个类
+ * 建筑触摸监听器（可将building移动到对应的点上）
  */
 public class BuildingViewTouchListener implements View.OnTouchListener {
 
@@ -58,7 +60,7 @@ public class BuildingViewTouchListener implements View.OnTouchListener {
                         areaViewGroup.refreshAreaAfterPoint(point);
                     } else if (v instanceof MultiBuildingView) {
                         MultiBuildingView multiBuildingView = (MultiBuildingView) v;
-                        BuildingViewMode.MultiParam multiParam = MULTI_PARAM_MAP.get(multiBuildingView.resId);
+                        BuildingMode.MultiParam multiParam = MULTI_PARAM_MAP.get(multiBuildingView.resId);
                         areaViewGroup.createBuilding(point, multiBuildingView.resId, multiParam);
                         areaViewGroup.refreshAreaAfterPoint(point);
                     }

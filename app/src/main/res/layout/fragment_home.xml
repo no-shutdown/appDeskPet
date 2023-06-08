@@ -31,7 +31,8 @@
                 android:layout_height="50dp"
                 android:gravity="center">
 
-                <com.xl.pet.ui.home.SegmentView
+                <com.xl.pet.ui.common.SegmentView
+                    android:id="@+id/top_segment"
                     android:layout_width="wrap_content"
                     android:layout_height="30dp"
                     app:bgColor="#FFFFFF"
@@ -53,7 +54,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <com.xl.pet.ui.home.AreaViewGroup
+            <com.xl.pet.ui.forest.AreaViewGroup
                 android:id="@+id/layout_fields"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

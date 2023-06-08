@@ -1,7 +1,6 @@
-package com.xl.pet.ui.home;
+package com.xl.pet.ui.forest;
 
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -21,31 +20,37 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.xl.pet.R;
+import com.xl.pet.ui.common.SegmentView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeFragment extends Fragment {
+public class ForestFragment extends Fragment {
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        HomeViewModel homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
+        ForestViewModel viewModel = ViewModelProviders.of(this).get(ForestViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
 
-        //设置title数据和树的数据
+
+        SegmentView segmentView = root.findViewById(R.id.top_segment);
         TextView topTitle = root.findViewById(R.id.top_title);
+        CardView cardView = root.findViewById(R.id.card_data_count);
+        BarChart chart = root.findViewById(R.id.chart);
+        viewModel.getSelectDateRange().observe(getViewLifecycleOwner(), s -> segmentView.setText(s));
+
+
+
+        //设置title数据和树的数据
         topTitle.setText("2023-06");
 
         //设置卡片宽度为 90%
-        CardView cardView = root.findViewById(R.id.card_data_count);
         ViewGroup.LayoutParams layoutParams = cardView.getLayoutParams();
         layoutParams.width = (int) (fetchScreenWidth() * 0.9);
         cardView.setLayoutParams(layoutParams);
 
         //柱状图数据
-        BarChart chart = root.findViewById(R.id.chart);
-
         List<BarEntry> entries = new ArrayList<>();
         entries.add(new BarEntry(0f, 20f));
         entries.add(new BarEntry(1f, 30f));

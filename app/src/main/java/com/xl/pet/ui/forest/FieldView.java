@@ -1,4 +1,4 @@
-package com.xl.pet.ui.home;
+package com.xl.pet.ui.forest;
 
 import android.content.Context;
 import android.content.res.Resources;
