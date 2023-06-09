@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey;
 
 @Entity(tableName = "menstruation")
 public class MenstruationDO {
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     public int id;
 
     public int year;

@@ -1,10 +1,14 @@
-package com.xl.pet.ui.forest;
+package com.xl.pet.ui.forest.listener;
 
 import static com.xl.pet.ui.forest.mode.BuildingMode.MULTI_PARAM_MAP;
 
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.xl.pet.ui.forest.AreaViewGroup;
+import com.xl.pet.ui.forest.BuildingView;
+import com.xl.pet.ui.forest.FieldView;
+import com.xl.pet.ui.forest.MultiBuildingView;
 import com.xl.pet.ui.forest.mode.BuildingMode;
 import com.xl.pet.utils.Utils;
 
@@ -81,7 +85,8 @@ public class BuildingViewTouchListener implements View.OnTouchListener {
     private List<AreaViewGroup.FieldPoint> finLightFields(float x, float y, int n, int m) {
         findFields.clear();
         AreaViewGroup.FieldPoint lightField = findRecentlyField(x, y);
-        int i = Math.min(lightField.i, areaViewGroup.n - m), j = Math.min(lightField.j, areaViewGroup.n - n);
+        int groupN = areaViewGroup.getN();
+        int i = Math.min(lightField.i, groupN - m), j = Math.min(lightField.j, groupN - n);
         for (int mm = 0; mm < m; mm++) {
             for (int nn = 0; nn < n; nn++) {
                 findFields.add(new AreaViewGroup.FieldPoint(i + mm, j + nn));

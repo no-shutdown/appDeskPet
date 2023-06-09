@@ -25,7 +25,7 @@ public class SegmentView extends ViewGroup implements View.OnClickListener {
     private String[] mText = {"item1", "item2", "item3"};
 
     private int checkedItem = 1;
-    private OnItemClickListener listener;
+    private SegmentItemClickListener listener;
 
     public SegmentView(Context context) {
         super(context);
@@ -130,7 +130,7 @@ public class SegmentView extends ViewGroup implements View.OnClickListener {
     /**
      * segment子集item
      */
-    class ItemView extends View {
+    public class ItemView extends View {
         public final static int GRAVITY_SINGLE = 1 << 0;
         public final static int GRAVITY_LEFT = 1 << 1;
         public final static int GRAVITY_CENTER = 1 << 2;
@@ -200,11 +200,11 @@ public class SegmentView extends ViewGroup implements View.OnClickListener {
 
     }
 
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
-        this.listener = onItemClickListener;
+    public void setOnSegmentItemClickListener(SegmentItemClickListener segmentItemClickListener) {
+        this.listener = segmentItemClickListener;
     }
 
-    interface OnItemClickListener {
+    public interface SegmentItemClickListener {
         void onItemClick(ItemView item, int checkedItem);
     }
 

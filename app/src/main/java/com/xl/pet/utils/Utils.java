@@ -13,6 +13,8 @@ import androidx.annotation.RequiresApi;
 
 import com.haibin.calendarview.Calendar;
 
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,7 +100,57 @@ public class Utils {
 
     //计算两点之间的距离
     public static double distance(double x1, double y1, double x2, double y2) {
-        double distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-        return distance;
+        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     }
+
+
+    // 获取今天的日期
+    public static java.util.Calendar getToday() {
+        return java.util.Calendar.getInstance();
+    }
+
+    // 获取本周的第一天（周日）
+    public static java.util.Calendar getFirstDayOfWeek() {
+        java.util.Calendar calendar = getToday();
+        calendar.set(java.util.Calendar.DAY_OF_WEEK, java.util.Calendar.SUNDAY);
+        return setZeroClock(calendar);
+    }
+
+    // 获取本月的第一天
+    public static java.util.Calendar getFirstDayOfMonth() {
+        java.util.Calendar calendar = getToday();
+        calendar.set(java.util.Calendar.DAY_OF_MONTH, 1);
+        return setZeroClock(calendar);
+    }
+
+    // 获取本年的第一天
+    public static java.util.Calendar getFirstDayOfYear() {
+        java.util.Calendar calendar = getToday();
+        calendar.set(java.util.Calendar.DAY_OF_YEAR, 1);
+        return setZeroClock(calendar);
+    }
+
+    //设置0点0分0秒
+    public static java.util.Calendar setZeroClock(java.util.Calendar calendar) {
+        calendar.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        calendar.set(java.util.Calendar.MINUTE, 0);
+        calendar.set(java.util.Calendar.SECOND, 0);
+        calendar.set(java.util.Calendar.MILLISECOND, 0);
+        return calendar;
+    }
+
+    //得到最小的平方数大于等于指定数
+    public static int getMinSquare(int number) {
+        if (number <= 0) {
+            return 0;
+        }
+        int square = 0;
+        int i = 1;
+        while (square < number) {
+            square = i * i;
+            i++;
+        }
+        return square;
+    }
+
 }

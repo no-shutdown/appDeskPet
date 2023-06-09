@@ -18,7 +18,7 @@ public abstract class AbstractBuildingView extends View {
     protected final int bmpH;
 
     //资源id
-    protected final int resId;
+    public final int resId;
     //图片
     protected final Bitmap buildingBitmap;
     //绘图矩阵

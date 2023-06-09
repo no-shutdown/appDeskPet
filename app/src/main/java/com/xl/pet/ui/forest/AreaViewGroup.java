@@ -1,11 +1,14 @@
 package com.xl.pet.ui.forest;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import com.xl.pet.database.entity.ForestDO;
 import com.xl.pet.ui.forest.mode.BuildingMode;
+import com.xl.pet.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +21,10 @@ public class AreaViewGroup extends RelativeLayout {
     public FieldView[][] fieldViews;
     public AbstractBuildingView[][] buildingViews;
 
+    //modes
+    private List<BuildingMode.Mode> data;
     //n*n
-    public int n;
+    private int n;
     //缩放
     private float scale;
     //起点左边距
@@ -38,13 +43,17 @@ public class AreaViewGroup extends RelativeLayout {
 
     public AreaViewGroup(Context context, AttributeSet attrs) {
         super(context, attrs);
-        createFields(context);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        refreshArea(getContext());
     }
 
     //绘制区域内的子组件
-    private void createFields(Context context) {
+    private void refreshArea(Context context) {
         int widthPixels = context.getResources().getDisplayMetrics().widthPixels;
-        n = 6; //n*n
         scale = computeScale(widthPixels, n, 297); //计算缩放比例 297是图片长宽的斜边dp，即x轴长度
         offset_top = dipToPx(60 * scale); //偏移量 60固定偏移量才能刚好重合
         offset_left = dipToPx(103 * scale); //偏移量 103固定偏移量才能刚好重合
@@ -75,8 +84,7 @@ public class AreaViewGroup extends RelativeLayout {
         }
 
         // buildings
-        List<BuildingMode.Mode> modes = DatabaseTB.findModesFromDatabase();
-        for (BuildingMode.Mode mode : modes) {
+        for (BuildingMode.Mode mode : data) {
             createBuilding(new FieldPoint(mode.xI, mode.yI), mode.resId, mode.multiParam);
         }
     }
@@ -226,6 +234,16 @@ public class AreaViewGroup extends RelativeLayout {
     private int dipToPx(float dpValue) {
         final float scale = this.getResources().getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
+    }
+
+    public void setData(List<BuildingMode.Mode> data) {
+        this.data = data;
+        n = Utils.getMinSquare(data.size());
+        invalidate();
+    }
+
+    public int getN() {
+        return n;
     }
 
     public static class FieldPoint {

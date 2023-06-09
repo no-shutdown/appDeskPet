@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
@@ -20,35 +21,49 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.xl.pet.R;
+import com.xl.pet.database.dao.ForestDao;
+import com.xl.pet.database.entity.ForestDO;
 import com.xl.pet.ui.common.SegmentView;
+import com.xl.pet.ui.forest.listener.SimplySegmentItemOnClickListener;
+import com.xl.pet.ui.forest.mode.BuildingMode;
+import com.xl.pet.ui.forest.mode.DateRange;
+import com.xl.pet.utils.DatabaseHelper;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ForestFragment extends Fragment {
 
+    private static final DateFormat dateFormat = new SimpleDateFormat("MM/dd");
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        ForestViewModel viewModel = ViewModelProviders.of(this).get(ForestViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_home, container, false);
+    private ForestDao forestDao = DatabaseHelper.forestDao(); //TODO ??? NPE
 
 
-        SegmentView segmentView = root.findViewById(R.id.top_segment);
-        TextView topTitle = root.findViewById(R.id.top_title);
-        CardView cardView = root.findViewById(R.id.card_data_count);
-        BarChart chart = root.findViewById(R.id.chart);
-        viewModel.getSelectDateRange().observe(getViewLifecycleOwner(), s -> segmentView.setText(s));
+    private List<BuildingMode.Mode> buildBuildingModes(List<ForestDO> rawData) {
+        //TODO
+        return new ArrayList<>();
+    }
 
-
-
-        //设置title数据和树的数据
-        topTitle.setText("2023-06");
-
-        //设置卡片宽度为 90%
-        ViewGroup.LayoutParams layoutParams = cardView.getLayoutParams();
-        layoutParams.width = (int) (fetchScreenWidth() * 0.9);
-        cardView.setLayoutParams(layoutParams);
+    private void barCharSetData(List<ForestDO> rawData, BarChart chart) {
+        ArrayList<String> xLabels = new ArrayList<>();
+        xLabels.add("标签1");
+        xLabels.add("标签2");
+        xLabels.add("标签3");
+        xLabels.add("标签4");
+        xLabels.add("标签5");
+        xLabels.add("标签6");
+        xLabels.add("标签7");
+        xLabels.add("标签8");
+        xLabels.add("标签9");
+        xLabels.add("标签10");
+        xLabels.add("标签11");
+        xLabels.add("标签12");
+        xLabels.add("标签13");
+        xLabels.add("标签14");
+        xLabels.add("标签15");
+        chart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(xLabels));
 
         //柱状图数据
         List<BarEntry> entries = new ArrayList<>();
@@ -68,50 +83,58 @@ public class ForestFragment extends Fragment {
         entries.add(new BarEntry(13f, 40f));
         entries.add(new BarEntry(14f, 35f));
 
-        // 设置 X 轴标签
-        XAxis xAxis = chart.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM); // 设置 X 轴位置为底部
-        xAxis.setGranularity(1f); // 设置 X 轴标签之间的最小间隔
-        ArrayList<String> xLabels = new ArrayList<>();
-        xLabels.add("标签1");
-        xLabels.add("标签2");
-        xLabels.add("标签3");
-        xLabels.add("标签4");
-        xLabels.add("标签5");
-        xLabels.add("标签6");
-        xLabels.add("标签7");
-        xLabels.add("标签8");
-        xLabels.add("标签9");
-        xLabels.add("标签10");
-        xLabels.add("标签11");
-        xLabels.add("标签12");
-        xLabels.add("标签13");
-        xLabels.add("标签14");
-        xLabels.add("标签15");
-        xAxis.setValueFormatter(new IndexAxisValueFormatter(xLabels));
-
         BarDataSet dataSet = new BarDataSet(entries, "销售量");
         dataSet.setColor(0xFF7aa667); // 设置柱状图颜色
 
         BarData barData = new BarData(dataSet);
         chart.setData(barData);
 
+        chart.invalidate(); // 刷新图表
+    }
+
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.fragment_home, container, false);
+
+        SegmentView segmentView = root.findViewById(R.id.top_segment);
+        TextView topTitle = root.findViewById(R.id.top_title);
+        CardView cardView = root.findViewById(R.id.card_data_count);
+        //设置卡片宽度为 90%
+        ViewGroup.LayoutParams layoutParams = cardView.getLayoutParams();
+        layoutParams.width = (int) (fetchScreenWidth() * 0.9);
+        cardView.setLayoutParams(layoutParams);
+        AreaViewGroup areaView = root.findViewById(R.id.layout_area);
+        BarChart chart = root.findViewById(R.id.chart);
         chart.getDescription().setEnabled(false); // 隐藏描述文本
         chart.getLegend().setEnabled(false); // 隐藏图例
         chart.getXAxis().setDrawGridLines(false); //隐藏X轴网格线
         chart.getAxisLeft().setDrawGridLines(false); // 隐藏Y轴网格线
         chart.getAxisRight().setEnabled(false); // 隐藏右侧Y轴
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM); // 设置 X 轴位置为底部
+        xAxis.setGranularity(1f); // 设置 X 轴标签之间的最小间隔
 
-
-        chart.invalidate(); // 刷新图表
-
+        ForestViewModel viewModel = ViewModelProviders.of(this).get(ForestViewModel.class);
+        segmentView.setOnSegmentItemClickListener(new SimplySegmentItemOnClickListener(viewModel.getSelectDateRange()));
+        viewModel.getSelectDateRange().observe(getViewLifecycleOwner(), (dateRange) -> {
+            topTitle.setText(topTitleText(dateRange));
+            viewModel.getForestData().setValue(forestDao.findByRange(dateRange.getStart(), dateRange.getEnd()));
+        });
+        viewModel.getForestData().observe(getViewLifecycleOwner(), (data) -> {
+            areaView.setData(buildBuildingModes(data));
+            barCharSetData(data, chart);
+        });
         return root;
     }
 
-
-
-
-
+    private String topTitleText(DateRange dateRange) {
+        String start = dateFormat.format(dateRange.getStart());
+        String end = dateFormat.format(dateRange.getEnd());
+        if (start.equals(end)) {
+            return start;
+        }
+        return start + "~" + end;
+    }
 
     public int fetchScreenWidth() {
         DisplayMetrics displayMetrics = new DisplayMetrics();
