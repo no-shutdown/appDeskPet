@@ -41,7 +41,7 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
     private MenstruationViewModel viewModel;
 
 
-    private MenstruationDao menstruationDao;
+    private final MenstruationDao menstruationDao = DatabaseHelper.menstruationDao();
     private final Timer timer = new Timer();
 
     //日历map
@@ -71,7 +71,6 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         activity = getActivity();
-        menstruationDao = DatabaseHelper.menstruationDao();
         mCalendarView.setOnCalendarSelectListener(this);
         mCalendarView.setOnMonthChangeListener(this);
         int y = mCalendarView.getCurYear();//获取年

@@ -2,6 +2,7 @@ package com.xl.pet.ui.forest;
 
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,7 +39,7 @@ public class ForestFragment extends Fragment {
 
     private static final DateFormat dateFormat = new SimpleDateFormat("MM/dd");
 
-    private ForestDao forestDao = DatabaseHelper.forestDao(); //TODO ??? NPE
+    private final ForestDao forestDao = DatabaseHelper.forestDao();
 
 
     private List<BuildingMode.Mode> buildBuildingModes(List<ForestDO> rawData) {
@@ -117,14 +118,22 @@ public class ForestFragment extends Fragment {
         ForestViewModel viewModel = ViewModelProviders.of(this).get(ForestViewModel.class);
         segmentView.setOnSegmentItemClickListener(new SimplySegmentItemOnClickListener(viewModel.getSelectDateRange()));
         viewModel.getSelectDateRange().observe(getViewLifecycleOwner(), (dateRange) -> {
-            topTitle.setText(topTitleText(dateRange));
-            viewModel.getForestData().setValue(forestDao.findByRange(dateRange.getStart(), dateRange.getEnd()));
+            new Thread(() -> initData(dateRange, topTitle, viewModel));
         });
         viewModel.getForestData().observe(getViewLifecycleOwner(), (data) -> {
             areaView.setData(buildBuildingModes(data));
             barCharSetData(data, chart);
         });
         return root;
+    }
+
+    private void initData(DateRange dateRange, TextView topTitle, ForestViewModel viewModel) {
+        topTitle.setText(topTitleText(dateRange));
+        List<ForestDO> byRange = forestDao.findByRange(dateRange.getStart(), dateRange.getEnd());
+        getActivity().runOnUiThread(() -> {
+            viewModel.getForestData().setValue(byRange);
+
+        });
     }
 
     private String topTitleText(DateRange dateRange) {

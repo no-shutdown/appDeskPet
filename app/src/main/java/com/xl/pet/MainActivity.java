@@ -24,10 +24,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //创建UI界面
-        createUI();
         //创建数据库实例
         DatabaseHelper.createDatabase(this);
+        //创建UI界面
+        createUI();
 //        finish();
     }
 
