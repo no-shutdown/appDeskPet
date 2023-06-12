@@ -106,7 +106,7 @@ public class Utils {
 
     // 获取今天的日期
     public static java.util.Calendar getToday() {
-        return java.util.Calendar.getInstance();
+        return setZeroClock(java.util.Calendar.getInstance());
     }
 
     // 获取本周的第一天（周日）

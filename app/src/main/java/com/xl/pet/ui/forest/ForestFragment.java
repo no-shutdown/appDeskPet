@@ -29,6 +29,7 @@ import com.xl.pet.ui.forest.listener.SimplySegmentItemOnClickListener;
 import com.xl.pet.ui.forest.mode.BuildingMode;
 import com.xl.pet.ui.forest.mode.DateRange;
 import com.xl.pet.utils.DatabaseHelper;
+import com.xl.pet.utils.Utils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -100,12 +101,13 @@ public class ForestFragment extends Fragment {
         SegmentView segmentView = root.findViewById(R.id.top_segment);
         TextView topTitle = root.findViewById(R.id.top_title);
         CardView cardView = root.findViewById(R.id.card_data_count);
+        AreaViewGroup areaView = root.findViewById(R.id.layout_area);
+        BarChart chart = root.findViewById(R.id.chart);
+
         //设置卡片宽度为 90%
         ViewGroup.LayoutParams layoutParams = cardView.getLayoutParams();
         layoutParams.width = (int) (fetchScreenWidth() * 0.9);
         cardView.setLayoutParams(layoutParams);
-        AreaViewGroup areaView = root.findViewById(R.id.layout_area);
-        BarChart chart = root.findViewById(R.id.chart);
         chart.getDescription().setEnabled(false); // 隐藏描述文本
         chart.getLegend().setEnabled(false); // 隐藏图例
         chart.getXAxis().setDrawGridLines(false); //隐藏X轴网格线
@@ -118,12 +120,14 @@ public class ForestFragment extends Fragment {
         ForestViewModel viewModel = ViewModelProviders.of(this).get(ForestViewModel.class);
         segmentView.setOnSegmentItemClickListener(new SimplySegmentItemOnClickListener(viewModel.getSelectDateRange()));
         viewModel.getSelectDateRange().observe(getViewLifecycleOwner(), (dateRange) -> {
-            new Thread(() -> initData(dateRange, topTitle, viewModel));
+            new Thread(() -> initData(dateRange, topTitle, viewModel)).start();
         });
         viewModel.getForestData().observe(getViewLifecycleOwner(), (data) -> {
             areaView.setData(buildBuildingModes(data));
             barCharSetData(data, chart);
         });
+
+        viewModel.getSelectDateRange().setValue(new DateRange(Utils.getToday().getTimeInMillis(), System.currentTimeMillis()));
         return root;
     }
 
@@ -132,7 +136,6 @@ public class ForestFragment extends Fragment {
         List<ForestDO> byRange = forestDao.findByRange(dateRange.getStart(), dateRange.getEnd());
         getActivity().runOnUiThread(() -> {
             viewModel.getForestData().setValue(byRange);
-
         });
     }
 

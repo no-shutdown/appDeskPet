@@ -1,12 +1,11 @@
 package com.xl.pet.ui.forest;
 
 import android.content.Context;
-import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
-import com.xl.pet.database.entity.ForestDO;
+import com.xl.pet.R;
 import com.xl.pet.ui.forest.mode.BuildingMode;
 import com.xl.pet.utils.Utils;
 
@@ -45,12 +44,6 @@ public class AreaViewGroup extends RelativeLayout {
         super(context, attrs);
     }
 
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-        refreshArea(getContext());
-    }
-
     //绘制区域内的子组件
     private void refreshArea(Context context) {
         int widthPixels = context.getResources().getDisplayMetrics().widthPixels;
@@ -84,8 +77,12 @@ public class AreaViewGroup extends RelativeLayout {
         }
 
         // buildings
-        for (BuildingMode.Mode mode : data) {
-            createBuilding(new FieldPoint(mode.xI, mode.yI), mode.resId, mode.multiParam);
+        if (null == data || data.isEmpty()) {
+            createBuilding(new FieldPoint(2, 2), R.drawable.b_none, null);
+        } else {
+            for (BuildingMode.Mode mode : data) {
+                createBuilding(new FieldPoint(mode.xI, mode.yI), mode.resId, mode.multiParam);
+            }
         }
     }
 
@@ -238,8 +235,12 @@ public class AreaViewGroup extends RelativeLayout {
 
     public void setData(List<BuildingMode.Mode> data) {
         this.data = data;
-        n = Utils.getMinSquare(data.size());
+        n = Math.max(5, Utils.getMinSquare(data.size()));
+        removeAllViews();
+        refreshArea(getContext());
+        requestLayout();
         invalidate();
+
     }
 
     public int getN() {

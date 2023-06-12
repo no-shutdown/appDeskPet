@@ -24,7 +24,7 @@ public class SimplySegmentItemOnClickListener implements SegmentView.SegmentItem
             calendar = Utils.getToday();
         } else if (checkedItem == 1) {
             //周
-            calendar = Utils.getFirstDayOfMonth();
+            calendar = Utils.getFirstDayOfWeek();
         } else if (checkedItem == 2) {
             //月
             calendar = Utils.getFirstDayOfMonth();
