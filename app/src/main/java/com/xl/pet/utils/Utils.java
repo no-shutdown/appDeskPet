@@ -103,6 +103,11 @@ public class Utils {
         return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     }
 
+    //获取当前月的天数
+    public static int getDayOfMonth() {
+        java.util.Calendar aCalendar = java.util.Calendar.getInstance();
+        return aCalendar.getActualMaximum(java.util.Calendar.DATE);
+    }
 
     // 获取今天的日期
     public static java.util.Calendar getToday() {

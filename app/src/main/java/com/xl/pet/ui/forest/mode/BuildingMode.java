@@ -16,7 +16,7 @@ public class BuildingMode {
         MULTI_PARAM_MAP.put(R.drawable.b_car, new MultiParam(6, 2, -0.2344f, 0f, 0.7619f));
     }
 
-    public static class Mode {
+    public static class Mode implements Comparable<Mode> {
         public int xI; //坐标x
         public int yI; //坐标y
         public int resId; //资源id
@@ -33,6 +33,13 @@ public class BuildingMode {
             this.yI = yI;
             this.resId = resId;
             this.multiParam = multiParam;
+        }
+
+        @Override
+        public int compareTo(Mode o) {
+            if (this.xI < o.xI) return -1;
+            else if (this.xI > o.xI) return 1;
+            else return Integer.compare(this.yI, o.yI);
         }
     }
 

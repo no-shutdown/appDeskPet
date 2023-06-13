@@ -208,6 +208,10 @@ public class SegmentView extends ViewGroup implements View.OnClickListener {
         void onItemClick(ItemView item, int checkedItem);
     }
 
+    public int getCheckedItem() {
+        return checkedItem;
+    }
+
     public static boolean isEmpty(String str) {
         return null == str || str.trim().length() == 0;
     }

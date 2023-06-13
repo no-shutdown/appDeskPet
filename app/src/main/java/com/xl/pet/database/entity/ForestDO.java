@@ -10,6 +10,11 @@ public class ForestDO {
 
     public long startTime;
     public long endTime;
-    public String resId;
+    public int year;
+    public int month;
+    public int day;
+    public int hour;
+    public int week;
+    public Integer resId;
 
 }
