@@ -36,8 +36,11 @@ public class ForestBarChar extends BarChart {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void setData(int segmentItem, DateRange dateRange, List<ForestDO> rawData) {
-        BarCharMode.Mode data = buildBarCharMode(segmentItem, dateRange, rawData);
+        if (rawData.isEmpty()) {
+            return;
+        }
 
+        BarCharMode.Mode data = buildBarCharMode(segmentItem, dateRange, rawData);
         BarDataSet dataSet = new BarDataSet(data.data, "统计");
         dataSet.setColor(0xFF7aa667); // 设置柱状图颜色
         BarData barData = new BarData(dataSet);
@@ -51,11 +54,13 @@ public class ForestBarChar extends BarChart {
         if (0 == segmentItem)
             return buildMode(dateRange, rawData, BarCharMode.XLabel.DAY, (i) -> ONE_HOUR, ONE_MINUTE);
         if (1 == segmentItem)
-            return buildMode(dateRange, rawData, BarCharMode.XLabel.WEEK, (i) -> ONE_DAY, ONE_HOUR);
-        if (2 == segmentItem)
-            return buildMode(dateRange, rawData, BarCharMode.XLabel.MONTH, (i) -> ONE_DAY, ONE_HOUR);
+            return buildMode(dateRange, rawData, BarCharMode.XLabel.WEEK, (i) -> ONE_DAY, ONE_MINUTE);
+        if (2 == segmentItem) {
+            int monthDayOfTime = Utils.getMonthDayOfTime(dateRange.getStart());
+            return buildMode(dateRange, rawData, BarCharMode.XLabel.MONTH.subList(0, monthDayOfTime), (i) -> ONE_DAY, ONE_MINUTE);
+        }
         if (3 == segmentItem)
-            return buildMode(dateRange, rawData, BarCharMode.XLabel.YEAR, (i) -> Utils.getDayOfMonth(i + 1) * ONE_DAY, ONE_DAY);
+            return buildMode(dateRange, rawData, BarCharMode.XLabel.YEAR, (i) -> Utils.getDayOfMonth(i) * ONE_DAY, ONE_MINUTE);
         throw new RuntimeException();
 
 //
@@ -89,7 +94,7 @@ public class ForestBarChar extends BarChart {
             //计算每一条专注记录与间隔的交集时长
             for (ForestDO data : rawData)
                 sumTime += countIntersection(dataItem.reset(data.startTime, data.endTime), intervalItem);
-            entries.add(new BarEntry(i, sumTime * 0.1f / cell));
+            entries.add(new BarEntry(i, sumTime * 1.0f / cell));
         }
         return new BarCharMode.Mode(xLabels, entries);
     }

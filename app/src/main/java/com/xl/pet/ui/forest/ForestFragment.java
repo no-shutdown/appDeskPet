@@ -65,8 +65,10 @@ public class ForestFragment extends Fragment {
         viewModel.getSegmentItem().observe(getViewLifecycleOwner(), (item) -> viewModel.getDateRange().setValue(changeDateRange(item)));
         viewModel.getDateRange().observe(getViewLifecycleOwner(), (dateRange) -> new Thread(() -> fetchData(dateRange, topTitle, viewModel)).start());
         viewModel.getForestData().observe(getViewLifecycleOwner(), (data) -> {
-            areaView.setData(data);
-            chart.setData(viewModel.getSegmentItem().getValue(), viewModel.getDateRange().getValue(), data);
+            Integer checkItem = viewModel.getSegmentItem().getValue();
+            DateRange dateRange = viewModel.getDateRange().getValue();
+            areaView.setData(checkItem, data);
+            chart.setData(checkItem, dateRange, data);
         });
 
         viewModel.getSegmentItem().setValue(0);
@@ -95,30 +97,30 @@ public class ForestFragment extends Fragment {
         topTitle.setText(topTitleText(dateRange));
         List<ForestDO> byRange = forestDao.findByRange(dateRange.getStart(), dateRange.getEnd());
         getActivity().runOnUiThread(() -> {
-//            viewModel.getForestData().setValue(byRange);
+            viewModel.getForestData().setValue(byRange);
             //TODO
-            ForestDO mock1 = new ForestDO();
-            mock1.id = 1;
-            mock1.startTime = Utils.getToday().getTimeInMillis();
-            mock1.endTime = mock1.startTime + 3 * 60 * 60 * 1000;
-            mock1.resId = R.drawable.b_forest1;
-            ForestDO mock2 = new ForestDO();
-            mock2.id = 2;
-            mock2.startTime = Utils.getFirstDayOfWeek().getTimeInMillis();
-            mock2.endTime = mock2.startTime + 3 * 60 * 60 * 1000;
-            mock2.resId = R.drawable.b_forest1;
-            ForestDO mock3 = new ForestDO();
-            mock3.id = 3;
-            mock3.startTime = Utils.getFirstDayOfMonth().getTimeInMillis();
-            mock3.endTime = mock3.startTime + 3 * 60 * 60 * 1000;
-            mock3.resId = R.drawable.b_forest1;
-            ForestDO mock4 = new ForestDO();
-            mock4.id = 4;
-            mock4.startTime = Utils.getFirstDayOfYear().getTimeInMillis();
-            mock4.endTime = mock4.startTime + 3 * 60 * 60 * 1000;
-            mock4.resId = R.drawable.b_forest1;
-            List<ForestDO> mockData = List.of(mock1, mock2, mock3, mock4);
-            viewModel.getForestData().setValue(mockData);
+//            ForestDO mock1 = new ForestDO();
+//            mock1.id = 1;
+//            mock1.startTime = Utils.getToday().getTimeInMillis();
+//            mock1.endTime = mock1.startTime + 3 * 60 * 60 * 1000;
+//            mock1.resId = R.drawable.b_forest1;
+//            ForestDO mock2 = new ForestDO();
+//            mock2.id = 2;
+//            mock2.startTime = Utils.getFirstDayOfWeek().getTimeInMillis();
+//            mock2.endTime = mock2.startTime + 3 * 60 * 60 * 1000;
+//            mock2.resId = R.drawable.b_forest1;
+//            ForestDO mock3 = new ForestDO();
+//            mock3.id = 3;
+//            mock3.startTime = Utils.getFirstDayOfMonth().getTimeInMillis();
+//            mock3.endTime = mock3.startTime + 3 * 60 * 60 * 1000;
+//            mock3.resId = R.drawable.b_forest1;
+//            ForestDO mock4 = new ForestDO();
+//            mock4.id = 4;
+//            mock4.startTime = Utils.getFirstDayOfYear().getTimeInMillis();
+//            mock4.endTime = mock4.startTime + 3 * 60 * 60 * 1000;
+//            mock4.resId = R.drawable.b_forest1;
+//            List<ForestDO> mockData = List.of(mock1, mock2, mock3, mock4);
+//            viewModel.getForestData().setValue(mockData);
         });
     }
 

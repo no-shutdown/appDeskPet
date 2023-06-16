@@ -27,6 +27,7 @@ import java.util.stream.Stream;
 public class AreaViewGroup extends RelativeLayout {
 
     private static final Random RANDOM = new Random();
+    private static final int TREE_MINUTE = 60 * 60 * 1000;
 
     public FieldView[][] fieldViews;
     public AbstractBuildingView[][] buildingViews;
@@ -89,7 +90,7 @@ public class AreaViewGroup extends RelativeLayout {
 
         // buildings
         if (null == data || data.isEmpty()) {
-            createBuilding(new FieldPoint(2, 2), R.drawable.b_none, null);
+            createBuilding(new FieldPoint(n / 2, n / 2), R.drawable.b_none, null);
         } else {
             for (BuildingMode.Mode mode : data) {
                 createBuilding(new FieldPoint(mode.xI, mode.yI), mode.resId, mode.multiParam);
@@ -245,15 +246,23 @@ public class AreaViewGroup extends RelativeLayout {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public void setData(List<ForestDO> rawData) {
+    public void setData(int segmentItem, List<ForestDO> rawData) {
         int treeNum = countTreeNum(rawData);
-        n = Math.max(5, Utils.getMinSquare(treeNum));
+        if (rawData.isEmpty()) n = 5;
+        else n = Math.max(minN(segmentItem), Utils.getMinSquare(treeNum));
         this.data = buildBuildingMode(rawData, n);
         removeAllViews();
         refreshArea(getContext());
         requestLayout();
         invalidate();
+    }
 
+    private int minN(int segmentItem) {
+        if (0 == segmentItem) return 5;
+        if (1 == segmentItem) return 8;
+        if (2 == segmentItem) return 10;
+        if (3 == segmentItem) return 15;
+        throw new RuntimeException();
     }
 
     private int countTreeNum(List<ForestDO> rawData) {
@@ -261,7 +270,7 @@ public class AreaViewGroup extends RelativeLayout {
         for (ForestDO i : rawData) {
             sum += (i.endTime - i.startTime);
         }
-        return (int) (sum / (30 * 60 * 1000));
+        return (int) (sum / TREE_MINUTE);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -269,16 +278,19 @@ public class AreaViewGroup extends RelativeLayout {
         List<BuildingMode.Mode> modes = new ArrayList<>();
         Set<FieldPoint> set = new HashSet<>();
         for (int index = 0; index < rawData.size(); index++) {
-            int i = RANDOM.nextInt(n);
-            int j = RANDOM.nextInt(n);
-            AreaViewGroup.FieldPoint fieldPoint = new AreaViewGroup.FieldPoint(i, j);
-            if (set.contains(fieldPoint)) {
-                index--;
-                continue;
-            }
-            set.add(fieldPoint);
             ForestDO rawDatum = rawData.get(index);
-            modes.add(new BuildingMode.Mode(i, j, rawDatum.resId));
+            int num = (int) ((rawDatum.endTime - rawDatum.startTime) / TREE_MINUTE);
+            for (int treeI = 0; treeI < num; treeI++) {
+                int i = RANDOM.nextInt(n);
+                int j = RANDOM.nextInt(n);
+                AreaViewGroup.FieldPoint fieldPoint = new AreaViewGroup.FieldPoint(i, j);
+                if (set.contains(fieldPoint)) {
+                    treeI--;
+                    continue;
+                }
+                set.add(fieldPoint);
+                modes.add(new BuildingMode.Mode(i, j, rawDatum.resId));
+            }
         }
         Stream<BuildingMode.Mode> sorted = modes.stream().sorted();
         return sorted.collect(Collectors.toList());

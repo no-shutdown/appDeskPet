@@ -109,6 +109,13 @@ public class Utils {
         return aCalendar.getActualMaximum(java.util.Calendar.DATE);
     }
 
+    //获取指定日期的月数
+    public static int getMonthDayOfTime(long timeStamp) {
+        java.util.Calendar aCalendar = java.util.Calendar.getInstance();
+        aCalendar.setTimeInMillis(timeStamp);
+        return getDayOfMonth(aCalendar.get(java.util.Calendar.MONTH));
+    }
+
     //获取指定月的天数
     public static int getDayOfMonth(int month) {
         java.util.Calendar aCalendar = java.util.Calendar.getInstance();
@@ -162,7 +169,7 @@ public class Utils {
             square = i * i;
             i++;
         }
-        return square;
+        return i;
     }
 
 }
