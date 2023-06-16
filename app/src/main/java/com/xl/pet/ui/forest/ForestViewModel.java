@@ -10,16 +10,22 @@ import java.util.List;
 
 public class ForestViewModel extends ViewModel {
 
-    private final MutableLiveData<DateRange> selectDateRange;
+    private final MutableLiveData<Integer> segmentItem;
+    private final MutableLiveData<DateRange> dateRange;
     private final MutableLiveData<List<ForestDO>> forestData;
 
     public ForestViewModel() {
-        selectDateRange = new MutableLiveData<>();
+        segmentItem = new MutableLiveData<>();
+        dateRange = new MutableLiveData<>();
         forestData = new MutableLiveData<>();
     }
 
-    public MutableLiveData<DateRange> getSelectDateRange() {
-        return selectDateRange;
+    public MutableLiveData<Integer> getSegmentItem() {
+        return segmentItem;
+    }
+
+    public MutableLiveData<DateRange> getDateRange() {
+        return dateRange;
     }
 
     public MutableLiveData<List<ForestDO>> getForestData() {

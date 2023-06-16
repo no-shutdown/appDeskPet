@@ -10,28 +10,15 @@ import java.util.Calendar;
 
 public class SimplySegmentItemOnClickListener implements SegmentView.SegmentItemClickListener {
 
-    private MutableLiveData<DateRange> selectDateRange;
+    private final MutableLiveData<Integer> segmentItem;
 
-    public SimplySegmentItemOnClickListener(MutableLiveData<DateRange> selectDateRange) {
-        this.selectDateRange = selectDateRange;
+    public SimplySegmentItemOnClickListener(MutableLiveData<Integer> segmentItem) {
+        this.segmentItem = segmentItem;
     }
 
     @Override
     public void onItemClick(SegmentView.ItemView item, int checkedItem) {
-        Calendar calendar;
-        if (checkedItem == 0) {
-            //日
-            calendar = Utils.getToday();
-        } else if (checkedItem == 1) {
-            //周
-            calendar = Utils.getFirstDayOfWeek();
-        } else if (checkedItem == 2) {
-            //月
-            calendar = Utils.getFirstDayOfMonth();
-        } else {
-            //年
-            calendar = Utils.getFirstDayOfYear();
-        }
-        selectDateRange.setValue(new DateRange(calendar.getTimeInMillis(), System.currentTimeMillis()));
+
+        segmentItem.setValue(checkedItem);
     }
 }

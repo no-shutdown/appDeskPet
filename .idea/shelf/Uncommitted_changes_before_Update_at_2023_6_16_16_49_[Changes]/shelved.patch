@@ -1,0 +1,141 @@
+Index: .idea/deploymentTargetDropDown.xml
+===================================================================
+diff --git a/.idea/deploymentTargetDropDown.xml b/.idea/deploymentTargetDropDown.xml
+deleted file mode 100644
+--- a/.idea/deploymentTargetDropDown.xml	(revision 6a087221f21c71a4b2663927c3dc030da11fda4b)
++++ /dev/null	(revision 6a087221f21c71a4b2663927c3dc030da11fda4b)
+@@ -1,17 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project version="4">
+-  <component name="deploymentTargetDropDown">
+-    <runningDeviceTargetSelectedWithDropDown>
+-      <Target>
+-        <type value="RUNNING_DEVICE_TARGET" />
+-        <deviceKey>
+-          <Key>
+-            <type value="SERIAL_NUMBER" />
+-            <value value="7SQ0222120007874" />
+-          </Key>
+-        </deviceKey>
+-      </Target>
+-    </runningDeviceTargetSelectedWithDropDown>
+-    <timeTargetWasSelectedWithDropDown value="2023-06-07T16:59:04.300045400Z" />
+-  </component>
+-</project>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_2023_6_1_19_26_[Changes]/shelved.patch
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_2023_6_1_19_26_[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Update_at_2023_6_1_19_26_[Changes]/shelved.patch
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_2023_6_1_19_26_[Changes]/shelved.patch	(revision 6a087221f21c71a4b2663927c3dc030da11fda4b)
++++ /dev/null	(revision 6a087221f21c71a4b2663927c3dc030da11fda4b)
+@@ -1,25 +0,0 @@
+-Index: .idea/deploymentTargetDropDown.xml
+-===================================================================
+-diff --git a/.idea/deploymentTargetDropDown.xml b/.idea/deploymentTargetDropDown.xml
+-deleted file mode 100644
+---- a/.idea/deploymentTargetDropDown.xml	(revision caf3b7129dba49fbc5338e96de1a82b06cc0990a)
+-+++ /dev/null	(revision caf3b7129dba49fbc5338e96de1a82b06cc0990a)
+-@@ -1,17 +0,0 @@
+--<?xml version="1.0" encoding="UTF-8"?>
+--<project version="4">
+--  <component name="deploymentTargetDropDown">
+--    <runningDeviceTargetSelectedWithDropDown>
+--      <Target>
+--        <type value="RUNNING_DEVICE_TARGET" />
+--        <deviceKey>
+--          <Key>
+--            <type value="SERIAL_NUMBER" />
+--            <value value="7SQ0222120007874" />
+--          </Key>
+--        </deviceKey>
+--      </Target>
+--    </runningDeviceTargetSelectedWithDropDown>
+--    <timeTargetWasSelectedWithDropDown value="2023-05-31T18:06:16.131404900Z" />
+--  </component>
+--</project>
+-\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Checkout_at_2023_6_3_16_43__Changes_.xml
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Checkout_at_2023_6_3_16_43__Changes_.xml b/.idea/shelf/Uncommitted_changes_before_Checkout_at_2023_6_3_16_43__Changes_.xml
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Checkout_at_2023_6_3_16_43__Changes_.xml	(revision 6a087221f21c71a4b2663927c3dc030da11fda4b)
++++ /dev/null	(revision 6a087221f21c71a4b2663927c3dc030da11fda4b)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Checkout_at_2023_6_3_16_43_[Changes]" date="1685781840589" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2023_6_3_16_43_[Changes]/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Checkout at 2023/6/3 16:43 [Changes]" />
+-</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Checkout_at_2023_6_3_16_45__Changes_.xml
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Checkout_at_2023_6_3_16_45__Changes_.xml b/.idea/shelf/Uncommitted_changes_before_Checkout_at_2023_6_3_16_45__Changes_.xml
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Checkout_at_2023_6_3_16_45__Changes_.xml	(revision 6a087221f21c71a4b2663927c3dc030da11fda4b)
++++ /dev/null	(revision 6a087221f21c71a4b2663927c3dc030da11fda4b)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Checkout_at_2023_6_3_16_45_[Changes]" date="1685781909111" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2023_6_3_16_45_[Changes]/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Checkout at 2023/6/3 16:45 [Changes]" />
+-</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_2023_6_2_18_29__Changes_.xml
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_2023_6_2_18_29__Changes_.xml b/.idea/shelf/Uncommitted_changes_before_Update_at_2023_6_2_18_29__Changes_.xml
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_2023_6_2_18_29__Changes_.xml	(revision 6a087221f21c71a4b2663927c3dc030da11fda4b)
++++ /dev/null	(revision 6a087221f21c71a4b2663927c3dc030da11fda4b)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Update_at_2023_6_2_18_29_[Changes]" date="1685701769242" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2023_6_2_18_29_[Changes]/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Update at 2023/6/2 18:29 [Changes]" />
+-</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_2023_6_1_19_26__Changes_.xml
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_2023_6_1_19_26__Changes_.xml b/.idea/shelf/Uncommitted_changes_before_Update_at_2023_6_1_19_26__Changes_.xml
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_2023_6_1_19_26__Changes_.xml	(revision 6a087221f21c71a4b2663927c3dc030da11fda4b)
++++ /dev/null	(revision 6a087221f21c71a4b2663927c3dc030da11fda4b)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Update_at_2023_6_1_19_26_[Changes]" date="1685618780272" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2023_6_1_19_26_[Changes]/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Update at 2023/6/1 19:26 [Changes]" />
+-</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_2023_6_2_18_29_[Changes]/shelved.patch
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_2023_6_2_18_29_[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Update_at_2023_6_2_18_29_[Changes]/shelved.patch
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_2023_6_2_18_29_[Changes]/shelved.patch	(revision 6a087221f21c71a4b2663927c3dc030da11fda4b)
++++ /dev/null	(revision 6a087221f21c71a4b2663927c3dc030da11fda4b)
+@@ -1,25 +0,0 @@
+-Index: .idea/deploymentTargetDropDown.xml
+-===================================================================
+-diff --git a/.idea/deploymentTargetDropDown.xml b/.idea/deploymentTargetDropDown.xml
+-deleted file mode 100644
+---- a/.idea/deploymentTargetDropDown.xml	(revision 8486ce56a229aa56473433b53a4ca7f99195d9f8)
+-+++ /dev/null	(revision 8486ce56a229aa56473433b53a4ca7f99195d9f8)
+-@@ -1,17 +0,0 @@
+--<?xml version="1.0" encoding="UTF-8"?>
+--<project version="4">
+--  <component name="deploymentTargetDropDown">
+--    <runningDeviceTargetSelectedWithDropDown>
+--      <Target>
+--        <type value="RUNNING_DEVICE_TARGET" />
+--        <deviceKey>
+--          <Key>
+--            <type value="VIRTUAL_DEVICE_PATH" />
+--            <value value="C:\Users\13565\.android\avd\Pixel_3a_XL_API_31.avd" />
+--          </Key>
+--        </deviceKey>
+--      </Target>
+--    </runningDeviceTargetSelectedWithDropDown>
+--    <timeTargetWasSelectedWithDropDown value="2023-06-01T14:34:08.837943100Z" />
+--  </component>
+--</project>
+-\ No newline at end of file
+diff --git a/.idea/shelf/Uncommitted_changes_before_Checkout_at_2023_6_3_16_45_[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Checkout_at_2023_6_3_16_45_[Changes]/shelved.patch
+deleted file mode 100644
+diff --git a/.idea/shelf/Uncommitted_changes_before_Checkout_at_2023_6_3_16_43_[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Checkout_at_2023_6_3_16_43_[Changes]/shelved.patch
+deleted file mode 100644

@@ -1,0 +1,104 @@
+package com.xl.pet.ui.forest;
+
+import android.content.Context;
+import android.os.Build;
+import android.util.AttributeSet;
+
+import androidx.annotation.RequiresApi;
+
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.xl.pet.database.entity.ForestDO;
+import com.xl.pet.ui.forest.mode.BarCharMode;
+import com.xl.pet.ui.forest.mode.DateRange;
+import com.xl.pet.utils.Utils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+
+public class ForestBarChar extends BarChart {
+
+    private static final long ONE_MINUTE = 60 * 1000;
+    private static final long ONE_HOUR = 60 * 60 * 1000;
+    private static final long ONE_DAY = 24 * 60 * 60 * 1000;
+
+    public ForestBarChar(Context context) {
+        super(context);
+    }
+
+    public ForestBarChar(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void setData(int segmentItem, DateRange dateRange, List<ForestDO> rawData) {
+        BarCharMode.Mode data = buildBarCharMode(segmentItem, dateRange, rawData);
+
+        BarDataSet dataSet = new BarDataSet(data.data, "统计");
+        dataSet.setColor(0xFF7aa667); // 设置柱状图颜色
+        BarData barData = new BarData(dataSet);
+        this.getXAxis().setValueFormatter(new IndexAxisValueFormatter(data.xLabel));
+        this.setData(barData);
+        this.invalidate(); // 刷新图表
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private BarCharMode.Mode buildBarCharMode(int segmentItem, DateRange dateRange, List<ForestDO> rawData) {
+        if (0 == segmentItem)
+            return buildMode(dateRange, rawData, BarCharMode.XLabel.DAY, (i) -> ONE_HOUR, ONE_MINUTE);
+        if (1 == segmentItem)
+            return buildMode(dateRange, rawData, BarCharMode.XLabel.WEEK, (i) -> ONE_DAY, ONE_HOUR);
+        if (2 == segmentItem)
+            return buildMode(dateRange, rawData, BarCharMode.XLabel.MONTH, (i) -> ONE_DAY, ONE_HOUR);
+        if (3 == segmentItem)
+            return buildMode(dateRange, rawData, BarCharMode.XLabel.YEAR, (i) -> Utils.getDayOfMonth(i + 1) * ONE_DAY, ONE_DAY);
+        throw new RuntimeException();
+
+//
+//        List<BarEntry> entries = new ArrayList<>();
+//        entries.add(new BarEntry(0f, 20f));
+//        entries.add(new BarEntry(1f, 30f));
+//        entries.add(new BarEntry(2f, 25f));
+//        entries.add(new BarEntry(3f, 40f));
+//        entries.add(new BarEntry(4f, 35f));
+//        entries.add(new BarEntry(5f, 20f));
+//        entries.add(new BarEntry(6f, 30f));
+//        entries.add(new BarEntry(7f, 25f));
+//        entries.add(new BarEntry(8f, 40f));
+//        entries.add(new BarEntry(9f, 35f));
+//        entries.add(new BarEntry(10f, 20f));
+//        entries.add(new BarEntry(11f, 30f));
+//        entries.add(new BarEntry(12f, 25f));
+//        entries.add(new BarEntry(13f, 40f));
+//        entries.add(new BarEntry(14f, 35f));
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private BarCharMode.Mode buildMode(DateRange dateRange, List<ForestDO> rawData, List<String> xLabels, Function<Integer, Long> intervalFunction, long cell) {
+        List<BarEntry> entries = new ArrayList<>();
+        DateRange intervalItem = new DateRange();
+        DateRange dataItem = new DateRange();
+        for (int i = 0; i < xLabels.size(); i++) {
+            long interval = intervalFunction.apply(i);
+            intervalItem.reset(dateRange.getStart() + i * interval, dateRange.getStart() + (i + 1) * interval);
+            long sumTime = 0;
+            //计算每一条专注记录与间隔的交集时长
+            for (ForestDO data : rawData)
+                sumTime += countIntersection(dataItem.reset(data.startTime, data.endTime), intervalItem);
+            entries.add(new BarEntry(i, sumTime * 0.1f / cell));
+        }
+        return new BarCharMode.Mode(xLabels, entries);
+    }
+
+    private long countIntersection(DateRange dateRange1, DateRange dateRange2) {
+        long start = Math.max(dateRange1.getStart(), dateRange2.getStart());
+        long end = Math.min(dateRange1.getEnd(), dateRange2.getEnd());
+        return Math.max(0, end - start);
+    }
+
+
+}

@@ -109,6 +109,13 @@ public class Utils {
         return aCalendar.getActualMaximum(java.util.Calendar.DATE);
     }
 
+    //获取指定月的天数
+    public static int getDayOfMonth(int month) {
+        java.util.Calendar aCalendar = java.util.Calendar.getInstance();
+        aCalendar.set(java.util.Calendar.MONTH, month);
+        return aCalendar.getActualMaximum(java.util.Calendar.DATE);
+    }
+
     // 获取今天的日期
     public static java.util.Calendar getToday() {
         return setZeroClock(java.util.Calendar.getInstance());

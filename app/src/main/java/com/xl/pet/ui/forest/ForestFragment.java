@@ -15,38 +15,24 @@ import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
-import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.xl.pet.R;
 import com.xl.pet.database.dao.ForestDao;
 import com.xl.pet.database.entity.ForestDO;
 import com.xl.pet.ui.common.SegmentView;
 import com.xl.pet.ui.forest.listener.SimplySegmentItemOnClickListener;
-import com.xl.pet.ui.forest.mode.BuildingMode;
-import com.xl.pet.ui.forest.mode.CharMode;
 import com.xl.pet.ui.forest.mode.DateRange;
 import com.xl.pet.utils.DatabaseHelper;
 import com.xl.pet.utils.Utils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Calendar;
 import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ForestFragment extends Fragment {
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd");
-
-    private static final Random RANDOM = new Random();
 
     private final ForestDao forestDao = DatabaseHelper.forestDao();
 
@@ -59,7 +45,7 @@ public class ForestFragment extends Fragment {
         TextView topTitle = root.findViewById(R.id.top_title);
         CardView cardView = root.findViewById(R.id.card_data_count);
         AreaViewGroup areaView = root.findViewById(R.id.layout_area);
-        BarChart chart = root.findViewById(R.id.chart);
+        ForestBarChar chart = root.findViewById(R.id.chart);
 
         //设置卡片宽度为 90%
         ViewGroup.LayoutParams layoutParams = cardView.getLayoutParams();
@@ -75,20 +61,37 @@ public class ForestFragment extends Fragment {
         xAxis.setGranularity(1f); // 设置 X 轴标签之间的最小间隔
 
         ForestViewModel viewModel = ViewModelProviders.of(this).get(ForestViewModel.class);
-        segmentView.setOnSegmentItemClickListener(new SimplySegmentItemOnClickListener(viewModel.getSelectDateRange()));
-        viewModel.getSelectDateRange().observe(getViewLifecycleOwner(), (dateRange) -> {
-            new Thread(() -> selectData(dateRange, topTitle, viewModel)).start();
-        });
+        segmentView.setOnSegmentItemClickListener(new SimplySegmentItemOnClickListener(viewModel.getSegmentItem()));
+        viewModel.getSegmentItem().observe(getViewLifecycleOwner(), (item) -> viewModel.getDateRange().setValue(changeDateRange(item)));
+        viewModel.getDateRange().observe(getViewLifecycleOwner(), (dateRange) -> new Thread(() -> fetchData(dateRange, topTitle, viewModel)).start());
         viewModel.getForestData().observe(getViewLifecycleOwner(), (data) -> {
-            areaView.setData(buildAreaViewData(data, areaView.getN()));
-            buildCharData(data, chart, segmentView.getCheckedItem());
+            areaView.setData(data);
+            chart.setData(viewModel.getSegmentItem().getValue(), viewModel.getDateRange().getValue(), data);
         });
 
-        viewModel.getSelectDateRange().setValue(new DateRange(Utils.getToday().getTimeInMillis(), System.currentTimeMillis()));
+        viewModel.getSegmentItem().setValue(0);
         return root;
     }
 
-    private void selectData(DateRange dateRange, TextView topTitle, ForestViewModel viewModel) {
+    private DateRange changeDateRange(int checkItem) {
+        Calendar calendar;
+        if (checkItem == 0) {
+            //日
+            calendar = Utils.getToday();
+        } else if (checkItem == 1) {
+            //周
+            calendar = Utils.getFirstDayOfWeek();
+        } else if (checkItem == 2) {
+            //月
+            calendar = Utils.getFirstDayOfMonth();
+        } else {
+            //年
+            calendar = Utils.getFirstDayOfYear();
+        }
+        return new DateRange(calendar.getTimeInMillis(), System.currentTimeMillis());
+    }
+
+    private void fetchData(DateRange dateRange, TextView topTitle, ForestViewModel viewModel) {
         topTitle.setText(topTitleText(dateRange));
         List<ForestDO> byRange = forestDao.findByRange(dateRange.getStart(), dateRange.getEnd());
         getActivity().runOnUiThread(() -> {
@@ -126,60 +129,6 @@ public class ForestFragment extends Fragment {
             return start;
         }
         return start + "~" + end;
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    private List<BuildingMode.Mode> buildAreaViewData(List<ForestDO> rawData, int n) {
-        List<BuildingMode.Mode> modes = new ArrayList<>();
-        Set<AreaViewGroup.FieldPoint> set = new HashSet<>();
-        for (int index = 0; index < rawData.size(); index++) {
-            int i = RANDOM.nextInt(n);
-            int j = RANDOM.nextInt(n);
-            AreaViewGroup.FieldPoint fieldPoint = new AreaViewGroup.FieldPoint(i, j);
-            if (set.contains(fieldPoint)) {
-                index--;
-                continue;
-            }
-            set.add(fieldPoint);
-            ForestDO rawDatum = rawData.get(index);
-            modes.add(new BuildingMode.Mode(i, j, rawDatum.resId));
-        }
-        Stream<BuildingMode.Mode> sorted = modes.stream().sorted();
-        return sorted.collect(Collectors.toList());
-    }
-
-    private void buildCharData(List<ForestDO> rawData, BarChart chart, int segmentItem) {
-
-        //柱状图数据
-        List<String> xLabels = CharMode.XLabel.getXLabel(segmentItem);
-
-        rawData.stream().filter(i->i.)
-        for (int i = 0; i < xLabels.size(); i++) {
-            //TODO
-        }
-        List<BarEntry> entries = new ArrayList<>();
-        entries.add(new BarEntry(0f, 20f));
-        entries.add(new BarEntry(1f, 30f));
-        entries.add(new BarEntry(2f, 25f));
-        entries.add(new BarEntry(3f, 40f));
-        entries.add(new BarEntry(4f, 35f));
-        entries.add(new BarEntry(5f, 20f));
-        entries.add(new BarEntry(6f, 30f));
-        entries.add(new BarEntry(7f, 25f));
-        entries.add(new BarEntry(8f, 40f));
-        entries.add(new BarEntry(9f, 35f));
-        entries.add(new BarEntry(10f, 20f));
-        entries.add(new BarEntry(11f, 30f));
-        entries.add(new BarEntry(12f, 25f));
-        entries.add(new BarEntry(13f, 40f));
-        entries.add(new BarEntry(14f, 35f));
-
-        chart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(xLabels));
-        BarDataSet dataSet = new BarDataSet(entries, "统计");
-        dataSet.setColor(0xFF7aa667); // 设置柱状图颜色
-        BarData barData = new BarData(dataSet);
-        chart.setData(barData);
-        chart.invalidate(); // 刷新图表
     }
 
     public int fetchScreenWidth() {

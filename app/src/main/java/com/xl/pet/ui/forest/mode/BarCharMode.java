@@ -1,17 +1,22 @@
 package com.xl.pet.ui.forest.mode;
 
 
+import com.github.mikephil.charting.data.BarEntry;
 import com.xl.pet.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-public class CharMode {
+public class BarCharMode {
 
     public static class Mode {
         public List<String> xLabel;
-        public Map<String, Float> data;
+        public List<BarEntry> data;
+
+        public Mode(List<String> xLabel, List<BarEntry> data) {
+            this.xLabel = xLabel;
+            this.data = data;
+        }
     }
 
 
@@ -99,19 +104,6 @@ public class CharMode {
             YEAR.add("10");
             YEAR.add("11");
             YEAR.add("12");
-        }
-
-        public static List<String> getXLabel(int segmentItem) {
-            if (0 == segmentItem) {
-                return DAY;
-            }
-            if (1 == segmentItem) {
-                return WEEK;
-            }
-            if (2 == segmentItem) {
-                return MONTH.subList(0, Utils.getDayOfMonth());
-            }
-            return YEAR;
         }
     }
 }

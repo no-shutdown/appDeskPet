@@ -1,21 +1,32 @@
 package com.xl.pet.ui.forest;
 
 import android.content.Context;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import androidx.annotation.RequiresApi;
+
 import com.xl.pet.R;
+import com.xl.pet.database.entity.ForestDO;
 import com.xl.pet.ui.forest.mode.BuildingMode;
 import com.xl.pet.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 区域组件
  */
 public class AreaViewGroup extends RelativeLayout {
+
+    private static final Random RANDOM = new Random();
 
     public FieldView[][] fieldViews;
     public AbstractBuildingView[][] buildingViews;
@@ -233,14 +244,44 @@ public class AreaViewGroup extends RelativeLayout {
         return (int) (dpValue * scale + 0.5f);
     }
 
-    public void setData(List<BuildingMode.Mode> data) {
-        this.data = data;
-        n = Math.max(5, Utils.getMinSquare(data.size()));
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void setData(List<ForestDO> rawData) {
+        int treeNum = countTreeNum(rawData);
+        n = Math.max(5, Utils.getMinSquare(treeNum));
+        this.data = buildBuildingMode(rawData, n);
         removeAllViews();
         refreshArea(getContext());
         requestLayout();
         invalidate();
 
+    }
+
+    private int countTreeNum(List<ForestDO> rawData) {
+        long sum = 0;
+        for (ForestDO i : rawData) {
+            sum += (i.endTime - i.startTime);
+        }
+        return (int) (sum / (30 * 60 * 1000));
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private List<BuildingMode.Mode> buildBuildingMode(List<ForestDO> rawData, int n) {
+        List<BuildingMode.Mode> modes = new ArrayList<>();
+        Set<FieldPoint> set = new HashSet<>();
+        for (int index = 0; index < rawData.size(); index++) {
+            int i = RANDOM.nextInt(n);
+            int j = RANDOM.nextInt(n);
+            AreaViewGroup.FieldPoint fieldPoint = new AreaViewGroup.FieldPoint(i, j);
+            if (set.contains(fieldPoint)) {
+                index--;
+                continue;
+            }
+            set.add(fieldPoint);
+            ForestDO rawDatum = rawData.get(index);
+            modes.add(new BuildingMode.Mode(i, j, rawDatum.resId));
+        }
+        Stream<BuildingMode.Mode> sorted = modes.stream().sorted();
+        return sorted.collect(Collectors.toList());
     }
 
     public int getN() {
