@@ -62,24 +62,6 @@ public class ForestBarChar extends BarChart {
         if (3 == segmentItem)
             return buildMode(dateRange, rawData, BarCharMode.XLabel.YEAR, (i) -> Utils.getDayOfMonth(i) * ONE_DAY, ONE_MINUTE);
         throw new RuntimeException();
-
-//
-//        List<BarEntry> entries = new ArrayList<>();
-//        entries.add(new BarEntry(0f, 20f));
-//        entries.add(new BarEntry(1f, 30f));
-//        entries.add(new BarEntry(2f, 25f));
-//        entries.add(new BarEntry(3f, 40f));
-//        entries.add(new BarEntry(4f, 35f));
-//        entries.add(new BarEntry(5f, 20f));
-//        entries.add(new BarEntry(6f, 30f));
-//        entries.add(new BarEntry(7f, 25f));
-//        entries.add(new BarEntry(8f, 40f));
-//        entries.add(new BarEntry(9f, 35f));
-//        entries.add(new BarEntry(10f, 20f));
-//        entries.add(new BarEntry(11f, 30f));
-//        entries.add(new BarEntry(12f, 25f));
-//        entries.add(new BarEntry(13f, 40f));
-//        entries.add(new BarEntry(14f, 35f));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)

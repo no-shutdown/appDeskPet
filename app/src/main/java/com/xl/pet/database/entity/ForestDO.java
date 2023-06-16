@@ -11,5 +11,6 @@ public class ForestDO {
     public long startTime;
     public long endTime;
     public Integer resId;
+    public int flagId;
 
 }

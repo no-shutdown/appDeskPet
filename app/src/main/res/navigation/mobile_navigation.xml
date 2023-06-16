@@ -9,7 +9,7 @@
         android:id="@+id/navigation_home"
         android:name="com.xl.pet.ui.forest.ForestFragment"
         android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_forest" />
 
     <fragment
         android:id="@+id/navigation_menstruation"
@@ -19,7 +19,7 @@
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.xl.pet.ui.notifications.NotificationsFragment"
+        android:name="com.xl.pet.ui.forest.time.ForestTimeFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        tools:layout="@layout/fragment_forest_time" />
 </navigation>

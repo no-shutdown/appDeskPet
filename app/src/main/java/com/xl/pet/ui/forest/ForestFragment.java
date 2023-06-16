@@ -39,7 +39,7 @@ public class ForestFragment extends Fragment {
     @RequiresApi(api = Build.VERSION_CODES.N)
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_home, container, false);
+        View root = inflater.inflate(R.layout.fragment_forest, container, false);
 
         SegmentView segmentView = root.findViewById(R.id.top_segment);
         TextView topTitle = root.findViewById(R.id.top_title);
