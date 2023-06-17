@@ -3,6 +3,7 @@ package com.xl.pet;
 import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -71,12 +72,25 @@ public class MainActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_menstruation, R.id.navigation_notifications)
+                R.id.navigation_forest, R.id.navigation_menstruation, R.id.navigation_forest_time)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+
+
         NavigationUI.setupWithNavController(navigationView, navController);
+//        navigationView.setNavigationItemSelectedListener((menuItem) -> {
+//            if (R.id.navigation_forest_time == menuItem.getItemId()) {
+//                binding.appBarMain.toolbar.setBackgroundColor(Color.BLUE);
+//            } else {
+//                binding.appBarMain.toolbar.setBackgroundColor(Color.GRAY);
+//            }
+//            NavigationUI.onNavDestinationSelected(menuItem, navController);
+//            return true;
+//        });
+
+
     }
 
     private void startFloatWindowService() {

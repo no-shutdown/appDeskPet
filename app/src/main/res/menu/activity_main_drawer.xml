@@ -5,7 +5,7 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/navigation_home"
+            android:id="@+id/navigation_forest"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/menu_forest" />
         <item
@@ -13,7 +13,7 @@
             android:icon="@drawable/ic_menu_gallery"
             android:title="@string/menu_menstruation" />
         <item
-            android:id="@+id/navigation_notifications"
+            android:id="@+id/navigation_forest_time"
             android:icon="@drawable/ic_menu_slideshow"
             android:title="@string/menu_forest_time" />
     </group>
