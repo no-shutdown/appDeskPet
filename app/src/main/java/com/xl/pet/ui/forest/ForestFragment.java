@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.xl.pet.R;
 import com.xl.pet.database.dao.ForestDao;
 import com.xl.pet.database.entity.ForestDO;
@@ -51,12 +52,13 @@ public class ForestFragment extends Fragment {
         ViewGroup.LayoutParams layoutParams = cardView.getLayoutParams();
         layoutParams.width = (int) (fetchScreenWidth() * 0.9);
         cardView.setLayoutParams(layoutParams);
-        chart.getDescription().setEnabled(false); // 隐藏描述文本
         chart.getLegend().setEnabled(false); // 隐藏图例
-        chart.getXAxis().setDrawGridLines(false); //隐藏X轴网格线
-        chart.getAxisLeft().setDrawGridLines(false); // 隐藏Y轴网格线
         chart.getAxisRight().setEnabled(false); // 隐藏右侧Y轴
+        chart.getDescription().setEnabled(false); //隐藏描述文本
+        YAxis yAxis = chart.getAxisLeft();
+        yAxis.setAxisMinimum(0);
         XAxis xAxis = chart.getXAxis();
+        xAxis.setDrawGridLines(false); //隐藏X轴网格线
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM); // 设置 X 轴位置为底部
         xAxis.setGranularity(1f); // 设置 X 轴标签之间的最小间隔
 
@@ -97,30 +99,30 @@ public class ForestFragment extends Fragment {
         topTitle.setText(topTitleText(dateRange));
         List<ForestDO> byRange = forestDao.findByRange(dateRange.getStart(), dateRange.getEnd());
         getActivity().runOnUiThread(() -> {
-            viewModel.getForestData().setValue(byRange);
+//            viewModel.getForestData().setValue(byRange);
             //TODO
-//            ForestDO mock1 = new ForestDO();
-//            mock1.id = 1;
-//            mock1.startTime = Utils.getToday().getTimeInMillis();
-//            mock1.endTime = mock1.startTime + 3 * 60 * 60 * 1000;
-//            mock1.resId = R.drawable.b_forest1;
-//            ForestDO mock2 = new ForestDO();
-//            mock2.id = 2;
-//            mock2.startTime = Utils.getFirstDayOfWeek().getTimeInMillis();
-//            mock2.endTime = mock2.startTime + 3 * 60 * 60 * 1000;
-//            mock2.resId = R.drawable.b_forest1;
-//            ForestDO mock3 = new ForestDO();
-//            mock3.id = 3;
-//            mock3.startTime = Utils.getFirstDayOfMonth().getTimeInMillis();
-//            mock3.endTime = mock3.startTime + 3 * 60 * 60 * 1000;
-//            mock3.resId = R.drawable.b_forest1;
-//            ForestDO mock4 = new ForestDO();
-//            mock4.id = 4;
-//            mock4.startTime = Utils.getFirstDayOfYear().getTimeInMillis();
-//            mock4.endTime = mock4.startTime + 3 * 60 * 60 * 1000;
-//            mock4.resId = R.drawable.b_forest1;
-//            List<ForestDO> mockData = List.of(mock1, mock2, mock3, mock4);
-//            viewModel.getForestData().setValue(mockData);
+            ForestDO mock1 = new ForestDO();
+            mock1.id = 1;
+            mock1.startTime = Utils.getToday().getTimeInMillis();
+            mock1.endTime = mock1.startTime + 3 * 60 * 60 * 1000;
+            mock1.resId = R.drawable.b_forest1;
+            ForestDO mock2 = new ForestDO();
+            mock2.id = 2;
+            mock2.startTime = Utils.getFirstDayOfWeek().getTimeInMillis();
+            mock2.endTime = mock2.startTime + 3 * 60 * 60 * 1000;
+            mock2.resId = R.drawable.b_forest1;
+            ForestDO mock3 = new ForestDO();
+            mock3.id = 3;
+            mock3.startTime = Utils.getFirstDayOfMonth().getTimeInMillis();
+            mock3.endTime = mock3.startTime + 3 * 60 * 60 * 1000;
+            mock3.resId = R.drawable.b_forest1;
+            ForestDO mock4 = new ForestDO();
+            mock4.id = 4;
+            mock4.startTime = Utils.getFirstDayOfYear().getTimeInMillis();
+            mock4.endTime = mock4.startTime + 3 * 60 * 60 * 1000;
+            mock4.resId = R.drawable.b_forest1;
+            List<ForestDO> mockData = List.of(mock1, mock2, mock3, mock4);
+            viewModel.getForestData().setValue(mockData);
         });
     }
 
