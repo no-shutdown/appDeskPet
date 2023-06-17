@@ -23,7 +23,6 @@ import androidx.navigation.ui.NavigationUI;
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
-    private ActivityMainBinding binding;
 
     //开发阶段先暂时去掉不必要功能
     @Override
@@ -63,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
 //    }
 
     private void createUI() {
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        com.xl.pet.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.appBarMain.toolbar);

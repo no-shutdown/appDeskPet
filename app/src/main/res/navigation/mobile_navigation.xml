@@ -20,6 +20,6 @@
     <fragment
         android:id="@+id/navigation_notifications"
         android:name="com.xl.pet.ui.forest.time.ForestTimeFragment"
-        android:label="@string/title_notifications"
+        android:label="@string/title_forest_time"
         tools:layout="@layout/fragment_forest_time" />
 </navigation>

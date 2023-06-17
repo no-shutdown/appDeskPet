@@ -7,14 +7,14 @@
         <item
             android:id="@+id/navigation_home"
             android:icon="@drawable/ic_menu_camera"
-            android:title="@string/menu_home" />
+            android:title="@string/menu_forest" />
         <item
             android:id="@+id/navigation_menstruation"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="@string/menu_gallery" />
+            android:title="@string/menu_menstruation" />
         <item
             android:id="@+id/navigation_notifications"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="@string/menu_slideshow" />
+            android:title="@string/menu_forest_time" />
     </group>
 </menu>
