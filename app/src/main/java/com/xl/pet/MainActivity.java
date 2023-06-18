@@ -1,5 +1,6 @@
 package com.xl.pet;
 
+import android.annotation.SuppressLint;
 import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.Intent;
@@ -14,9 +15,12 @@ import com.xl.pet.databinding.ActivityMainBinding;
 import com.xl.pet.flowWindow.FloatWindowService;
 import com.xl.pet.utils.DatabaseHelper;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -80,17 +84,13 @@ public class MainActivity extends AppCompatActivity {
 
 
         NavigationUI.setupWithNavController(navigationView, navController);
-//        navigationView.setNavigationItemSelectedListener((menuItem) -> {
-//            if (R.id.navigation_forest_time == menuItem.getItemId()) {
-//                binding.appBarMain.toolbar.setBackgroundColor(Color.BLUE);
-//            } else {
-//                binding.appBarMain.toolbar.setBackgroundColor(Color.GRAY);
-//            }
-//            NavigationUI.onNavDestinationSelected(menuItem, navController);
-//            return true;
-//        });
-
-
+        navController.addOnDestinationChangedListener((navController1, navDestination, bundle) -> {
+            if (R.id.navigation_forest_time == navDestination.getId()) {
+                binding.appBarMain.toolbar.setBackgroundColor(0XFF009688);
+            } else {
+                binding.appBarMain.toolbar.setBackgroundColor(0XFF00574B);
+            }
+        });
     }
 
     private void startFloatWindowService() {
@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
     private void requestUsageStatsPermissionIfNeed() {
         AppOpsManager appOps = (AppOpsManager) getSystemService(Context.APP_OPS_SERVICE);
         int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, android.os.Process.myUid(), getPackageName());
-        boolean hasUsageStatsPermission =  mode == AppOpsManager.MODE_ALLOWED;
+        boolean hasUsageStatsPermission = mode == AppOpsManager.MODE_ALLOWED;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !hasUsageStatsPermission) {
             Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
