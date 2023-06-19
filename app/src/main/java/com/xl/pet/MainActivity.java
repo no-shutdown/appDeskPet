@@ -1,26 +1,24 @@
 package com.xl.pet;
 
-import android.annotation.SuppressLint;
 import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.Menu;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.google.android.material.navigation.NavigationView;
 import com.xl.pet.databinding.ActivityMainBinding;
 import com.xl.pet.flowWindow.FloatWindowService;
 import com.xl.pet.utils.DatabaseHelper;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
-import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -73,22 +71,27 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(binding.appBarMain.toolbar);
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_forest, R.id.navigation_menstruation, R.id.navigation_forest_time)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
-
-
         NavigationUI.setupWithNavController(navigationView, navController);
+        //添加左侧导航监听，设置toolBar和手机状态栏颜色
         navController.addOnDestinationChangedListener((navController1, navDestination, bundle) -> {
             if (R.id.navigation_forest_time == navDestination.getId()) {
-                binding.appBarMain.toolbar.setBackgroundColor(0XFF009688);
+                int primaryBrightColor = ContextCompat.getColor(this, R.color.colorPrimaryBright);
+                binding.appBarMain.toolbar.setBackgroundColor(primaryBrightColor);
+                Window window = getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.setStatusBarColor(primaryBrightColor);
             } else {
-                binding.appBarMain.toolbar.setBackgroundColor(0XFF00574B);
+                int primaryColor = ContextCompat.getColor(this, R.color.colorPrimary);
+                binding.appBarMain.toolbar.setBackgroundColor(primaryColor);
+                Window window = getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.setStatusBarColor(primaryColor);
             }
         });
     }
@@ -128,7 +131,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
@@ -139,5 +141,4 @@ public class MainActivity extends AppCompatActivity {
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
-
 }
