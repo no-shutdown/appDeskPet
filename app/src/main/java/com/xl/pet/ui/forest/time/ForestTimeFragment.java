@@ -1,51 +1,56 @@
 package com.xl.pet.ui.forest.time;
 
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.Button;
+import android.widget.Chronometer;
 
-import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 
 import com.xl.pet.R;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 public class ForestTimeFragment extends Fragment {
 
-    private final Timer timer = new Timer();
+    private Chronometer chronometer;
+    private Button startPauseButton;
+
+    private boolean isRunning = false;
+    private long pauseOffset = 0;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_forest_time, container, false);
-        TextView forestTime = root.findViewById(R.id.text_forest_time);
-        TextView button = root.findViewById(R.id.button_forest_time);
+        chronometer = root.findViewById(R.id.chronometer);
+        startPauseButton = root.findViewById(R.id.startPauseButton);
 
-
-        ForestTimeViewModel forestTimeViewModel = ViewModelProviders.of(this).get(ForestTimeViewModel.class);
-        forestTimeViewModel.getSeconds().observe(getViewLifecycleOwner(), (data) -> {
-            int min = data / 60;
-            int second = data - min * 60;
-            forestTime.setText(String.format("%02d:%02d", min, second));
+        startPauseButton.setOnClickListener(v -> {
+            if (isRunning) {
+                pauseChronometer();
+            } else {
+                startChronometer();
+            }
         });
-
-        button.setOnClickListener(v -> {
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    getActivity().runOnUiThread(() -> {
-                        forestTimeViewModel.getSeconds().setValue(forestTimeViewModel.getSeconds().getValue() + 1);
-                    });
-                }
-            }, 0, 1000);
-        });
-
         return root;
+    }
+
+
+
+    private void startChronometer() {
+        pauseOffset = 0;
+        chronometer.setBase(SystemClock.elapsedRealtime() - pauseOffset);
+        chronometer.start();
+        startPauseButton.setText("结束");
+        isRunning = true;
+    }
+
+    private void pauseChronometer() {
+        chronometer.stop();
+        pauseOffset = SystemClock.elapsedRealtime() - chronometer.getBase();
+        startPauseButton.setText("开始");
+        isRunning = false;
     }
 }

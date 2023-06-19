@@ -5,14 +5,13 @@ import androidx.lifecycle.ViewModel;
 
 public class ForestTimeViewModel extends ViewModel {
 
-    private final MutableLiveData<Integer> seconds;
+    private final MutableLiveData<String> text;
 
     public ForestTimeViewModel() {
-        seconds = new MutableLiveData<>();
-        seconds.setValue(0);
+        text = new MutableLiveData<>();
     }
 
-    public MutableLiveData<Integer> getSeconds() {
-        return seconds;
+    public MutableLiveData<String> getText() {
+        return text;
     }
 }
