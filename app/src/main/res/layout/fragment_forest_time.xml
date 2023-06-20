@@ -33,7 +33,7 @@
             android:layout_width="240dp"
             android:layout_height="240dp"
             android:padding="26dp"
-            android:background="@drawable/round_background"
+            android:background="@drawable/x_round_background"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

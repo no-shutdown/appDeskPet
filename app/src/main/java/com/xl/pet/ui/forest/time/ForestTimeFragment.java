@@ -1,14 +1,20 @@
 package com.xl.pet.ui.forest.time;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -42,6 +48,9 @@ public class ForestTimeFragment extends Fragment {
     private boolean isRunning = false;
     private Integer selectResId = R.drawable.forest_tree_1;
 
+    private String[] items = {"Item 1", "Item 2", "Item 3", "Item 4", "Item 5"};
+    private String selectedItem;
+
     private ForestTimeViewModel viewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -54,11 +63,17 @@ public class ForestTimeFragment extends Fragment {
         startPauseButton = root.findViewById(R.id.startPauseButton);
         TextView textView = root.findViewById(R.id.textView_forest_flag);
         ImageView image = root.findViewById(R.id.imageView_forest_time);
+        //树种弹窗
         BottomSheetDialog bottomSheetDialog = createForestDialog();
-        ImageAdapter adapter = new ImageAdapter(this.getContext(), TreeImages.list);
+        ImageAdapter treeAdapter = new ImageAdapter(this.getContext(), TreeImages.list);
         GridView gridView = bottomSheetDialog.findViewById(R.id.gridView);
-        gridView.setAdapter(adapter);
+        gridView.setAdapter(treeAdapter);
+        //标签弹窗
+        Dialog popupDialog = createPopupDialog();
+        EditText editText = popupDialog.findViewById(R.id.editText);
+        ListView listView = popupDialog.findViewById(R.id.listView);
 
+        //viewModel
         viewModel = ViewModelProviders.of(this).get(ForestTimeViewModel.class);
         viewModel.getResId().observe(getViewLifecycleOwner(), image::setImageResource);
         viewModel.getFlag().observe(getViewLifecycleOwner(), (data) -> {
@@ -74,7 +89,8 @@ public class ForestTimeFragment extends Fragment {
                 startChronometer();
             }
         });
-        //图片点击事件
+
+        //显示弹窗
         image.setOnClickListener(v -> bottomSheetDialog.show());
         //树种点击事件
         gridView.setOnItemClickListener((parent, view, position, id) -> {
@@ -85,6 +101,16 @@ public class ForestTimeFragment extends Fragment {
             viewModel.setResId(selectResId);
             bottomSheetDialog.hide();
         });
+
+        //显示弹窗
+        textView.setOnClickListener(v -> popupDialog.show());
+        //标签点击事件
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            // 根据列表项点击打印对应的内容
+            String selectedItem = (String) listView.getItemAtPosition(position);
+            System.out.println(selectedItem);
+        });
+
 
         //显示默认选择的树种
         viewModel.setResId(selectResId);
@@ -110,6 +136,15 @@ public class ForestTimeFragment extends Fragment {
         View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.forest_bottom_dialog, null);
         bottomSheetDialog.setContentView(dialogView);
         return bottomSheetDialog;
+    }
+
+    // 弹窗创建方法
+    private Dialog createPopupDialog() {
+        // 创建弹窗对象
+        Dialog popupDialog = new Dialog(this.getContext());
+        // 设置弹窗的布局
+        popupDialog.setContentView(R.layout.forest_flag_dialog);
+        return popupDialog;
     }
 
     private void startChronometer() {
