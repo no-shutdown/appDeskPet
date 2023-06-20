@@ -9,7 +9,7 @@ public class FlagColors {
 
     static {
         list.add(0xFF2196F3);
-        list.add(0xFFFFEB3B);
+        list.add(0xFF8E74B3);
         list.add(0xFFFFC107);
         list.add(0xFF009688);
         list.add(0xFFFF5722);

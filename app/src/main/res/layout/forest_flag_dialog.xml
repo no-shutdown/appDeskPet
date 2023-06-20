@@ -1,21 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    android:layout_width="230dp"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:background="#C8E8CA"
+    android:orientation="vertical"
+    android:padding="5dp">
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="选择标签"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
 
     <EditText
         android:id="@+id/editText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter some text" />
+        android:hint="新增/删除标签"
+        android:textSize="15sp" />
 
     <ListView
         android:id="@+id/listView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="300dp"
         android:choiceMode="singleChoice"
         android:divider="@android:color/darker_gray"
         android:dividerHeight="1dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right">
+        <Button
+            android:id="@+id/button_del"
+            android:layout_margin="5dp"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="删除" />
+        <Button
+            android:id="@+id/button_ok"
+            android:layout_margin="5dp"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="确认"/>
+    </LinearLayout>
 
 </LinearLayout>

@@ -98,32 +98,7 @@ public class ForestFragment extends Fragment {
     private void fetchData(DateRange dateRange, TextView topTitle, ForestViewModel viewModel) {
         topTitle.setText(topTitleText(dateRange));
         List<ForestDO> byRange = forestDao.findByRange(dateRange.getStart(), dateRange.getEnd());
-        getActivity().runOnUiThread(() -> {
-//            viewModel.getForestData().setValue(byRange);
-            //TODO
-            ForestDO mock1 = new ForestDO();
-            mock1.id = 1;
-            mock1.startTime = Utils.getToday().getTimeInMillis();
-            mock1.endTime = mock1.startTime + 3 * 60 * 60 * 1000;
-            mock1.resId = R.drawable.forest_tree_2;
-            ForestDO mock2 = new ForestDO();
-            mock2.id = 2;
-            mock2.startTime = Utils.getFirstDayOfWeek().getTimeInMillis();
-            mock2.endTime = mock2.startTime + 3 * 60 * 60 * 1000;
-            mock2.resId = R.drawable.forest_tree_2;
-            ForestDO mock3 = new ForestDO();
-            mock3.id = 3;
-            mock3.startTime = Utils.getFirstDayOfMonth().getTimeInMillis();
-            mock3.endTime = mock3.startTime + 3 * 60 * 60 * 1000;
-            mock3.resId = R.drawable.forest_tree_2;
-            ForestDO mock4 = new ForestDO();
-            mock4.id = 4;
-            mock4.startTime = Utils.getFirstDayOfYear().getTimeInMillis();
-            mock4.endTime = mock4.startTime + 3 * 60 * 60 * 1000;
-            mock4.resId = R.drawable.forest_tree_2;
-            List<ForestDO> mockData = List.of(mock1, mock2, mock3, mock4);
-            viewModel.getForestData().setValue(mockData);
-        });
+        getActivity().runOnUiThread(() -> viewModel.getForestData().setValue(byRange));
     }
 
     private String topTitleText(DateRange dateRange) {

@@ -1,14 +1,13 @@
 package com.xl.pet.ui.forest.time;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.EditText;
@@ -16,6 +15,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -32,13 +32,15 @@ import com.xl.pet.ui.forest.constants.FlagColors;
 import com.xl.pet.ui.forest.constants.TreeImages;
 import com.xl.pet.utils.DatabaseHelper;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class ForestTimeFragment extends Fragment {
 
-    private static final long MIN = 60 * 1000;
+    private static final long MIN = 1000;
 
+    private final Handler handler = new Handler(Looper.getMainLooper());
     private Timer mTimer;
     private Chronometer chronometer;
     private Button startPauseButton;
@@ -47,9 +49,6 @@ public class ForestTimeFragment extends Fragment {
 
     private boolean isRunning = false;
     private Integer selectResId = R.drawable.forest_tree_1;
-
-    private String[] items = {"Item 1", "Item 2", "Item 3", "Item 4", "Item 5"};
-    private String selectedItem;
 
     private ForestTimeViewModel viewModel;
 
@@ -72,6 +71,9 @@ public class ForestTimeFragment extends Fragment {
         Dialog popupDialog = createPopupDialog();
         EditText editText = popupDialog.findViewById(R.id.editText);
         ListView listView = popupDialog.findViewById(R.id.listView);
+        Button delButton = popupDialog.findViewById(R.id.button_del);
+        Button okButton = popupDialog.findViewById(R.id.button_ok);
+        delButton.setBackgroundColor(ContextCompat.getColor(this.getContext(), R.color.attention));
 
         //viewModel
         viewModel = ViewModelProviders.of(this).get(ForestTimeViewModel.class);
@@ -81,7 +83,7 @@ public class ForestTimeFragment extends Fragment {
             textView.setBackgroundColor(fetchColor(data.id));
         });
 
-        //button点击事件
+        //开始/结束button点击事件
         startPauseButton.setOnClickListener(v -> {
             if (isRunning) {
                 pauseChronometer();
@@ -89,8 +91,32 @@ public class ForestTimeFragment extends Fragment {
                 startChronometer();
             }
         });
+        //flag ok button点击事件
+        okButton.setOnClickListener(v -> {
+            String inputStr = trimStr(editText.getText().toString());
+            new Thread(() -> {
+                ForestFlagDO byFlag = forestFlagDao.findByFlag(inputStr);
+                if (null == byFlag) {
+                    forestFlagDao.insert(new ForestFlagDO(inputStr));
+                    refreshFlagList(listView);
+                }
+            }).start();
+        });
+        //flag del button点击事件
+        delButton.setOnClickListener(v -> {
+            String inputStr = trimStr(editText.getText().toString());
+            new Thread(() -> {
+                List<ForestFlagDO> flags = forestFlagDao.findAll();
+                if (!(flags.size() == 1 && flags.get(0).flag.equals(inputStr))) {
+                    forestFlagDao.deleteByFlag(inputStr);
+                    refreshFlagList(listView);
+                } else {
+                    message("至少保留一个标签噢");
+                }
+            }).start();
+        });
 
-        //显示弹窗
+        //图片点击事件显示弹窗
         image.setOnClickListener(v -> bottomSheetDialog.show());
         //树种点击事件
         gridView.setOnItemClickListener((parent, view, position, id) -> {
@@ -102,13 +128,16 @@ public class ForestTimeFragment extends Fragment {
             bottomSheetDialog.hide();
         });
 
-        //显示弹窗
-        textView.setOnClickListener(v -> popupDialog.show());
-        //标签点击事件
+        //标签点击事件显示弹窗
+        textView.setOnClickListener(v -> {
+            new Thread(() -> refreshFlagList(listView)).start();
+            popupDialog.show();
+        });
+        //标签列表点击事件
         listView.setOnItemClickListener((parent, view, position, id) -> {
-            // 根据列表项点击打印对应的内容
-            String selectedItem = (String) listView.getItemAtPosition(position);
-            System.out.println(selectedItem);
+            ForestFlagDO selectedItem = (ForestFlagDO) listView.getItemAtPosition(position);
+            viewModel.setFlag(selectedItem);
+            popupDialog.hide();
         });
 
 
@@ -129,6 +158,13 @@ public class ForestTimeFragment extends Fragment {
         if (null != mTimer) {
             mTimer.cancel();
         }
+        handler.removeCallbacksAndMessages(null);
+    }
+
+    private void refreshFlagList(ListView listView) {
+        List<ForestFlagDO> flags = forestFlagDao.findAll();
+        FlagAdapter flagAdapter = new FlagAdapter(this.getContext(), flags);
+        this.getActivity().runOnUiThread(() -> listView.setAdapter(flagAdapter));
     }
 
     private BottomSheetDialog createForestDialog() {
@@ -142,7 +178,6 @@ public class ForestTimeFragment extends Fragment {
     private Dialog createPopupDialog() {
         // 创建弹窗对象
         Dialog popupDialog = new Dialog(this.getContext());
-        // 设置弹窗的布局
         popupDialog.setContentView(R.layout.forest_flag_dialog);
         return popupDialog;
     }
@@ -184,7 +219,8 @@ public class ForestTimeFragment extends Fragment {
         startPauseButton.setText("开始");
         isRunning = false;
         mTimer.cancel();
-        new Thread(() -> insertData(chronometer.getBase(), SystemClock.elapsedRealtime(), viewModel.getResId().getValue(), viewModel.getFlag().getValue().flag))
+        new Thread(() -> insertData(chronometer.getBase(), SystemClock.elapsedRealtime(),
+                viewModel.getResId().getValue(), viewModel.getFlag().getValue().flag))
                 .start();
     }
 
@@ -207,6 +243,8 @@ public class ForestTimeFragment extends Fragment {
         if (endTime - startTime < MIN) {
             return;
         }
+        int time = (int) ((endTime - startTime) / MIN);
+        message(String.format("本次时长%d分钟", time));
         //时间不够是枯树
         if (restId != selectResId) {
             restId = R.drawable.forest_tree_decayed;
@@ -217,5 +255,13 @@ public class ForestTimeFragment extends Fragment {
         data.resId = restId;
         data.flag = flag;
         forestDao.insert(data);
+    }
+
+    private void message(String message) {
+        handler.post(() -> Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show());
+    }
+
+    private String trimStr(String str) {
+        return str.replaceAll("\\s+", "").replaceAll("[\\r\\n]", "");
     }
 }
