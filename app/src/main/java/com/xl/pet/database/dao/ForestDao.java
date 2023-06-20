@@ -15,6 +15,10 @@ public interface ForestDao {
     List<ForestDO> findByRange(long start, long end);
 
     @Insert
-    void insertEntities(List<ForestDO> forestList);
+    void insert(List<ForestDO> forestList);
+
+
+    @Insert
+    void insert(ForestDO forest);
 
 }

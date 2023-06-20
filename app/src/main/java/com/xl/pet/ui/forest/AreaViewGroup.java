@@ -90,7 +90,7 @@ public class AreaViewGroup extends RelativeLayout {
 
         // buildings
         if (null == data || data.isEmpty()) {
-            createBuilding(new FieldPoint(n / 2, n / 2), R.drawable.b_none, null);
+            createBuilding(new FieldPoint(n / 2, n / 2), R.drawable.forest_tree_none, null);
         } else {
             for (BuildingMode.Mode mode : data) {
                 createBuilding(new FieldPoint(mode.xI, mode.yI), mode.resId, mode.multiParam);

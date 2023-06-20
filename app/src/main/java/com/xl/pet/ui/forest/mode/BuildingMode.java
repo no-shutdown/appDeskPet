@@ -12,8 +12,8 @@ public class BuildingMode {
     public static Map<Integer, MultiParam> MULTI_PARAM_MAP = new HashMap<>();
 
     static {
-        MULTI_PARAM_MAP.put(R.drawable.b_room1, new MultiParam(1, 2, -0.5596f, -0.4774f, 0.41f));
-        MULTI_PARAM_MAP.put(R.drawable.b_car, new MultiParam(6, 2, -0.2344f, 0f, 0.7619f));
+//        MULTI_PARAM_MAP.put(R.drawable.b_room1, new MultiParam(1, 2, -0.5596f, -0.4774f, 0.41f));
+//        MULTI_PARAM_MAP.put(R.drawable.b_car, new MultiParam(6, 2, -0.2344f, 0f, 0.7619f));
     }
 
     public static class Mode implements Comparable<Mode> {

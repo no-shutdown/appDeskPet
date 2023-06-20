@@ -3,14 +3,14 @@ package com.xl.pet.database.entity;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "forest")
-public class ForestDO {
+@Entity(tableName = "forest_flag")
+public class ForestFlagDO {
     @PrimaryKey(autoGenerate = true)
     public int id;
 
-    public long startTime;
-    public long endTime;
-    public Integer resId;
     public String flag;
 
+    public ForestFlagDO(String flag) {
+        this.flag = flag;
+    }
 }
