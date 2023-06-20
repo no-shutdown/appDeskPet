@@ -239,6 +239,12 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
         }, 2000);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        timer.cancel();
+    }
+
     private void switchPeriod(Calendar calendar, boolean tag) {
         Calendar today = Utils.todayCalendar();
         if (calendar.compareTo(today) > 0) {

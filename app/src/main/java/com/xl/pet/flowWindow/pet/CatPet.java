@@ -249,7 +249,7 @@ public class CatPet extends Pet {
     @Override
     public void destroy() {
         super.destroy();
-        handler.removeCallbacks(randomRunnable);
+        handler.removeCallbacksAndMessages(null);
     }
 
     class RandomRunnable implements Runnable {

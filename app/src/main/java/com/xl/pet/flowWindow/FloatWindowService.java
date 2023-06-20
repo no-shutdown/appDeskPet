@@ -100,6 +100,7 @@ public class FloatWindowService extends Service {
         if (floatManager != null){
             floatManager.removeAll(getApplicationContext());
         }
+        handler.removeCallbacksAndMessages(null);
         stopForeground(true);
     }
 

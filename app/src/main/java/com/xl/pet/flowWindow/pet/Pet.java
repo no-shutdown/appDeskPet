@@ -84,7 +84,7 @@ public abstract class Pet extends View implements Actionable {
 
     //停止渲染
     public void destroy() {
-        handler.removeCallbacks(drawRunnable);
+        handler.removeCallbacksAndMessages(null);
     }
 
     class DrawRunnable implements Runnable {
