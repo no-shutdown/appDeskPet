@@ -45,7 +45,7 @@
             android:layout_margin="5dp"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:text="确认"/>
+            android:text="新增"/>
     </LinearLayout>
 
 </LinearLayout>

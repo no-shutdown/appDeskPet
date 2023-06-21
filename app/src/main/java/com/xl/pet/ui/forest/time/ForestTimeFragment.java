@@ -98,6 +98,9 @@ public class ForestTimeFragment extends Fragment {
         //flag ok button点击事件
         okButton.setOnClickListener(v -> {
             String inputStr = trimStr(editText.getText().toString());
+            if (inputStr.length() == 0) {
+                return;
+            }
             new Thread(() -> {
                 ForestFlagDO byFlag = forestFlagDao.findByFlag(inputStr);
                 if (null == byFlag) {
@@ -109,6 +112,9 @@ public class ForestTimeFragment extends Fragment {
         //flag del button点击事件
         delButton.setOnClickListener(v -> {
             String inputStr = trimStr(editText.getText().toString());
+            if (inputStr.length() == 0) {
+                return;
+            }
             new Thread(() -> {
                 List<ForestFlagDO> flags = forestFlagDao.findAll();
                 if (!(flags.size() == 1 && flags.get(0).flag.equals(inputStr))) {
