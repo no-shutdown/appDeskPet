@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 public class AreaViewGroup extends RelativeLayout {
 
     private static final Random RANDOM = new Random();
-    private static final int TREE_MINUTE = 30 * 60 * 1000;
+    private static final int TREE_MINUTE = 10 * 60 * 1000;
 
     public FieldView[][] fieldViews;
     public AbstractBuildingView[][] buildingViews;
@@ -251,7 +251,6 @@ public class AreaViewGroup extends RelativeLayout {
         if (rawData.isEmpty()) n = 5;
         else n = Math.max(minN(segmentItem), Utils.getMinSquare(treeNum));
         this.data = buildBuildingMode(rawData, n);
-        System.out.println("sssssss" + this.data.size());
         removeAllViews();
         refreshArea(getContext());
         requestLayout();

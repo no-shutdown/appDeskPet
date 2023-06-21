@@ -51,7 +51,7 @@ public class ForestTimeFragment extends Fragment {
     private ForestFlagDao forestFlagDao;
 
     private boolean isRunning = false;
-    private Integer selectResId = R.drawable.forest_tree_1;
+    private List<Integer> selectResId = TreeImages.list.get(0);
 
     private ForestTimeViewModel viewModel;
 
@@ -134,7 +134,7 @@ public class ForestTimeFragment extends Fragment {
                 return;
             }
             selectResId = TreeImages.list.get(position);
-            viewModel.setResId(selectResId);
+            viewModel.setResId(selectResId.get(selectResId.size() - 1));
             bottomSheetDialog.hide();
         });
 
@@ -152,7 +152,7 @@ public class ForestTimeFragment extends Fragment {
 
 
         //显示默认选择的树种
-        viewModel.setResId(selectResId);
+        viewModel.setResId(selectResId.get(selectResId.size() - 1));
         //显示默认标签
         new Thread(() -> {
             ForestFlagDO firstFlag = findFirstFlag();
@@ -208,17 +208,17 @@ public class ForestTimeFragment extends Fragment {
             public void run() {
                 long elapsedMillis = SystemClock.elapsedRealtime() - chronometer.getBase();
                 //超过30分钟显示全树
-                if (elapsedMillis >= 30 * MIN) {
-                    getActivity().runOnUiThread(() -> viewModel.setResId(selectResId));
+                if (elapsedMillis >= 120 * MIN) {
+                    getActivity().runOnUiThread(() -> viewModel.setResId(selectResId.get(4)));
                     cancel();
-                } else if (elapsedMillis >= 20 * MIN) {
-                    getActivity().runOnUiThread(() -> viewModel.setResId(R.drawable.forest_tree_seedlings5));
+                } else if (elapsedMillis >= 90 * MIN) {
+                    getActivity().runOnUiThread(() -> viewModel.setResId(selectResId.get(3)));
+                } else if (elapsedMillis >= 60 * MIN) {
+                    getActivity().runOnUiThread(() -> viewModel.setResId(selectResId.get(2)));
+                } else if (elapsedMillis >= 30 * MIN) {
+                    getActivity().runOnUiThread(() -> viewModel.setResId(selectResId.get(1)));
                 } else if (elapsedMillis >= 10 * MIN) {
-                    getActivity().runOnUiThread(() -> viewModel.setResId(R.drawable.forest_tree_seedlings4));
-                } else if (elapsedMillis >= 5 * MIN) {
-                    getActivity().runOnUiThread(() -> viewModel.setResId(R.drawable.forest_tree_seedlings3));
-                } else if (elapsedMillis >= 3 * MIN) {
-                    getActivity().runOnUiThread(() -> viewModel.setResId(R.drawable.forest_tree_seedlings2));
+                    getActivity().runOnUiThread(() -> viewModel.setResId(selectResId.get(0)));
                 }
             }
         }, 0, MIN);
@@ -251,10 +251,15 @@ public class ForestTimeFragment extends Fragment {
     private void insertData(long startTime, long endTime, int restId, String flag) {
         //不够1分钟不算
         if (endTime - startTime < MIN) {
+            message("1分钟都没有，不给你算时间");
             return;
         }
         int time = (int) ((endTime - startTime) / MIN);
-        message(String.format("本次时长%d分钟", time));
+        if (time < 10) {
+            message("小于10分钟，你将获得一颗枯树");
+        } else {
+            message(String.format("本次时长%d分钟", time));
+        }
         ForestDO data = new ForestDO();
         data.startTime = startTime;
         data.endTime = endTime;

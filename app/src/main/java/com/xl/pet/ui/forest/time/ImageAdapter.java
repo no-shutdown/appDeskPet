@@ -7,6 +7,7 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ImageAdapter extends BaseAdapter {
@@ -14,9 +15,12 @@ public class ImageAdapter extends BaseAdapter {
     private final Context context;
     private final List<Integer> imageIds;
 
-    public ImageAdapter(Context context, List<Integer> imageIds) {
+    public ImageAdapter(Context context, List<List<Integer>> imageIds) {
         this.context = context;
-        this.imageIds = imageIds;
+        this.imageIds = new ArrayList<>();
+        for (List<Integer> imageId : imageIds) {
+            this.imageIds.add(imageId.get(imageId.size() - 1));
+        }
     }
 
     @Override
