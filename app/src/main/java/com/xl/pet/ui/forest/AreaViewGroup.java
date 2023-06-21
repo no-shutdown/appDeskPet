@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 public class AreaViewGroup extends RelativeLayout {
 
     private static final Random RANDOM = new Random();
-    private static final int TREE_MINUTE = 10 * 1000;
+    private static final int TREE_MINUTE = 10 * 60 * 1000;
 
     public FieldView[][] fieldViews;
     public AbstractBuildingView[][] buildingViews;

@@ -38,7 +38,7 @@ import java.util.TimerTask;
 
 public class ForestTimeFragment extends Fragment {
 
-    private static final long MIN = 1000;
+    private static final long MIN = 60 * 1000;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private Timer mTimer;
