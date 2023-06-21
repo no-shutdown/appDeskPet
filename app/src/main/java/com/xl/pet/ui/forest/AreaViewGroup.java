@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 public class AreaViewGroup extends RelativeLayout {
 
     private static final Random RANDOM = new Random();
-    private static final int TREE_MINUTE = 60 * 60 * 1000;
+    private static final int TREE_MINUTE = 30 * 60 * 1000;
 
     public FieldView[][] fieldViews;
     public AbstractBuildingView[][] buildingViews;
@@ -251,6 +251,7 @@ public class AreaViewGroup extends RelativeLayout {
         if (rawData.isEmpty()) n = 5;
         else n = Math.max(minN(segmentItem), Utils.getMinSquare(treeNum));
         this.data = buildBuildingMode(rawData, n);
+        System.out.println("sssssss" + this.data.size());
         removeAllViews();
         refreshArea(getContext());
         requestLayout();
@@ -280,16 +281,23 @@ public class AreaViewGroup extends RelativeLayout {
         for (int index = 0; index < rawData.size(); index++) {
             ForestDO rawDatum = rawData.get(index);
             int num = (int) ((rawDatum.endTime - rawDatum.startTime) / TREE_MINUTE);
-            for (int treeI = 0; treeI < num; treeI++) {
+            if (0 == num) {
+                //不足时间，显示一颗枯树
                 int i = RANDOM.nextInt(n);
                 int j = RANDOM.nextInt(n);
-                AreaViewGroup.FieldPoint fieldPoint = new AreaViewGroup.FieldPoint(i, j);
-                if (set.contains(fieldPoint)) {
-                    treeI--;
-                    continue;
+                modes.add(new BuildingMode.Mode(i, j, R.drawable.forest_tree_decayed));
+            } else {
+                for (int treeI = 0; treeI < num; treeI++) {
+                    int i = RANDOM.nextInt(n);
+                    int j = RANDOM.nextInt(n);
+                    AreaViewGroup.FieldPoint fieldPoint = new AreaViewGroup.FieldPoint(i, j);
+                    if (set.contains(fieldPoint)) {
+                        treeI--;
+                        continue;
+                    }
+                    set.add(fieldPoint);
+                    modes.add(new BuildingMode.Mode(i, j, rawDatum.resId));
                 }
-                set.add(fieldPoint);
-                modes.add(new BuildingMode.Mode(i, j, rawDatum.resId));
             }
         }
         Stream<BuildingMode.Mode> sorted = modes.stream().sorted();

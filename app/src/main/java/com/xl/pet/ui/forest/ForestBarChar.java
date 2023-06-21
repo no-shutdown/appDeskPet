@@ -10,18 +10,22 @@ import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.xl.pet.database.entity.ForestDO;
 import com.xl.pet.ui.forest.mode.BarCharMode;
 import com.xl.pet.ui.forest.mode.DateRange;
 import com.xl.pet.utils.Utils;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
 public class ForestBarChar extends BarChart {
 
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.#");
+    private static final ValueFormatter VALUE_FORMATTER = new BarValueFormatter();
     private static final long ONE_MINUTE = 60 * 1000;
     private static final long ONE_HOUR = 60 * 60 * 1000;
     private static final long ONE_DAY = 24 * 60 * 60 * 1000;
@@ -44,6 +48,7 @@ public class ForestBarChar extends BarChart {
         BarDataSet dataSet = new BarDataSet(data.data, "统计");
         dataSet.setColor(0xFF7aa667); // 设置柱状图颜色
         BarData barData = new BarData(dataSet);
+        barData.setValueFormatter(VALUE_FORMATTER);
         this.getXAxis().setValueFormatter(new IndexAxisValueFormatter(data.xLabel));
         this.setData(barData);
         this.invalidate(); // 刷新图表
@@ -76,7 +81,7 @@ public class ForestBarChar extends BarChart {
             //计算每一条专注记录与间隔的交集时长
             for (ForestDO data : rawData)
                 sumTime += countIntersection(dataItem.reset(data.startTime, data.endTime), intervalItem);
-            entries.add(new BarEntry(i, sumTime * 1.0f / cell));
+            entries.add(new BarEntry(i, Float.parseFloat(DECIMAL_FORMAT.format(sumTime * 1.0f / cell))));
         }
         return new BarCharMode.Mode(xLabels, entries);
     }
@@ -87,5 +92,10 @@ public class ForestBarChar extends BarChart {
         return Math.max(0, end - start);
     }
 
-
+    protected static class BarValueFormatter extends ValueFormatter {
+        @Override
+        public String getFormattedValue(float value) {
+            return DECIMAL_FORMAT.format(value);
+        }
+    }
 }

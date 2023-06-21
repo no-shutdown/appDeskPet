@@ -38,11 +38,14 @@ import java.util.TimerTask;
 
 public class ForestTimeFragment extends Fragment {
 
-    private static final long MIN = 1000;
+    private static final long MIN = 60 * 1000;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private Timer mTimer;
     private Chronometer chronometer;
+    private long startTime;
+    private long endTime;
+
     private Button startPauseButton;
     private ForestDao forestDao;
     private ForestFlagDao forestFlagDao;
@@ -51,6 +54,7 @@ public class ForestTimeFragment extends Fragment {
     private Integer selectResId = R.drawable.forest_tree_1;
 
     private ForestTimeViewModel viewModel;
+
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -183,6 +187,7 @@ public class ForestTimeFragment extends Fragment {
     }
 
     private void startChronometer() {
+        startTime = System.currentTimeMillis();
         chronometer.setBase(SystemClock.elapsedRealtime());
         chronometer.start();
         startPauseButton.setBackgroundColor(ContextCompat.getColor(this.getContext(), R.color.attention));
@@ -214,14 +219,13 @@ public class ForestTimeFragment extends Fragment {
     }
 
     private void pauseChronometer() {
+        endTime = System.currentTimeMillis();
         chronometer.stop();
         startPauseButton.setBackgroundColor(ContextCompat.getColor(this.getContext(), R.color.colorPrimary));
         startPauseButton.setText("开始");
         isRunning = false;
         mTimer.cancel();
-        new Thread(() -> insertData(chronometer.getBase(), SystemClock.elapsedRealtime(),
-                viewModel.getResId().getValue(), viewModel.getFlag().getValue().flag))
-                .start();
+        new Thread(() -> insertData(startTime, endTime, viewModel.getResId().getValue(), viewModel.getFlag().getValue().flag)).start();
     }
 
     private ForestFlagDO findFirstFlag() {
@@ -245,10 +249,6 @@ public class ForestTimeFragment extends Fragment {
         }
         int time = (int) ((endTime - startTime) / MIN);
         message(String.format("本次时长%d分钟", time));
-        //时间不够是枯树
-        if (restId != selectResId) {
-            restId = R.drawable.forest_tree_decayed;
-        }
         ForestDO data = new ForestDO();
         data.startTime = startTime;
         data.endTime = endTime;
