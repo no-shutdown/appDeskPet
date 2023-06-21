@@ -1,17 +1,17 @@
 <resources>
-    <string name="app_name">pet</string>
+    <string name="app_name">spring into action</string>
 
     <string name="menu_forest_time">专注一下</string>
     <string name="menu_forest">我的森林</string>
     <string name="menu_menstruation">姨妈日历</string>
 
     <string name="title_forest_time">专注一下</string>
-    <string name="title_forest">我的的森林</string>
+    <string name="title_forest">我的森林</string>
     <string name="title_menstruation">姨妈日历</string>
 
-    <string name="nav_header_title">这里是标题</string>
+    <string name="nav_header_title">茉莉花香，双木成林</string>
     <string name="nav_header_subtitle">\@贫僧洗发水呢</string>
-    <string name="nav_header_desc">这里是描述</string>
+    <string name="nav_header_desc">spring into action</string>
 
     <string name="action_abort">关于我</string>
 </resources>
