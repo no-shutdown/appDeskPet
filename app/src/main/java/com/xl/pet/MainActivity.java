@@ -1,5 +1,6 @@
 package com.xl.pet;
 
+import android.app.AlertDialog;
 import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -72,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_forest, R.id.navigation_menstruation, R.id.navigation_forest_time)
+                R.id.navigation_forest_time, R.id.navigation_forest, R.id.navigation_menstruation)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
@@ -80,19 +82,16 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navigationView, navController);
         //添加左侧导航监听，设置toolBar和手机状态栏颜色
         navController.addOnDestinationChangedListener((navController1, navDestination, bundle) -> {
+            int primaryColor;
             if (R.id.navigation_forest_time == navDestination.getId()) {
-                int primaryBrightColor = ContextCompat.getColor(this, R.color.colorPrimaryBright);
-                binding.appBarMain.toolbar.setBackgroundColor(primaryBrightColor);
-                Window window = getWindow();
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.setStatusBarColor(primaryBrightColor);
+                primaryColor = ContextCompat.getColor(this, R.color.colorPrimaryBright);
             } else {
-                int primaryColor = ContextCompat.getColor(this, R.color.colorPrimary);
-                binding.appBarMain.toolbar.setBackgroundColor(primaryColor);
-                Window window = getWindow();
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.setStatusBarColor(primaryColor);
+                primaryColor = ContextCompat.getColor(this, R.color.colorPrimary);
             }
+            binding.appBarMain.toolbar.setBackgroundColor(primaryColor);
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(primaryColor);
         });
     }
 
@@ -134,6 +133,21 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_abort) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("关于我")  // 设置对话框标题
+                    .setMessage("该app系个人开发，仅供学习，不作为任何商业用途。部分界面参考自\"专注森林\"。如有侵权，联系必删。\n\n敬礼！( •̀ ω •́ )y");
+            AlertDialog dialog = builder.create();
+            dialog.show();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 
     @Override
     public boolean onSupportNavigateUp() {

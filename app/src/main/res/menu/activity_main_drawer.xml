@@ -5,16 +5,16 @@
 
     <group android:checkableBehavior="single">
         <item
+            android:id="@+id/navigation_forest_time"
+            android:icon="@drawable/ic_time"
+            android:title="@string/menu_forest_time" />
+        <item
             android:id="@+id/navigation_forest"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/ic_tree"
             android:title="@string/menu_forest" />
         <item
             android:id="@+id/navigation_menstruation"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/ic_calendar"
             android:title="@string/menu_menstruation" />
-        <item
-            android:id="@+id/navigation_forest_time"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="@string/menu_forest_time" />
     </group>
 </menu>
