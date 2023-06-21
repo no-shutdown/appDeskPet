@@ -38,7 +38,7 @@ import java.util.TimerTask;
 
 public class ForestTimeFragment extends Fragment {
 
-    private static final long MIN = 60 * 1000;
+    private static final long MIN = 1000;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private Timer mTimer;
@@ -209,10 +209,8 @@ public class ForestTimeFragment extends Fragment {
                 long elapsedMillis = SystemClock.elapsedRealtime() - chronometer.getBase();
                 //超过30分钟显示全树
                 if (elapsedMillis >= 120 * MIN) {
-                    getActivity().runOnUiThread(() -> viewModel.setResId(selectResId.get(4)));
-                    cancel();
-                } else if (elapsedMillis >= 90 * MIN) {
                     getActivity().runOnUiThread(() -> viewModel.setResId(selectResId.get(3)));
+                    cancel();
                 } else if (elapsedMillis >= 60 * MIN) {
                     getActivity().runOnUiThread(() -> viewModel.setResId(selectResId.get(2)));
                 } else if (elapsedMillis >= 30 * MIN) {
@@ -256,7 +254,8 @@ public class ForestTimeFragment extends Fragment {
         }
         int time = (int) ((endTime - startTime) / MIN);
         if (time < 10) {
-            message("小于10分钟，你将获得一颗枯树");
+            message("不足10分钟，你将获得一颗枯树");
+            restId = R.drawable.forest_tree_decayed;
         } else {
             message(String.format("本次时长%d分钟", time));
         }

@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 public class AreaViewGroup extends RelativeLayout {
 
     private static final Random RANDOM = new Random();
-    private static final int TREE_MINUTE = 10 * 60 * 1000;
+    private static final int TREE_MINUTE = 10 * 1000;
 
     public FieldView[][] fieldViews;
     public AbstractBuildingView[][] buildingViews;
@@ -279,24 +279,17 @@ public class AreaViewGroup extends RelativeLayout {
         Set<FieldPoint> set = new HashSet<>();
         for (int index = 0; index < rawData.size(); index++) {
             ForestDO rawDatum = rawData.get(index);
-            int num = (int) ((rawDatum.endTime - rawDatum.startTime) / TREE_MINUTE);
-            if (0 == num) {
-                //不足时间，显示一颗枯树
+            double num = Math.ceil((rawDatum.endTime - rawDatum.startTime) * 1.0f / TREE_MINUTE);
+            for (int treeI = 0; treeI < num; treeI++) {
                 int i = RANDOM.nextInt(n);
                 int j = RANDOM.nextInt(n);
-                modes.add(new BuildingMode.Mode(i, j, R.drawable.forest_tree_decayed));
-            } else {
-                for (int treeI = 0; treeI < num; treeI++) {
-                    int i = RANDOM.nextInt(n);
-                    int j = RANDOM.nextInt(n);
-                    AreaViewGroup.FieldPoint fieldPoint = new AreaViewGroup.FieldPoint(i, j);
-                    if (set.contains(fieldPoint)) {
-                        treeI--;
-                        continue;
-                    }
-                    set.add(fieldPoint);
-                    modes.add(new BuildingMode.Mode(i, j, rawDatum.resId));
+                AreaViewGroup.FieldPoint fieldPoint = new AreaViewGroup.FieldPoint(i, j);
+                if (set.contains(fieldPoint)) {
+                    treeI--;
+                    continue;
                 }
+                set.add(fieldPoint);
+                modes.add(new BuildingMode.Mode(i, j, rawDatum.resId));
             }
         }
         Stream<BuildingMode.Mode> sorted = modes.stream().sorted();
