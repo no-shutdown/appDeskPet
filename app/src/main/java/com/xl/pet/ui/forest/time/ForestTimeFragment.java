@@ -41,10 +41,9 @@ public class ForestTimeFragment extends Fragment {
     private static final long MIN = 60 * 1000;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
-    private Timer mTimer;
+    private Timer treeTimer;
     private Chronometer chronometer;
     private long startTime;
-    private long endTime;
 
     private Button startPauseButton;
     private ForestDao forestDao;
@@ -90,9 +89,9 @@ public class ForestTimeFragment extends Fragment {
         //开始/结束button点击事件
         startPauseButton.setOnClickListener(v -> {
             if (isRunning) {
-                pauseChronometer();
+                stopTime();
             } else {
-                startChronometer();
+                startTime();
             }
         });
         //flag ok button点击事件
@@ -127,12 +126,14 @@ public class ForestTimeFragment extends Fragment {
         });
 
         //图片点击事件显示弹窗
-        image.setOnClickListener(v -> bottomSheetDialog.show());
-        //树种点击事件
-        gridView.setOnItemClickListener((parent, view, position, id) -> {
+        image.setOnClickListener(v -> {
             if (isRunning) {
                 return;
             }
+            bottomSheetDialog.show();
+        });
+        //树种点击事件
+        gridView.setOnItemClickListener((parent, view, position, id) -> {
             selectResId = TreeImages.list.get(position);
             viewModel.setResId(selectResId.get(selectResId.size() - 1));
             bottomSheetDialog.hide();
@@ -140,6 +141,9 @@ public class ForestTimeFragment extends Fragment {
 
         //标签点击事件显示弹窗
         textView.setOnClickListener(v -> {
+            if (isRunning) {
+                return;
+            }
             new Thread(() -> refreshFlagList(listView)).start();
             popupDialog.show();
         });
@@ -165,8 +169,8 @@ public class ForestTimeFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (null != mTimer) {
-            mTimer.cancel();
+        if (null != treeTimer) {
+            treeTimer.cancel();
         }
         handler.removeCallbacksAndMessages(null);
     }
@@ -192,7 +196,7 @@ public class ForestTimeFragment extends Fragment {
         return popupDialog;
     }
 
-    private void startChronometer() {
+    private void startTime() {
         startTime = System.currentTimeMillis();
         chronometer.setBase(SystemClock.elapsedRealtime());
         chronometer.start();
@@ -202,8 +206,8 @@ public class ForestTimeFragment extends Fragment {
 
         //先设置为小树苗，然后根据时间升级树种
         viewModel.setResId(R.drawable.forest_tree_seedlings1);
-        mTimer = new Timer();
-        mTimer.schedule(new TimerTask() {
+        treeTimer = new Timer();
+        treeTimer.schedule(new TimerTask() {
             @Override
             public void run() {
                 long elapsedMillis = SystemClock.elapsedRealtime() - chronometer.getBase();
@@ -222,14 +226,13 @@ public class ForestTimeFragment extends Fragment {
         }, 0, MIN);
     }
 
-    private void pauseChronometer() {
-        endTime = System.currentTimeMillis();
+    private void stopTime() {
         chronometer.stop();
         startPauseButton.setBackgroundColor(ContextCompat.getColor(this.getContext(), R.color.colorPrimary));
         startPauseButton.setText("开始");
         isRunning = false;
-        mTimer.cancel();
-        new Thread(() -> insertData(startTime, endTime, viewModel.getResId().getValue(), viewModel.getFlag().getValue().flag)).start();
+        treeTimer.cancel();
+        insertData();
     }
 
     private ForestFlagDO findFirstFlag() {
@@ -246,7 +249,10 @@ public class ForestTimeFragment extends Fragment {
         return FlagColors.list.get(index);
     }
 
-    private void insertData(long startTime, long endTime, int restId, String flag) {
+    private void insertData() {
+        int restId = viewModel.getResId().getValue();
+        String flag = String.copyValueOf(viewModel.getFlag().getValue().flag.toCharArray());
+        long endTime = System.currentTimeMillis();
         //不够1分钟不算
         if (endTime - startTime < MIN) {
             message("1分钟都没有，不给你算时间");
@@ -264,7 +270,7 @@ public class ForestTimeFragment extends Fragment {
         data.endTime = endTime;
         data.resId = restId;
         data.flag = flag;
-        forestDao.insert(data);
+        new Thread(() -> forestDao.insert(data)).start();
     }
 
     private void message(String message) {
