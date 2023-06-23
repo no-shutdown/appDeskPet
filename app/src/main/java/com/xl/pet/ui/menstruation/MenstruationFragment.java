@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +19,7 @@ import com.haibin.calendarview.CalendarView;
 import com.xl.pet.R;
 import com.xl.pet.database.dao.MenstruationDao;
 import com.xl.pet.database.entity.MenstruationDO;
+import com.xl.pet.ui.menstruation.constants.Settings;
 import com.xl.pet.ui.menstruation.constants.TagEnum;
 import com.xl.pet.utils.DatabaseHelper;
 import com.xl.pet.utils.Utils;
@@ -59,10 +61,15 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
 
         tvMonth = root.findViewById(R.id.tv_month);
         mCalendarView = root.findViewById(R.id.calendarView);
+        LinearLayout simplyLayout = root.findViewById(R.id.simplyLayout);
+        tvTip = root.findViewById(R.id.tv_tip);
+
         viewModel.getmMonth().observe(getViewLifecycleOwner(), s -> tvMonth.setText(s));
         viewModel.getData().observe(getViewLifecycleOwner(), this::refreshCalendar);
 
-        tvTip = root.findViewById(R.id.tv_tip);
+        if (Settings.simple) {
+            simplyLayout.setVisibility(View.GONE);
+        }
 
         return root;
     }
@@ -135,10 +142,12 @@ public class MenstruationFragment extends Fragment implements com.haibin.calenda
                 //只会将经期天数至少3天的作为周期推断
                 int currentDays = end.differ(start) + 1;
                 if (currentDays > 2) {
-                    //安全期：经期第一天前7后8
-                    putSecurity(start, end, currentDays);
-                    //排卵日：经期第一天往前推14天 | 排卵期：排卵日前5后4
-                    putOvulation(start);
+                    if (!Settings.simple) {
+                        //安全期：经期第一天前7后8
+                        putSecurity(start, end, currentDays);
+                        //排卵日：经期第一天往前推14天 | 排卵期：排卵日前5后4
+                        putOvulation(start);
+                    }
 
                     //记录上次经期日期，周期天数和经期天数
                     days.add(currentDays);
