@@ -257,7 +257,7 @@ public class ForestTimeFragment extends Fragment {
                     getActivity().runOnUiThread(() -> viewModel.setResId(selectResId.get(2)));
                 } else if (elapsedMillis >= 30 * MIN) {
                     getActivity().runOnUiThread(() -> viewModel.setResId(selectResId.get(1)));
-                } else if (elapsedMillis >= 1 * MIN) {
+                } else if (elapsedMillis >= 10 * MIN) {
                     getActivity().runOnUiThread(() -> viewModel.setResId(selectResId.get(0)));
                 }
             }
