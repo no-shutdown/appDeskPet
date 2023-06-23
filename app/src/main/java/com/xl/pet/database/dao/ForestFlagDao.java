@@ -19,6 +19,9 @@ public interface ForestFlagDao {
     @Query("SELECT * FROM forest_flag WHERE flag=:flag LIMIT 1")
     ForestFlagDO findByFlag(String flag);
 
+    @Query("SELECT * FROM forest_flag WHERE id=:id LIMIT 1")
+    ForestFlagDO findById(int id);
+
     @Query("DELETE FROM forest_flag WHERE flag=:flag")
     void deleteByFlag(String flag);
 

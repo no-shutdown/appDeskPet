@@ -7,6 +7,7 @@ import androidx.room.Room;
 import com.xl.pet.database.AppDatabase;
 import com.xl.pet.database.dao.ForestDao;
 import com.xl.pet.database.dao.ForestFlagDao;
+import com.xl.pet.database.dao.LastForestDao;
 import com.xl.pet.database.dao.MenstruationDao;
 
 public class DatabaseHelper {
@@ -30,6 +31,10 @@ public class DatabaseHelper {
 
     public static ForestFlagDao forestFlagDao() {
         return appDatabase.forestFlagDao();
+    }
+
+    public static LastForestDao lastForestDao() {
+        return appDatabase.lastForestDao();
     }
 
 }

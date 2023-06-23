@@ -26,8 +26,10 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.xl.pet.R;
 import com.xl.pet.database.dao.ForestDao;
 import com.xl.pet.database.dao.ForestFlagDao;
+import com.xl.pet.database.dao.LastForestDao;
 import com.xl.pet.database.entity.ForestDO;
 import com.xl.pet.database.entity.ForestFlagDO;
+import com.xl.pet.database.entity.LastForestDO;
 import com.xl.pet.ui.forest.constants.FlagColors;
 import com.xl.pet.ui.forest.constants.TreeImages;
 import com.xl.pet.utils.DatabaseHelper;
@@ -45,21 +47,23 @@ public class ForestTimeFragment extends Fragment {
     private Chronometer chronometer;
     private long startTime;
 
-    private Button startPauseButton;
     private ForestDao forestDao;
     private ForestFlagDao forestFlagDao;
+    private LastForestDao lastForestDao;
 
+    private Button startPauseButton;
     private boolean isRunning = false;
-    private List<Integer> selectResId = TreeImages.list.get(0);
+    private int selectPosition;
+    private List<Integer> selectResId;
 
     private ForestTimeViewModel viewModel;
 
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_forest_time, container, false);
         forestDao = DatabaseHelper.forestDao();
         forestFlagDao = DatabaseHelper.forestFlagDao();
+        lastForestDao = DatabaseHelper.lastForestDao();
 
         chronometer = root.findViewById(R.id.chronometer);
         startPauseButton = root.findViewById(R.id.startPauseButton);
@@ -89,9 +93,9 @@ public class ForestTimeFragment extends Fragment {
         //开始/结束button点击事件
         startPauseButton.setOnClickListener(v -> {
             if (isRunning) {
-                stopTime();
+                stopClock();
             } else {
-                startTime();
+                startClock(System.currentTimeMillis(), SystemClock.elapsedRealtime());
             }
         });
         //flag ok button点击事件
@@ -134,7 +138,8 @@ public class ForestTimeFragment extends Fragment {
         });
         //树种点击事件
         gridView.setOnItemClickListener((parent, view, position, id) -> {
-            selectResId = TreeImages.list.get(position);
+            selectPosition = position;
+            selectResId = TreeImages.list.get(selectPosition);
             viewModel.setResId(selectResId.get(selectResId.size() - 1));
             bottomSheetDialog.hide();
         });
@@ -155,12 +160,26 @@ public class ForestTimeFragment extends Fragment {
         });
 
 
-        //显示默认选择的树种
-        viewModel.setResId(selectResId.get(selectResId.size() - 1));
-        //显示默认标签
         new Thread(() -> {
-            ForestFlagDO firstFlag = findFirstFlag();
-            getActivity().runOnUiThread(() -> viewModel.setFlag(firstFlag));
+            LastForestDO first = lastForestDao.findFirst();
+            if (null != first) {
+                //继续上次未结束的树种
+                selectResId = TreeImages.list.get(first.resPosition);
+                getActivity().runOnUiThread(() -> viewModel.setResId(selectResId.get(selectResId.size() - 1)));
+                //继续上次未结束的标签
+                ForestFlagDO lastFlag = forestFlagDao.findById(first.flagId);
+                getActivity().runOnUiThread(() -> viewModel.setFlag(lastFlag));
+                //继续上次未结束的startTime, baseTime,
+                getActivity().runOnUiThread(() -> startClock(first.startTime, first.baseTime));
+            } else {
+                //显示默认选择的树种
+                selectPosition = 0;
+                selectResId = TreeImages.list.get(selectPosition);
+                getActivity().runOnUiThread(() -> viewModel.setResId(selectResId.get(selectResId.size() - 1)));
+                //显示默认标签
+                ForestFlagDO firstFlag = findFirstFlag();
+                getActivity().runOnUiThread(() -> viewModel.setFlag(firstFlag));
+            }
         }).start();
 
         return root;
@@ -173,6 +192,25 @@ public class ForestTimeFragment extends Fragment {
             treeTimer.cancel();
         }
         handler.removeCallbacksAndMessages(null);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (isRunning) {
+            new Thread(() -> {
+                LastForestDO forestLog = lastForestDao.findFirst();
+                if (null == forestLog) {
+                    forestLog = new LastForestDO();
+                    forestLog.id = 1;
+                    forestLog.baseTime = chronometer.getBase();
+                    forestLog.startTime = startTime;
+                    forestLog.resPosition = selectPosition;
+                    forestLog.flagId = viewModel.getFlag().getValue().id;
+                    lastForestDao.insert(forestLog);
+                }
+            }).start();
+        }
     }
 
     private void refreshFlagList(ListView listView) {
@@ -196,9 +234,9 @@ public class ForestTimeFragment extends Fragment {
         return popupDialog;
     }
 
-    private void startTime() {
-        startTime = System.currentTimeMillis();
-        chronometer.setBase(SystemClock.elapsedRealtime());
+    private void startClock(long start, long base) {
+        startTime = start;
+        chronometer.setBase(base);
         chronometer.start();
         startPauseButton.setBackgroundColor(ContextCompat.getColor(this.getContext(), R.color.attention));
         startPauseButton.setText("结束");
@@ -219,14 +257,14 @@ public class ForestTimeFragment extends Fragment {
                     getActivity().runOnUiThread(() -> viewModel.setResId(selectResId.get(2)));
                 } else if (elapsedMillis >= 30 * MIN) {
                     getActivity().runOnUiThread(() -> viewModel.setResId(selectResId.get(1)));
-                } else if (elapsedMillis >= 10 * MIN) {
+                } else if (elapsedMillis >= 1 * MIN) {
                     getActivity().runOnUiThread(() -> viewModel.setResId(selectResId.get(0)));
                 }
             }
         }, 0, MIN);
     }
 
-    private void stopTime() {
+    private void stopClock() {
         chronometer.stop();
         startPauseButton.setBackgroundColor(ContextCompat.getColor(this.getContext(), R.color.colorPrimary));
         startPauseButton.setText("开始");
@@ -270,7 +308,10 @@ public class ForestTimeFragment extends Fragment {
         data.endTime = endTime;
         data.resId = restId;
         data.flag = flag;
-        new Thread(() -> forestDao.insert(data)).start();
+        new Thread(() -> {
+            forestDao.insert(data);
+            lastForestDao.del();
+        }).start();
     }
 
     private void message(String message) {
